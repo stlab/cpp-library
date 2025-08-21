@@ -24,7 +24,8 @@ function(_cpp_library_setup_docs)
     if(NOT TARGET doxygen-awesome-css)
         CPMAddPackage(
             NAME doxygen-awesome-css
-            URI gh:jothepro/doxygen-awesome-css@2.3.4
+            GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
+            GIT_TAG v2.3.4
             DOWNLOAD_ONLY YES
         )
     endif()
