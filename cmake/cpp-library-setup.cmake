@@ -10,6 +10,7 @@ function(_cpp_library_setup_core)
         NAMESPACE
         HEADER_DIR
         REQUIRES_CPP_VERSION
+        TOP_LEVEL
     )
     set(multiValueArgs
         HEADERS
@@ -45,7 +46,7 @@ function(_cpp_library_setup_core)
     endif()
     
     # Only set up full installation when building as top-level project
-    if(PROJECT_IS_TOP_LEVEL)
+    if(ARG_TOP_LEVEL)
         include(GNUInstallDirs)
         include(CMakePackageConfigHelpers)
         

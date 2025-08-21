@@ -84,6 +84,92 @@ HTML_EXTRA_FILES       = @AWESOME_CSS_PATH@/doxygen-awesome-darkmode-toggle.js \
 HTML_HEADER            = 
 USE_MDFILE_AS_MAINPAGE = README.md
 ")
+set(CPP_LIBRARY_CI_TEMPLATE "name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [gcc, clang, msvc]
+        exclude:
+          - os: ubuntu-latest
+            compiler: msvc
+          - os: macos-latest
+            compiler: msvc
+          - os: macos-latest
+            compiler: gcc
+          - os: windows-latest
+            compiler: gcc
+          - os: windows-latest
+            compiler: clang
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@master
+
+    - name: Setup GCC
+      if: matrix.compiler == 'gcc'
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: latest
+
+    - name: Setup Clang
+      if: matrix.compiler == 'clang' && matrix.os == 'ubuntu-latest'
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: latest
+
+    - name: Setup MSVC
+      if: matrix.compiler == 'msvc'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Configure CMake
+      run: cmake --preset=test
+
+    - name: Build
+      run: cmake --build --preset=test
+
+    - name: Test
+      run: ctest --preset=test
+
+  docs:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@master
+      
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+    
+    - name: Configure CMake
+      run: cmake --preset=docs
+    
+    - name: Build Documentation
+      run: cmake --build --preset=docs
+    
+    - name: Deploy to GitHub Pages
+      if: success() && '@ENABLE_DOCS_DEPLOYMENT@' == 'true'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/docs/html
+        destination_dir: @PROJECT_NAME@
+")
 
 # === cpp-library-setup.cmake ===
 function(_cpp_library_setup_core)
@@ -339,6 +425,68 @@ function(_cpp_library_generate_presets)
 endfunction()
 
 
+# === cpp-library-ci.cmake ===
+function(_cpp_library_setup_ci)
+    set(options
+        CI_DEPLOY_DOCS
+    )
+    set(oneValueArgs
+        NAME
+        VERSION
+        DESCRIPTION
+    )
+    set(multiValueArgs
+        CI_PLATFORMS
+        CI_COMPILERS
+    )
+    
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    
+    # Set defaults
+    if(NOT ARG_CI_PLATFORMS)
+        set(ARG_CI_PLATFORMS "ubuntu-latest" "macos-latest" "windows-latest")
+    endif()
+    if(NOT ARG_CI_COMPILERS)
+        set(ARG_CI_COMPILERS "gcc" "clang" "msvc")
+    endif()
+    
+    # Only generate CI files if they don't exist
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml")
+        # Create .github/workflows directory
+        file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows")
+        
+        # Determine template source
+        if(DEFINED CPP_LIBRARY_CI_TEMPLATE)
+            # Embedded template (packaged version)
+            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/cpp-library-ci.yml.in" "${CPP_LIBRARY_CI_TEMPLATE}")
+            set(TEMPLATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/cpp-library-ci.yml.in")
+        else()
+            # External template file (development version)
+            set(TEMPLATE_FILE "${CPP_LIBRARY_ROOT}/templates/.github/workflows/ci.yml.in")
+        endif()
+        
+        # Configure template variables
+        set(PROJECT_NAME "${ARG_NAME}")
+        set(PROJECT_VERSION "${ARG_VERSION}")
+        set(PROJECT_DESCRIPTION "${ARG_DESCRIPTION}")
+        if(ARG_CI_DEPLOY_DOCS)
+            set(ENABLE_DOCS_DEPLOYMENT "true")
+        else()
+            set(ENABLE_DOCS_DEPLOYMENT "false")
+        endif()
+        
+        configure_file(
+            "${TEMPLATE_FILE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml"
+            @ONLY
+        )
+        
+        message(STATUS "Generated .github/workflows/ci.yml for ${ARG_NAME}")
+    endif()
+    
+endfunction()
+
+
 # === Main cpp_library_setup function ===
 # Main entry point function - users call this to set up their library
 function(cpp_library_setup)
@@ -346,6 +494,8 @@ function(cpp_library_setup)
     set(options 
         CUSTOM_INSTALL          # Skip default installation
         NO_PRESETS             # Skip CMakePresets.json generation
+        ENABLE_CI              # Generate CI files
+        CI_DEPLOY_DOCS         # Enable docs deployment in CI
     )
     set(oneValueArgs
         NAME                    # Project name (e.g., "stlab-enum-ops")
@@ -361,6 +511,8 @@ function(cpp_library_setup)
         TESTS                  # Test executables to build  
         DOCS_EXCLUDE_SYMBOLS   # Symbols to exclude from docs
         ADDITIONAL_DEPS        # Extra CPM dependencies
+        CI_PLATFORMS           # CI platforms (default: ubuntu-latest, macos-latest, windows-latest)
+        CI_COMPILERS           # CI compilers (default: gcc, clang, msvc)
     )
     
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -416,6 +568,17 @@ function(cpp_library_setup)
             VERSION "${ARG_VERSION}"
             DESCRIPTION "${ARG_DESCRIPTION}"
             DOCS_EXCLUDE_SYMBOLS "${ARG_DOCS_EXCLUDE_SYMBOLS}"
+        )
+    endif()
+    
+    if(ARG_ENABLE_CI AND PROJECT_IS_TOP_LEVEL)
+        _cpp_library_setup_ci(
+            NAME "${ARG_NAME}"
+            VERSION "${ARG_VERSION}"
+            DESCRIPTION "${ARG_DESCRIPTION}"
+            CI_PLATFORMS "${ARG_CI_PLATFORMS}"
+            CI_COMPILERS "${ARG_CI_COMPILERS}"
+            CI_DEPLOY_DOCS "${ARG_CI_DEPLOY_DOCS}"
         )
     endif()
     

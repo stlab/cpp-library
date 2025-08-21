@@ -16,6 +16,7 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")  
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-presets.cmake")
+include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
 # Main entry point function - users call this to set up their library
 function(cpp_library_setup)
@@ -23,6 +24,7 @@ function(cpp_library_setup)
     set(options 
         CUSTOM_INSTALL          # Skip default installation
         NO_PRESETS             # Skip CMakePresets.json generation
+        NO_CI                  # Skip CI generation (CI enabled by default)
     )
     set(oneValueArgs
         NAME                    # Project name (e.g., "stlab-enum-ops")
@@ -64,7 +66,7 @@ function(cpp_library_setup)
         set(ARG_REQUIRES_CPP_VERSION 17)
     endif()
     
-    # Call component setup functions
+    # Create the basic library target (always done)
     _cpp_library_setup_core(
         NAME "${ARG_NAME}"
         VERSION "${ARG_VERSION}" 
@@ -73,13 +75,21 @@ function(cpp_library_setup)
         HEADERS "${ARG_HEADERS}"
         HEADER_DIR "${ARG_HEADER_DIR}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
+        TOP_LEVEL "${PROJECT_IS_TOP_LEVEL}"
     )
     
-    if(NOT ARG_NO_PRESETS AND PROJECT_IS_TOP_LEVEL)
+    # Only setup development infrastructure when building as top-level project
+    if(NOT PROJECT_IS_TOP_LEVEL)
+        return()  # Early return for lightweight consumer mode
+    endif()
+    
+    # Generate CMakePresets.json (unless disabled)
+    if(NOT ARG_NO_PRESETS)
         _cpp_library_generate_presets()
     endif()
     
-    if(BUILD_TESTING AND PROJECT_IS_TOP_LEVEL AND ARG_TESTS)
+    # Setup testing (if tests are specified)
+    if(BUILD_TESTING AND ARG_TESTS)
         _cpp_library_setup_testing(
             NAME "${ARG_NAME}"
             NAMESPACE "${ARG_NAMESPACE}" 
@@ -87,7 +97,8 @@ function(cpp_library_setup)
         )
     endif()
     
-    if(BUILD_DOCS AND PROJECT_IS_TOP_LEVEL)
+    # Setup documentation (always for top-level)
+    if(BUILD_DOCS)
         _cpp_library_setup_docs(
             NAME "${ARG_NAME}"
             VERSION "${ARG_VERSION}"
@@ -96,8 +107,18 @@ function(cpp_library_setup)
         )
     endif()
     
-    # Build examples if specified
-    if(PROJECT_IS_TOP_LEVEL AND ARG_EXAMPLES)
+    # Setup CI (unless disabled)
+    if(NOT ARG_NO_CI)
+        _cpp_library_setup_ci(
+            NAME "${ARG_NAME}"
+            VERSION "${ARG_VERSION}"
+            DESCRIPTION "${ARG_DESCRIPTION}"
+            CI_DEPLOY_DOCS YES  # Always enable docs deployment
+        )
+    endif()
+    
+    # Build examples if specified  
+    if(ARG_EXAMPLES)
         foreach(example IN LISTS ARG_EXAMPLES)
             if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/example/${example}.cpp")
                 string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")

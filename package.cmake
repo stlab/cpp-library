@@ -14,11 +14,13 @@ file(READ ${SOURCE_DIR}/cmake/cpp-library-setup.cmake SETUP_CONTENT)
 file(READ ${SOURCE_DIR}/cmake/cpp-library-testing.cmake TESTING_CONTENT)  
 file(READ ${SOURCE_DIR}/cmake/cpp-library-docs.cmake DOCS_CONTENT)
 file(READ ${SOURCE_DIR}/cmake/cpp-library-presets.cmake PRESETS_CONTENT)
+file(READ ${SOURCE_DIR}/cmake/cpp-library-ci.cmake CI_CONTENT)
 
 # Read template files
 file(READ ${SOURCE_DIR}/templates/CMakePresets.json.in PRESETS_TEMPLATE)
 file(READ ${SOURCE_DIR}/templates/Config.cmake.in CONFIG_TEMPLATE)
 file(READ ${SOURCE_DIR}/templates/Doxyfile.in DOXYFILE_TEMPLATE)
+file(READ ${SOURCE_DIR}/templates/.github/workflows/ci.yml.in CI_TEMPLATE)
 
 # Escape templates for embedding
 string(REPLACE "\\" "\\\\" PRESETS_TEMPLATE "${PRESETS_TEMPLATE}")
@@ -27,12 +29,15 @@ string(REPLACE "\\" "\\\\" CONFIG_TEMPLATE "${CONFIG_TEMPLATE}")
 string(REPLACE "\"" "\\\"" CONFIG_TEMPLATE "${CONFIG_TEMPLATE}")
 string(REPLACE "\\" "\\\\" DOXYFILE_TEMPLATE "${DOXYFILE_TEMPLATE}")
 string(REPLACE "\"" "\\\"" DOXYFILE_TEMPLATE "${DOXYFILE_TEMPLATE}")
+string(REPLACE "\\" "\\\\" CI_TEMPLATE "${CI_TEMPLATE}")
+string(REPLACE "\"" "\\\"" CI_TEMPLATE "${CI_TEMPLATE}")
 
 # Clean up module content (remove duplicate headers)
 string(REGEX REPLACE "^# SPDX-License-Identifier: BSL-1\\.0[^\n]*\n#[^\n]*\n#[^\n]*\n\n?" "" SETUP_CLEAN "${SETUP_CONTENT}")
 string(REGEX REPLACE "^# SPDX-License-Identifier: BSL-1\\.0[^\n]*\n#[^\n]*\n#[^\n]*\n\n?" "" TESTING_CLEAN "${TESTING_CONTENT}")
 string(REGEX REPLACE "^# SPDX-License-Identifier: BSL-1\\.0[^\n]*\n#[^\n]*\n#[^\n]*\n\n?" "" DOCS_CLEAN "${DOCS_CONTENT}")
 string(REGEX REPLACE "^# SPDX-License-Identifier: BSL-1\\.0[^\n]*\n#[^\n]*\n#[^\n]*\n\n?" "" PRESETS_CLEAN "${PRESETS_CONTENT}")
+string(REGEX REPLACE "^# SPDX-License-Identifier: BSL-1\\.0[^\n]*\n#[^\n]*\n#[^\n]*\n\n?" "" CI_CLEAN "${CI_CONTENT}")
 
 # Fix template paths in setup module
 string(REPLACE "\"\${CPP_LIBRARY_ROOT}/templates/Config.cmake.in\"" "\"\${CMAKE_CURRENT_BINARY_DIR}/cpp-library-config.cmake.in\"" SETUP_CLEAN "${SETUP_CLEAN}")
@@ -71,6 +76,7 @@ include(CTest)
 set(CPP_LIBRARY_PRESETS_TEMPLATE \"${PRESETS_TEMPLATE}\")
 set(CPP_LIBRARY_CONFIG_TEMPLATE \"${CONFIG_TEMPLATE}\")  
 set(CPP_LIBRARY_DOXYFILE_TEMPLATE \"${DOXYFILE_TEMPLATE}\")
+set(CPP_LIBRARY_CI_TEMPLATE \"${CI_TEMPLATE}\")
 
 # === cpp-library-setup.cmake ===
 ${SETUP_CLEAN}
@@ -83,6 +89,9 @@ ${DOCS_CLEAN}
 
 # === cpp-library-presets.cmake ===
 ${PRESETS_CLEAN}
+
+# === cpp-library-ci.cmake ===
+${CI_CLEAN}
 
 # === Main cpp_library_setup function ===
 ${MAIN_CLEAN}")
