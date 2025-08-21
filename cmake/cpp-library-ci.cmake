@@ -3,28 +3,14 @@
 # cpp-library-ci.cmake - CI setup functionality
 
 function(_cpp_library_setup_ci)
-    set(options
-        CI_DEPLOY_DOCS
-    )
     set(oneValueArgs
         NAME
         VERSION
         DESCRIPTION
-    )
-    set(multiValueArgs
-        CI_PLATFORMS
-        CI_COMPILERS
+        CI_DEPLOY_DOCS  # Always YES, but kept as parameter for template substitution
     )
     
-    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    
-    # Set defaults
-    if(NOT ARG_CI_PLATFORMS)
-        set(ARG_CI_PLATFORMS "ubuntu-latest" "macos-latest" "windows-latest")
-    endif()
-    if(NOT ARG_CI_COMPILERS)
-        set(ARG_CI_COMPILERS "gcc" "clang" "msvc")
-    endif()
+    cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
     
     # Only generate CI files if they don't exist
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml")
@@ -45,11 +31,7 @@ function(_cpp_library_setup_ci)
         set(PROJECT_NAME "${ARG_NAME}")
         set(PROJECT_VERSION "${ARG_VERSION}")
         set(PROJECT_DESCRIPTION "${ARG_DESCRIPTION}")
-        if(ARG_CI_DEPLOY_DOCS)
-            set(ENABLE_DOCS_DEPLOYMENT "true")
-        else()
-            set(ENABLE_DOCS_DEPLOYMENT "false")
-        endif()
+        set(ENABLE_DOCS_DEPLOYMENT "true")  # Always enable docs deployment
         
         configure_file(
             "${TEMPLATE_FILE}"
