@@ -21,14 +21,14 @@ function(_cpp_library_setup_docs)
     endif()
     
     # Download doxygen-awesome-css theme via CPM
-    if(NOT TARGET doxygen-awesome-css)
-        CPMAddPackage(
-            NAME doxygen-awesome-css
-            GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
-            GIT_TAG v2.3.4
-            DOWNLOAD_ONLY YES
-        )
-    endif()
+    CPMAddPackage(
+        NAME doxygen-awesome-css
+        GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
+        GIT_TAG v2.3.4
+        DOWNLOAD_ONLY YES
+    )
+    
+    # Set the CSS directory path
     set(AWESOME_CSS_DIR ${doxygen-awesome-css_SOURCE_DIR})
     
     # Configure Doxyfile from template
