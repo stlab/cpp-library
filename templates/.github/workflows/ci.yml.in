@@ -29,25 +29,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup Ninja
-      uses: ashutoshvarma/setup-ninja@master
-
-    - name: Setup GCC
-      if: matrix.compiler == 'gcc'
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: latest
-
-    - name: Setup Clang
-      if: matrix.compiler == 'clang' && matrix.os == 'ubuntu-latest'
-      uses: egor-tensin/setup-clang@v1
-      with:
-        version: latest
-
-    - name: Setup MSVC
-      if: matrix.compiler == 'msvc'
-      uses: ilammy/msvc-dev-cmd@v1
-
     - name: Configure CMake
       run: cmake --preset=test
 
@@ -62,13 +43,10 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Ninja
-      uses: ashutoshvarma/setup-ninja@master
+    - uses: actions/checkout@v5
       
     - name: Install Doxygen
-      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+      uses: ssciwr/doxygen-install@v1
     
     - name: Configure CMake
       run: cmake --preset=docs
@@ -76,10 +54,14 @@ jobs:
     - name: Build Documentation
       run: cmake --build --preset=docs
     
-    - name: Deploy to GitHub Pages
-      if: success() && '@ENABLE_DOCS_DEPLOYMENT@' == 'true'
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/docs/html
-        destination_dir: @PROJECT_NAME@
+        path: build/docs/html
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
