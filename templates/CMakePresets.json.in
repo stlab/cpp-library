@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Configuration",
+      "description": "Default configuration for building the library",
+      "binaryDir": "${sourceDir}/build/default",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "test",
+      "displayName": "Test Configuration",
+      "description": "Configuration for building and running tests",
+      "binaryDir": "${sourceDir}/build/test",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_TESTING": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "docs",
+      "displayName": "Documentation Configuration",
+      "description": "Configuration for building documentation",
+      "binaryDir": "${sourceDir}/build/docs",
+      "inherits": "test",
+      "cacheVariables": {
+        "BUILD_DOCS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "default", "displayName": "Default Build", "configurePreset": "default" },
+    { "name": "test", "displayName": "Build Tests", "configurePreset": "test" },
+    { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": ["docs"] }
+  ],
+  "testPresets": [
+    { "name": "test", "displayName": "Run All Tests", "configurePreset": "test", "output": { "outputOnFailure": true } }
+  ]
+}

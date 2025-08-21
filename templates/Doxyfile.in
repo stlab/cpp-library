@@ -1,0 +1,23 @@
+PROJECT_NAME           = "@PROJECT_NAME@"
+PROJECT_BRIEF          = "@PROJECT_BRIEF@"
+PROJECT_NUMBER         = @PROJECT_VERSION@
+OUTPUT_DIRECTORY       = @OUTPUT_DIR@
+GENERATE_LATEX         = NO
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = YES
+INPUT                  = @INPUT_DIR@
+RECURSIVE              = YES
+EXCLUDE_SYMBOLS        = @EXCLUDE_SYMBOLS@
+EXAMPLE_PATH           = @EXAMPLE_PATH@
+HTML_EXTRA_STYLESHEET  = @AWESOME_CSS_PATH@/doxygen-awesome.css \
+                         @AWESOME_CSS_PATH@/doxygen-awesome-sidebar-only.css \
+                         @AWESOME_CSS_PATH@/doxygen-awesome-sidebar-only-darkmode-toggle.css
+HTML_COLORSTYLE        = LIGHT
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_EXTRA_FILES       = @AWESOME_CSS_PATH@/doxygen-awesome-darkmode-toggle.js \
+                         @AWESOME_CSS_PATH@/doxygen-awesome-fragment-copy-button.js \
+                         @AWESOME_CSS_PATH@/doxygen-awesome-paragraph-link.js
+HTML_HEADER            = 
+USE_MDFILE_AS_MAINPAGE = README.md

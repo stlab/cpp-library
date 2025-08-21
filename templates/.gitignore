@@ -1,0 +1,6 @@
+/.cpm-cache
+/.cpp-library-cache
+/.cache
+/build
+include/.DS_Store
+compile_commands.json
