@@ -23,7 +23,7 @@ function(_cpp_library_setup_testing)
     
     # Add test executables
     foreach(test IN LISTS ARG_TESTS)
-        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/${test}.cpp"
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/${test}.cpp")
            
             # Check tests/ directory
             set(test_file "")
