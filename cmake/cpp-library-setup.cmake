@@ -31,7 +31,7 @@ function(_cpp_library_setup_core)
         $<INSTALL_INTERFACE:include>
     )
     
-    # Set C++ standard requirement  
+    # Set C++ standard requirement
     target_compile_features(${ARG_NAME} INTERFACE cxx_std_${ARG_REQUIRES_CPP_VERSION})
     
     # Set up installation if headers are specified
