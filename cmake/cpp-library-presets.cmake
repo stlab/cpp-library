@@ -3,9 +3,16 @@
 # cpp-library-presets.cmake - CMakePresets.json generation
 
 function(_cpp_library_generate_presets)
-    # Only generate if CMakePresets.json doesn't already exist
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakePresets.json")
+    set(options FORCE_INIT)
+    cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
+    
+    # Only generate if CMakePresets.json doesn't already exist (unless forcing)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakePresets.json" AND NOT ARG_FORCE_INIT)
         return()
+    endif()
+    
+    if(ARG_FORCE_INIT)
+        message(STATUS "Force regenerating CMakePresets.json")
     endif()
     
     set(PRESETS_TEMPLATE ${CPP_LIBRARY_ROOT}/templates/CMakePresets.json.in)

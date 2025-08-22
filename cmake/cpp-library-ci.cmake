@@ -3,16 +3,20 @@
 # cpp-library-ci.cmake - CI setup functionality
 
 function(_cpp_library_setup_ci)
+    set(options FORCE_INIT)
     set(oneValueArgs
         NAME
         VERSION
         DESCRIPTION
     )
     
-    cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "" ${ARGN})
     
-    # Only generate CI files if they don't exist
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml")
+    # Only generate CI files if they don't exist (unless forcing)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml" OR ARG_FORCE_INIT)
+        if(ARG_FORCE_INIT)
+            message(STATUS "Force regenerating .github/workflows/ci.yml")
+        endif()
         # Create .github/workflows directory
         file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows")
         

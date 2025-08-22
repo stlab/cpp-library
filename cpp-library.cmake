@@ -25,6 +25,7 @@ function(cpp_library_setup)
         CUSTOM_INSTALL          # Skip default installation
         NO_PRESETS             # Skip CMakePresets.json generation
         NO_CI                  # Skip CI generation (CI enabled by default)
+        FORCE_INIT             # Force regeneration of template files
     )
     set(oneValueArgs
         NAME                    # Project name (e.g., "stlab-enum-ops")
@@ -66,6 +67,11 @@ function(cpp_library_setup)
         set(ARG_REQUIRES_CPP_VERSION 17)
     endif()
     
+    # Check for global FORCE_INIT option (can be set via -DCPP_LIBRARY_FORCE_INIT=ON)
+    if(CPP_LIBRARY_FORCE_INIT)
+        set(ARG_FORCE_INIT TRUE)
+    endif()
+    
     # Create the basic library target (always done)
     _cpp_library_setup_core(
         NAME "${ARG_NAME}"
@@ -95,7 +101,7 @@ function(cpp_library_setup)
     
     # Generate CMakePresets.json (unless disabled)
     if(NOT ARG_NO_PRESETS)
-        _cpp_library_generate_presets()
+        _cpp_library_generate_presets(FORCE_INIT ${ARG_FORCE_INIT})
     endif()
     
     # Setup testing (if tests are specified)
@@ -123,6 +129,7 @@ function(cpp_library_setup)
             NAME "${ARG_NAME}"
             VERSION "${ARG_VERSION}"
             DESCRIPTION "${ARG_DESCRIPTION}"
+            FORCE_INIT ${ARG_FORCE_INIT}
         )
     endif()
     
