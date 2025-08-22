@@ -33,14 +33,26 @@
       "cacheVariables": {
         "BUILD_DOCS": "ON"
       }
+    },
+    {
+      "name": "clang-tidy",
+      "displayName": "Clang-Tidy Configuration",
+      "description": "Configuration for running clang-tidy static analysis",
+      "binaryDir": "${sourceDir}/build/clang-tidy",
+      "inherits": "test",
+      "cacheVariables": {
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-checks=*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,-llvm-*,-llvmlibc-*,-altera-*,-android-*,-darwin-*,-objc-*,-openmp-*"
+      }
     }
   ],
   "buildPresets": [
     { "name": "default", "displayName": "Default Build", "configurePreset": "default" },
     { "name": "test", "displayName": "Build Tests", "configurePreset": "test" },
-    { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": ["docs"] }
+    { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": ["docs"] },
+    { "name": "clang-tidy", "displayName": "Build with Clang-Tidy", "configurePreset": "clang-tidy" }
   ],
   "testPresets": [
-    { "name": "test", "displayName": "Run All Tests", "configurePreset": "test", "output": { "outputOnFailure": true } }
+    { "name": "test", "displayName": "Run All Tests", "configurePreset": "test", "output": { "outputOnFailure": true } },
+    { "name": "clang-tidy", "displayName": "Run Tests with Clang-Tidy", "configurePreset": "clang-tidy", "output": { "outputOnFailure": true } }
   ]
 }

@@ -38,6 +38,32 @@ jobs:
     - name: Test
       run: ctest --preset=test
 
+  clang-tidy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@master
+
+    - name: Setup Clang
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: latest
+
+    - name: Install clang-tidy
+      run: sudo apt-get update && sudo apt-get install -y clang-tidy
+
+    - name: Configure CMake with clang-tidy
+      run: cmake --preset=clang-tidy
+
+    - name: Build with clang-tidy
+      run: cmake --build --preset=clang-tidy
+
+    - name: Run tests with clang-tidy
+      run: ctest --preset=clang-tidy
+
   docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
