@@ -42,7 +42,7 @@ function(_cpp_library_setup_docs)
     set(INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     set(AWESOME_CSS_PATH "${AWESOME_CSS_DIR}")
-    set(EXAMPLE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example")
+    set(EXAMPLES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/examples")
     
     # Convert exclude symbols list to space-separated string
     if(ARG_DOCS_EXCLUDE_SYMBOLS)

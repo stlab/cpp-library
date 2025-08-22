@@ -113,21 +113,20 @@ function(cpp_library_setup)
             NAME "${ARG_NAME}"
             VERSION "${ARG_VERSION}"
             DESCRIPTION "${ARG_DESCRIPTION}"
-            CI_DEPLOY_DOCS YES  # Always enable docs deployment
         )
     endif()
     
     # Build examples if specified  
     if(ARG_EXAMPLES)
         foreach(example IN LISTS ARG_EXAMPLES)
-            if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/example/${example}.cpp")
+            if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/${example}.cpp")
                 string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
                 
                 # Check if this is a compile-fail test (has "_fail" in the name)
                 string(FIND "${example}" "_fail" fail_pos)
                 if(fail_pos GREATER -1)
                     # Negative compile test: this example must fail to compile
-                    add_executable(${example} EXCLUDE_FROM_ALL "example/${example}.cpp")
+                    add_executable(${example} EXCLUDE_FROM_ALL "examples/${example}.cpp")
                     target_link_libraries(${example} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
                     add_test(
                         NAME compile_${example}
@@ -137,12 +136,12 @@ function(cpp_library_setup)
                     set_tests_properties(compile_${example} PROPERTIES WILL_FAIL TRUE)
                 else()
                     # Regular example
-                    add_executable(${example} "example/${example}.cpp")
+                    add_executable(${example} "examples/${example}.cpp")
                     target_link_libraries(${example} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
                     add_test(NAME ${example} COMMAND ${example})
                 endif()
             else()
-                message(WARNING "Example file example/${example}.cpp not found")
+                message(WARNING "Example file examples/${example}.cpp not found")
             endif()
         endforeach()
     endif()

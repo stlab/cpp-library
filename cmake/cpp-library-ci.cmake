@@ -7,7 +7,6 @@ function(_cpp_library_setup_ci)
         NAME
         VERSION
         DESCRIPTION
-        CI_DEPLOY_DOCS  # Always YES, but kept as parameter for template substitution
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
