@@ -21,16 +21,6 @@ function(_cpp_library_setup_testing)
         CPMAddPackage("gh:doctest/doctest@2.4.12")
     endif()
     
-    # Create symlink to compile_commands.json for clangd
-    if(CMAKE_EXPORT_COMPILE_COMMANDS)
-        add_custom_target(clangd_compile_commands ALL
-            COMMAND ${CMAKE_COMMAND} -E create_symlink 
-                ${CMAKE_BINARY_DIR}/compile_commands.json
-                ${CMAKE_SOURCE_DIR}/compile_commands.json
-            COMMENT "Creating symlink to compile_commands.json for clangd"
-        )
-    endif()
-    
     # Add test executables
     foreach(test IN LISTS ARG_TESTS)
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/${test}.cpp" OR 

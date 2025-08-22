@@ -83,6 +83,16 @@ function(cpp_library_setup)
         return()  # Early return for lightweight consumer mode
     endif()
     
+    # Create symlink to compile_commands.json for clangd
+    if(CMAKE_EXPORT_COMPILE_COMMANDS)
+        add_custom_target(clangd_compile_commands ALL
+            COMMAND ${CMAKE_COMMAND} -E create_symlink 
+                ${CMAKE_BINARY_DIR}/compile_commands.json
+                ${CMAKE_SOURCE_DIR}/compile_commands.json
+            COMMENT "Creating symlink to compile_commands.json for clangd"
+        )
+    endif()
+    
     # Generate CMakePresets.json (unless disabled)
     if(NOT ARG_NO_PRESETS)
         _cpp_library_generate_presets()
