@@ -25,34 +25,24 @@ Use CPMAddPackage to fetch cpp-library directly in your CMakeLists.txt:
 cmake_minimum_required(VERSION 3.20)
 project(your-library VERSION 1.0.0 DESCRIPTION "Your library description" LANGUAGES CXX)
 
-# Only setup full infrastructure when building as top-level project
-if(PROJECT_IS_TOP_LEVEL)
-    set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache")
-    include(cmake/CPM.cmake)
-    
-    # Fetch cpp-library via CPM
-    CPMAddPackage("gh:stlab/cpp-library@1.0.0")
-    include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
-    
-    cpp_library_setup(
-        NAME your-library
-        VERSION ${PROJECT_VERSION}
-        DESCRIPTION "${PROJECT_DESCRIPTION}"
-        NAMESPACE your_namespace
-        HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/your_namespace/your_header.hpp
-        EXAMPLES your_example
-        TESTS your_tests
-        DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
-    )
-else()
-    # Lightweight consumer mode - just create the library target
-    add_library(your-library INTERFACE)
-    add_library(your_namespace::your-library ALIAS your-library)
-    target_include_directories(your-library INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
-    target_compile_features(your-library INTERFACE cxx_std_17)
-endif()
+set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache")
+include(cmake/CPM.cmake)
+
+# Fetch cpp-library via CPM
+CPMAddPackage("gh:stlab/cpp-library@1.0.0")
+include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+
+cpp_library_setup(
+    NAME your-library
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION "${PROJECT_DESCRIPTION}"
+    NAMESPACE your_namespace
+    HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/your_namespace/your_header.hpp
+    EXAMPLES your_example
+    TESTS your_tests
+    DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
+)
+
 ```
 
 ### Prerequisites
@@ -128,35 +118,30 @@ This template is used by:
 cmake_minimum_required(VERSION 3.20)
 project(stlab-enum-ops VERSION 1.0.0 DESCRIPTION "Type-safe operators for enums" LANGUAGES CXX)
 
-if(PROJECT_IS_TOP_LEVEL)
-    set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache")
-    include(cmake/CPM.cmake)
-    
-    CPMAddPackage("gh:stlab/cpp-library@1.0.0")
-    include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
-    
-    cpp_library_setup(
-        NAME stlab-enum-ops
-        VERSION ${PROJECT_VERSION}
-        DESCRIPTION "${PROJECT_DESCRIPTION}"
-        NAMESPACE stlab
-        HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/stlab/enum_ops.hpp
-        EXAMPLES enum_ops_example enum_ops_example_fail
-        TESTS enum_ops_all_tests
-        DOCS_EXCLUDE_SYMBOLS "stlab::implementation"
-    )
-else()
-    add_library(stlab-enum-ops INTERFACE)
-    add_library(stlab::enum-ops ALIAS stlab-enum-ops)
-    target_include_directories(stlab-enum-ops INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
-    target_compile_features(stlab-enum-ops INTERFACE cxx_std_17)
-endif()
+# Setup cpp-library infrastructure
+set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache" FORCE)
+include(cmake/CPM.cmake)
+
+# Fetch cpp-library via CPM (using local path for development)
+CPMAddPackage(
+    URI gh:stlab/cpp-library@1.0.0
+    DOWNLOAD_ONLY YES
+)
+include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+
+# Configure library (handles both lightweight and full modes automatically)
+cpp_library_setup(
+    NAME stlab-enum-ops
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION "${PROJECT_DESCRIPTION}"
+    NAMESPACE stlab
+    HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/stlab/enum_ops.hpp
+    EXAMPLES enum_ops_example enum_ops_example_fail
+    TESTS enum_ops_tests
+    DOCS_EXCLUDE_SYMBOLS "stlab::implementation"
+)
+
 ```
-
-**Result**: 76 lines of CMake boilerplate reduced to 24 lines (68% reduction)!
-
 ## License
 
 Distributed under the Boost Software License, Version 1.0. See `LICENSE`.
