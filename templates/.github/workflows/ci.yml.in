@@ -67,6 +67,10 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      id-token: write
+      pages: write
+      contents: read
     
     steps:
     - uses: actions/checkout@v5
