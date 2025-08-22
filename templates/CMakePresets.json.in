@@ -43,8 +43,7 @@
       "binaryDir": "${sourceDir}/build/clang-tidy",
       "inherits": "test",
       "cacheVariables": {
-        "CMAKE_CXX_CLANG_TIDY": "clang-tidy",
-        "CMAKE_CXX_EXTENSIONS": "OFF"
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
       }
     },
     {
