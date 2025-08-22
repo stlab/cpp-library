@@ -2,7 +2,7 @@
 
 [![License][license-badge]][license-link]
 
-Modern CMake template for C++ header-only libraries with common infrastructure.
+Modern CMake template for C++ header-only libraries with comprehensive infrastructure.
 
 [license-badge]: https://img.shields.io/badge/license-BSL%201.0-blue.svg
 [license-link]: https://github.com/stlab/cpp-library/blob/main/LICENSE
@@ -11,10 +11,11 @@ Modern CMake template for C++ header-only libraries with common infrastructure.
 
 `cpp-library` provides a standardized CMake infrastructure template for header-only C++ libraries. It eliminates boilerplate and provides consistent patterns for:
 
-- **Library Setup**: INTERFACE targets with proper installation
-- **Testing**: Integrated doctest with CTest
+- **Library Setup**: INTERFACE targets with proper installation and package config
+- **Testing**: Integrated doctest with CTest and compile-fail test support
 - **Documentation**: Doxygen with doxygen-awesome-css theme
-- **Development Tools**: clangd integration, CMakePresets.json
+- **Development Tools**: clangd integration, CMakePresets.json, clang-tidy support
+- **CI/CD**: GitHub Actions workflows with multi-platform testing
 - **Dependency Management**: CPM.cmake integration
 
 ## Usage
@@ -38,11 +39,10 @@ cpp_library_setup(
     DESCRIPTION "${PROJECT_DESCRIPTION}"
     NAMESPACE your_namespace
     HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/your_namespace/your_header.hpp
-    EXAMPLES your_example
+    EXAMPLES your_example your_example_fail
     TESTS your_tests
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
 )
-
 ```
 
 ### Prerequisites
@@ -73,8 +73,12 @@ cpp_library_setup(
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
     [ADDITIONAL_DEPS dep_list]     # Extra CPM dependencies
+    
+    # Optional flags
     [CUSTOM_INSTALL]              # Skip default installation
     [NO_PRESETS]                  # Skip CMakePresets.json generation
+    [NO_CI]                       # Skip CI generation (enabled by default)
+    [FORCE_INIT]                  # Force regeneration of template files
 )
 ```
 
@@ -82,12 +86,12 @@ cpp_library_setup(
 
 ### Automated Infrastructure
 
-- **CMakePresets.json**: Generates standard presets (default, test, docs)
+- **CMakePresets.json**: Generates standard presets (default, test, docs, clang-tidy, init)
 - **Installation**: Modern CMake package config with FILE_SET headers
-- **Testing**: doctest integration with CTest
+- **Testing**: doctest integration with CTest and compile-fail test support
 - **Documentation**: Doxygen with doxygen-awesome-css theme
 - **Development**: clangd compile_commands.json symlink
-- **Compile-fail tests**: Automatic detection for examples with `_fail` suffix
+- **CI/CD**: GitHub Actions workflows with multi-platform testing and documentation deployment
 
 ### Smart Defaults
 
@@ -97,12 +101,45 @@ cpp_library_setup(
 - **Build isolation** with separate build directories
 - **Two-mode operation**: Full infrastructure when top-level, lightweight when consumed
 
+### Testing Features
+
+- **doctest@2.4.12** for unit testing
+- **Compile-fail tests**: Automatic detection for examples with `_fail` suffix
+- **CTest integration**: Proper test registration and labeling
+- **Multi-directory support**: Checks both `tests/` directories
+
+### Documentation Features
+
+- **Doxygen integration** with modern configuration
+- **doxygen-awesome-css@2.3.4** theme for beautiful output
+- **Symbol exclusion** support for implementation details
+- **GitHub Pages deployment** via CI
+- **Custom Doxyfile support** (falls back to template)
+
+### Development Tools
+
+- **clang-tidy integration** via CMakePresets.json
+- **clangd support** with compile_commands.json symlink
+- **CMakePresets.json** with multiple configurations:
+  - `default`: Release build
+  - `test`: Debug build with testing
+  - `docs`: Documentation generation
+  - `clang-tidy`: Static analysis
+  - `init`: Template regeneration
+
+### CI/CD Features
+
+- **Multi-platform testing**: Ubuntu, macOS, Windows
+- **Multi-compiler support**: GCC, Clang, MSVC
+- **Static analysis**: clang-tidy integration
+- **Documentation deployment**: Automatic GitHub Pages deployment
+- **Template generation**: CI workflow generation
+
 ### Dependency Management
 
 - **CPM.cmake** integration for seamless fetching
 - **Automatic caching** via CPM's built-in mechanisms
-- **doctest@2.4.12** for testing
-- **doxygen-awesome-css@2.3.4** for documentation
+- **Version pinning** for reliable builds
 - **Git tag versioning** for reliable updates
 
 ## Example Projects
@@ -140,8 +177,46 @@ cpp_library_setup(
     TESTS enum_ops_tests
     DOCS_EXCLUDE_SYMBOLS "stlab::implementation"
 )
-
 ```
+
+## Quick Start
+
+1. **Initialize a new project**:
+   ```bash
+   # Clone or create your project
+   mkdir my-library && cd my-library
+   
+   # Create basic structure
+   mkdir -p include/your_namespace examples tests cmake
+   
+   # Add CPM.cmake
+   curl -L https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake -o cmake/CPM.cmake
+   ```
+
+2. **Create CMakeLists.txt** with the usage example above
+
+3. **Add your headers** to `include/your_namespace/`
+
+4. **Add examples** to `examples/` (use `_fail` suffix for compile-fail tests)
+
+5. **Add tests** to `tests/`
+
+6. **Build and test**:
+   ```bash
+   cmake --preset=test
+   cmake --build --preset=test
+   ctest --preset=test
+   ```
+
+## Template Files Generated
+
+The template automatically generates:
+
+- **CMakePresets.json**: Build configurations for different purposes
+- **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline
+- **.gitignore**: Standard ignores for C++ projects
+- **Package config files**: For proper CMake integration
+
 ## License
 
 Distributed under the Boost Software License, Version 1.0. See `LICENSE`.
