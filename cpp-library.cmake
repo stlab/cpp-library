@@ -113,6 +113,9 @@ function(cpp_library_setup)
     if(NOT ARG_NO_PRESETS)
         _cpp_library_generate_presets(FORCE_INIT ${ARG_FORCE_INIT})
     endif()
+
+    # Copy static template files (like .clang-format, .gitignore, etc.)
+    _cpp_library_copy_templates(FORCE_INIT ${ARG_FORCE_INIT})
     
     # Setup testing (if tests are specified)
     if(BUILD_TESTING AND ARG_TESTS)

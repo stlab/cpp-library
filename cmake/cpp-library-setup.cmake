@@ -106,3 +106,39 @@ function(_cpp_library_setup_core)
     endif()
     
 endfunction()
+
+# Function to copy static template files
+function(_cpp_library_copy_templates)
+    set(options FORCE_INIT)
+    cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
+
+    # List of static template files to copy
+    set(TEMPLATE_FILES
+        ".clang-format"
+        ".gitignore"
+        ".gitattributes"
+        ".vscode/extensions.json"
+        "docs/index.html"
+    )
+
+    foreach(template_file IN LISTS TEMPLATE_FILES)
+        set(source_file "${CPP_LIBRARY_ROOT}/templates/${template_file}")
+        set(dest_file "${CMAKE_CURRENT_SOURCE_DIR}/${template_file}")
+        
+        # Check if template file exists
+        if(EXISTS "${source_file}")
+            # Copy if file doesn't exist or FORCE_INIT is enabled
+            if(NOT EXISTS "${dest_file}" OR ARG_FORCE_INIT)
+                # Create directory if needed
+                get_filename_component(dest_dir "${dest_file}" DIRECTORY)
+                file(MAKE_DIRECTORY "${dest_dir}")
+                
+                # Copy the file
+                file(COPY "${source_file}" DESTINATION "${dest_dir}")
+                message(STATUS "Copied template file: ${template_file}")
+            endif()
+        else()
+            message(WARNING "Template file not found: ${source_file}")
+        endif()
+    endforeach()
+endfunction()
