@@ -39,6 +39,8 @@ cpp_library_setup(
     DESCRIPTION "${PROJECT_DESCRIPTION}"
     NAMESPACE your_namespace
     HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/your_namespace/your_header.hpp
+    # Optional: add SOURCES for non-header-only libraries
+    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/your_library.cpp
     EXAMPLES your_example your_example_fail
     TESTS your_tests
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
@@ -66,14 +68,17 @@ cpp_library_setup(
     # Header specification (one required)
     HEADERS header_list            # List of header files
     HEADER_DIR directory           # Directory to install recursively
-    
+
+    # Optional: source specification for non-header-only libraries
+    SOURCES source_list            # List of source files (e.g., src/*.cpp)
+
     # Optional features
     [EXAMPLES example_list]        # Example executables to build
-    [TESTS test_list]             # Test executables to build  
+    [TESTS test_list]              # Test executables to build  
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
     [ADDITIONAL_DEPS dep_list]     # Extra CPM dependencies
-    
+
     # Optional flags
     [CUSTOM_INSTALL]              # Skip default installation
     [NO_PRESETS]                  # Skip CMakePresets.json generation
@@ -83,6 +88,11 @@ cpp_library_setup(
 ```
 
 ## Features
+### Non-Header-Only Library Support
+
+- **Automatic detection of sources in `src/`**: If source files are present in `src/`, the template will build a regular (static) library instead of header-only INTERFACE target.
+    Specify sources manually with the `SOURCES` argument, or let the template auto-detect files in `src/`.
+    Both header-only and compiled libraries are supported seamlessly.
 
 ### Automated Infrastructure
 
@@ -186,8 +196,8 @@ cpp_library_setup(
    # Clone or create your project
    mkdir my-library && cd my-library
    
-   # Create basic structure
-   mkdir -p include/your_namespace examples tests cmake
+    # Create basic structure
+    mkdir -p include/your_namespace src examples tests cmake
    
    # Add CPM.cmake
    curl -L https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake -o cmake/CPM.cmake
@@ -212,10 +222,11 @@ cpp_library_setup(
 
 The template automatically generates:
 
-- **CMakePresets.json**: Build configurations for different purposes
-- **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline
-- **.gitignore**: Standard ignores for C++ projects
-- **Package config files**: For proper CMake integration
+ - **CMakePresets.json**: Build configurations for different purposes
+ - **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline
+ - **.gitignore**: Standard ignores for C++ projects
+ - **src/**: Source directory for non-header-only libraries (auto-detected)
+ - **Package config files**: For proper CMake integration
 
 ## License
 

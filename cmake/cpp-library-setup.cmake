@@ -14,6 +14,7 @@ function(_cpp_library_setup_core)
     )
     set(multiValueArgs
         HEADERS
+        SOURCES
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -21,28 +22,40 @@ function(_cpp_library_setup_core)
     # Extract the library name without namespace prefix for target naming
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
-    # Create the INTERFACE library target
-    add_library(${ARG_NAME} INTERFACE)
-    add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
-    
-    # Set include directories
-    target_include_directories(${ARG_NAME} INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-    )
-    
-    # Set C++ standard requirement
-    target_compile_features(${ARG_NAME} INTERFACE cxx_std_${ARG_REQUIRES_CPP_VERSION})
-    
-    # Set up installation if headers are specified
-    if(ARG_HEADERS)
-        # Use FILE_SET for modern CMake header installation
-        target_sources(${ARG_NAME} INTERFACE
-            FILE_SET headers
-            TYPE HEADERS
-            BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-            FILES ${ARG_HEADERS}
+    if(ARG_SOURCES)
+        # Create a regular library if sources are present
+        add_library(${ARG_NAME} STATIC ${ARG_SOURCES})
+        add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
+        target_include_directories(${ARG_NAME} PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
         )
+        target_compile_features(${ARG_NAME} PUBLIC cxx_std_${ARG_REQUIRES_CPP_VERSION})
+        if(ARG_HEADERS)
+            target_sources(${ARG_NAME} PUBLIC
+                FILE_SET headers
+                TYPE HEADERS
+                BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+                FILES ${ARG_HEADERS}
+            )
+        endif()
+    else()
+        # Header-only INTERFACE target
+        add_library(${ARG_NAME} INTERFACE)
+        add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
+        target_include_directories(${ARG_NAME} INTERFACE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
+        )
+        target_compile_features(${ARG_NAME} INTERFACE cxx_std_${ARG_REQUIRES_CPP_VERSION})
+        if(ARG_HEADERS)
+            target_sources(${ARG_NAME} INTERFACE
+                FILE_SET headers
+                TYPE HEADERS
+                BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+                FILES ${ARG_HEADERS}
+            )
+        endif()
     endif()
     
     # Only set up full installation when building as top-level project
