@@ -11,6 +11,7 @@ Modern CMake template for C++ header-only libraries with comprehensive infrastru
 
 `cpp-library` provides a standardized CMake infrastructure template for header-only C++ libraries. It eliminates boilerplate and provides consistent patterns for:
 
+- **Project Declaration**: Uses existing `project()` declaration with automatic git tag-based versioning
 - **Library Setup**: INTERFACE targets with proper installation and package config
 - **Testing**: Integrated doctest with CTest and compile-fail test support
 - **Documentation**: Doxygen with doxygen-awesome-css theme
@@ -24,7 +25,9 @@ Use CPMAddPackage to fetch cpp-library directly in your CMakeLists.txt:
 
 ```cmake
 cmake_minimum_required(VERSION 3.20)
-project(your-library VERSION 1.0.0 DESCRIPTION "Your library description" LANGUAGES CXX)
+
+# Project declaration - cpp_library_setup will use this name and detect version from git tags
+project(your-library)
 
 set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache")
 include(cmake/CPM.cmake)
@@ -34,9 +37,7 @@ CPMAddPackage("gh:stlab/cpp-library@1.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 cpp_library_setup(
-    NAME your-library
-    VERSION ${PROJECT_VERSION}
-    DESCRIPTION "${PROJECT_DESCRIPTION}"
+    DESCRIPTION "Your library description"
     NAMESPACE your_namespace
     HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/your_namespace/your_header.hpp
     # Optional: add SOURCES for non-header-only libraries
@@ -60,10 +61,11 @@ cpp_library_setup(
 ```cmake
 cpp_library_setup(
     # Required parameters
-    NAME project_name              # e.g., "stlab-enum-ops"
-    VERSION version_string         # e.g., "1.0.0" 
     DESCRIPTION description        # e.g., "Type-safe operators for enums"
     NAMESPACE namespace            # e.g., "stlab"
+    
+    # Optional parameters
+    VERSION version_string         # e.g., "1.0.0" (auto-detected from git tags if not provided)
     
     # Header specification (one required)
     HEADERS header_list            # List of header files
@@ -86,6 +88,8 @@ cpp_library_setup(
     [FORCE_INIT]                  # Force regeneration of template files
 )
 ```
+
+**Note**: The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
 
 ## Features
 ### Non-Header-Only Library Support
@@ -110,6 +114,7 @@ cpp_library_setup(
 - **Debug** builds for testing, **Release** for default
 - **Build isolation** with separate build directories
 - **Two-mode operation**: Full infrastructure when top-level, lightweight when consumed
+- **Automatic version detection**: Version is automatically extracted from git tags (e.g., `v1.2.3` becomes `1.2.3`)
 
 ### Testing Features
 
@@ -152,6 +157,13 @@ cpp_library_setup(
 - **Version pinning** for reliable builds
 - **Git tag versioning** for reliable updates
 
+### Version Management
+
+- **Automatic git tag detection**: Version is automatically extracted from the latest git tag
+- **Fallback versioning**: Uses `0.0.0` if no git tag is found (with warning)
+- **Manual override**: You can still specify `VERSION` parameter to override automatic detection
+- **Tag format support**: Supports both `v1.2.3` and `1.2.3` tag formats
+
 ## Example Projects
 
 This template is used by:
@@ -163,7 +175,6 @@ This template is used by:
 
 ```cmake
 cmake_minimum_required(VERSION 3.20)
-project(stlab-enum-ops VERSION 1.0.0 DESCRIPTION "Type-safe operators for enums" LANGUAGES CXX)
 
 # Setup cpp-library infrastructure
 set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache" FORCE)
@@ -179,8 +190,7 @@ include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 # Configure library (handles both lightweight and full modes automatically)
 cpp_library_setup(
     NAME stlab-enum-ops
-    VERSION ${PROJECT_VERSION}
-    DESCRIPTION "${PROJECT_DESCRIPTION}"
+    DESCRIPTION "Type-safe operators for enums"
     NAMESPACE stlab
     HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/stlab/enum_ops.hpp
     EXAMPLES enum_ops_example enum_ops_example_fail
