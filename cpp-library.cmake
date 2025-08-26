@@ -22,17 +22,12 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 function(cpp_library_setup)
     # Parse arguments
     set(options 
-        CUSTOM_INSTALL          # Skip default installation
-        NO_PRESETS             # Skip CMakePresets.json generation
-        NO_CI                  # Skip CI generation (CI enabled by default)
         FORCE_INIT             # Force regeneration of template files
     )
     set(oneValueArgs
-        VERSION                 # Version string (e.g., "1.0.0") 
         DESCRIPTION             # Description string
         NAMESPACE               # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION    # C++ version (default: 17)
-        HEADER_DIR              # Directory to install recursively
     )
     set(multiValueArgs
         HEADERS                 # List of header files
@@ -40,7 +35,6 @@ function(cpp_library_setup)
         EXAMPLES                # Example executables to build
         TESTS                   # Test executables to build  
         DOCS_EXCLUDE_SYMBOLS    # Symbols to exclude from docs
-        ADDITIONAL_DEPS         # Extra CPM dependencies
     )
     
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -60,8 +54,8 @@ function(cpp_library_setup)
     if(NOT ARG_NAMESPACE)
         message(FATAL_ERROR "cpp_library_setup: NAMESPACE is required")
     endif()
-    if(NOT ARG_HEADERS AND NOT ARG_HEADER_DIR)
-        message(FATAL_ERROR "cpp_library_setup: Either HEADERS or HEADER_DIR is required")
+    if(NOT ARG_HEADERS)
+        message(FATAL_ERROR "cpp_library_setup: HEADERS is required")
     endif()
     
     # Use PROJECT_NAME as the library name
@@ -83,13 +77,11 @@ function(cpp_library_setup)
         set(ARG_FORCE_INIT TRUE)
     endif()
     
-    # Get version from git tags if not provided
-    if(NOT ARG_VERSION)
-        _cpp_library_get_git_version(GIT_VERSION)
-        set(ARG_VERSION "${GIT_VERSION}")
-    endif()
+    # Get version from git tags
+    _cpp_library_get_git_version(GIT_VERSION)
+    set(ARG_VERSION "${GIT_VERSION}")
     
-    # Parse version components for manual setting
+    # Parse version components
     string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${ARG_VERSION}")
     if(VERSION_MATCH)
         set(ARG_VERSION_MAJOR ${CMAKE_MATCH_1})
@@ -101,13 +93,11 @@ function(cpp_library_setup)
         set(ARG_VERSION_PATCH 0)
     endif()
     
-    # Update project version if it was detected from git
-    if(NOT DEFINED PROJECT_VERSION OR PROJECT_VERSION STREQUAL "")
-        set(PROJECT_VERSION ${ARG_VERSION} PARENT_SCOPE)
-        set(PROJECT_VERSION_MAJOR ${ARG_VERSION_MAJOR} PARENT_SCOPE)
-        set(PROJECT_VERSION_MINOR ${ARG_VERSION_MINOR} PARENT_SCOPE)
-        set(PROJECT_VERSION_PATCH ${ARG_VERSION_PATCH} PARENT_SCOPE)
-    endif()
+    # Update project version
+    set(PROJECT_VERSION ${ARG_VERSION} PARENT_SCOPE)
+    set(PROJECT_VERSION_MAJOR ${ARG_VERSION_MAJOR} PARENT_SCOPE)
+    set(PROJECT_VERSION_MINOR ${ARG_VERSION_MINOR} PARENT_SCOPE)
+    set(PROJECT_VERSION_PATCH ${ARG_VERSION_PATCH} PARENT_SCOPE)
     
     # Create the basic library target (always done)
     _cpp_library_setup_core(
@@ -117,7 +107,6 @@ function(cpp_library_setup)
         NAMESPACE "${ARG_NAMESPACE}"
         HEADERS "${ARG_HEADERS}"
         SOURCES "${ARG_SOURCES}"
-        HEADER_DIR "${ARG_HEADER_DIR}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
         TOP_LEVEL "${PROJECT_IS_TOP_LEVEL}"
     )
@@ -137,10 +126,8 @@ function(cpp_library_setup)
         )
     endif()
     
-    # Generate CMakePresets.json (unless disabled)
-    if(NOT ARG_NO_PRESETS)
-        _cpp_library_generate_presets(FORCE_INIT ${ARG_FORCE_INIT})
-    endif()
+    # Generate CMakePresets.json
+    _cpp_library_generate_presets(FORCE_INIT ${ARG_FORCE_INIT})
 
     # Copy static template files (like .clang-format, .gitignore, etc.)
     _cpp_library_copy_templates(FORCE_INIT ${ARG_FORCE_INIT})
@@ -164,15 +151,13 @@ function(cpp_library_setup)
         )
     endif()
     
-    # Setup CI (unless disabled)
-    if(NOT ARG_NO_CI)
-        _cpp_library_setup_ci(
-            NAME "${ARG_NAME}"
-            VERSION "${ARG_VERSION}"
-            DESCRIPTION "${ARG_DESCRIPTION}"
-            FORCE_INIT ${ARG_FORCE_INIT}
-        )
-    endif()
+    # Setup CI
+    _cpp_library_setup_ci(
+        NAME "${ARG_NAME}"
+        VERSION "${ARG_VERSION}"
+        DESCRIPTION "${ARG_DESCRIPTION}"
+        FORCE_INIT ${ARG_FORCE_INIT}
+    )
     
     # Build examples if specified  
     if(ARG_EXAMPLES)

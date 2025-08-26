@@ -30,7 +30,6 @@ function(_cpp_library_setup_core)
         VERSION 
         DESCRIPTION
         NAMESPACE
-        HEADER_DIR
         REQUIRES_CPP_VERSION
         TOP_LEVEL
     )
@@ -99,14 +98,6 @@ function(_cpp_library_setup_core)
             EXPORT ${ARG_NAME}Targets
             FILE_SET headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         )
-        
-        # Install header directory if specified (fallback for older CMake)
-        if(ARG_HEADER_DIR)
-            install(DIRECTORY ${ARG_HEADER_DIR}/
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-                FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
-            )
-        endif()
         
         # Generate package config files
         write_basic_package_version_file(

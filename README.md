@@ -33,7 +33,7 @@ set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache")
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
-CPMAddPackage("gh:stlab/cpp-library@1.0.0")
+CPMAddPackage("gh:stlab/cpp-library@3.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 cpp_library_setup(
@@ -63,33 +63,21 @@ cpp_library_setup(
     # Required parameters
     DESCRIPTION description        # e.g., "Type-safe operators for enums"
     NAMESPACE namespace            # e.g., "stlab"
-    
-    # Optional parameters
-    VERSION version_string         # e.g., "1.0.0" (auto-detected from git tags if not provided)
-    
-    # Header specification (one required)
     HEADERS header_list            # List of header files
-    HEADER_DIR directory           # Directory to install recursively
-
+    
     # Optional: source specification for non-header-only libraries
-    SOURCES source_list            # List of source files (e.g., src/*.cpp)
+    SOURCES source_list            # List of source files (auto-detected from src/ if not provided)
 
     # Optional features
     [EXAMPLES example_list]        # Example executables to build
     [TESTS test_list]              # Test executables to build  
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
-    [ADDITIONAL_DEPS dep_list]     # Extra CPM dependencies
-
-    # Optional flags
-    [CUSTOM_INSTALL]              # Skip default installation
-    [NO_PRESETS]                  # Skip CMakePresets.json generation
-    [NO_CI]                       # Skip CI generation (enabled by default)
     [FORCE_INIT]                  # Force regeneration of template files
 )
 ```
 
-**Note**: The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
+**Note**: The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`. Version is automatically detected from git tags.
 
 ## Features
 ### Non-Header-Only Library Support
@@ -115,6 +103,7 @@ cpp_library_setup(
 - **Build isolation** with separate build directories
 - **Two-mode operation**: Full infrastructure when top-level, lightweight when consumed
 - **Automatic version detection**: Version is automatically extracted from git tags (e.g., `v1.2.3` becomes `1.2.3`)
+- **Always-enabled features**: CI/CD, CMakePresets.json, and proper installation are always generated
 
 ### Testing Features
 
@@ -161,7 +150,6 @@ cpp_library_setup(
 
 - **Automatic git tag detection**: Version is automatically extracted from the latest git tag
 - **Fallback versioning**: Uses `0.0.0` if no git tag is found (with warning)
-- **Manual override**: You can still specify `VERSION` parameter to override automatic detection
 - **Tag format support**: Supports both `v1.2.3` and `1.2.3` tag formats
 
 ## Example Projects
@@ -175,21 +163,18 @@ This template is used by:
 
 ```cmake
 cmake_minimum_required(VERSION 3.20)
+project(enum-ops)
 
 # Setup cpp-library infrastructure
 set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache" FORCE)
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM (using local path for development)
-CPMAddPackage(
-    URI gh:stlab/cpp-library@1.0.0
-    DOWNLOAD_ONLY YES
-)
+CPMAddPackage("gh:stlab/cpp-library@3.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Configure library (handles both lightweight and full modes automatically)
 cpp_library_setup(
-    NAME stlab-enum-ops
     DESCRIPTION "Type-safe operators for enums"
     NAMESPACE stlab
     HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/stlab/enum_ops.hpp
