@@ -28,7 +28,6 @@ function(cpp_library_setup)
         FORCE_INIT             # Force regeneration of template files
     )
     set(oneValueArgs
-        NAME                    # Project name (e.g., "stlab-enum-ops")
         VERSION                 # Version string (e.g., "1.0.0") 
         DESCRIPTION             # Description string
         NAMESPACE               # Namespace (e.g., "stlab")
@@ -55,12 +54,6 @@ function(cpp_library_setup)
     endif()
     
     # Validate required arguments
-    if(NOT ARG_NAME)
-        message(FATAL_ERROR "cpp_library_setup: NAME is required")
-    endif()
-    if(NOT ARG_VERSION)
-        message(FATAL_ERROR "cpp_library_setup: VERSION is required")
-    endif()
     if(NOT ARG_DESCRIPTION)
         message(FATAL_ERROR "cpp_library_setup: DESCRIPTION is required")
     endif()
@@ -71,6 +64,12 @@ function(cpp_library_setup)
         message(FATAL_ERROR "cpp_library_setup: Either HEADERS or HEADER_DIR is required")
     endif()
     
+    # Use PROJECT_NAME as the library name
+    if(NOT DEFINED PROJECT_NAME)
+        message(FATAL_ERROR "cpp_library_setup: PROJECT_NAME must be defined. Call project() before cpp_library_setup()")
+    endif()
+    set(ARG_NAME "${PROJECT_NAME}")
+    
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
         set(ARG_REQUIRES_CPP_VERSION 17)
@@ -79,6 +78,32 @@ function(cpp_library_setup)
     # Check for global FORCE_INIT option (can be set via -DCPP_LIBRARY_FORCE_INIT=ON)
     if(CPP_LIBRARY_FORCE_INIT)
         set(ARG_FORCE_INIT TRUE)
+    endif()
+    
+    # Get version from git tags if not provided
+    if(NOT ARG_VERSION)
+        _cpp_library_get_git_version(GIT_VERSION)
+        set(ARG_VERSION "${GIT_VERSION}")
+    endif()
+    
+    # Parse version components for manual setting
+    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${ARG_VERSION}")
+    if(VERSION_MATCH)
+        set(ARG_VERSION_MAJOR ${CMAKE_MATCH_1})
+        set(ARG_VERSION_MINOR ${CMAKE_MATCH_2})
+        set(ARG_VERSION_PATCH ${CMAKE_MATCH_3})
+    else()
+        set(ARG_VERSION_MAJOR 0)
+        set(ARG_VERSION_MINOR 0)
+        set(ARG_VERSION_PATCH 0)
+    endif()
+    
+    # Update project version if it was detected from git
+    if(NOT DEFINED PROJECT_VERSION OR PROJECT_VERSION STREQUAL "")
+        set(PROJECT_VERSION ${ARG_VERSION} PARENT_SCOPE)
+        set(PROJECT_VERSION_MAJOR ${ARG_VERSION_MAJOR} PARENT_SCOPE)
+        set(PROJECT_VERSION_MINOR ${ARG_VERSION_MINOR} PARENT_SCOPE)
+        set(PROJECT_VERSION_PATCH ${ARG_VERSION_PATCH} PARENT_SCOPE)
     endif()
     
     # Create the basic library target (always done)

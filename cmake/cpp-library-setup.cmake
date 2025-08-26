@@ -2,6 +2,28 @@
 #
 # cpp-library-setup.cmake - Core library setup functionality
 
+# Function to get version from git tags
+function(_cpp_library_get_git_version OUTPUT_VAR)
+    # Try to get version from git tags
+    execute_process(
+        COMMAND git describe --tags --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    # If git tag found, use it (remove 'v' prefix if present)
+    if(GIT_TAG_VERSION)
+        string(REGEX REPLACE "^v" "" CLEAN_VERSION "${GIT_TAG_VERSION}")
+        set(${OUTPUT_VAR} "${CLEAN_VERSION}" PARENT_SCOPE)
+    else()
+        # Fallback to 0.0.0 if no git tag found
+        set(${OUTPUT_VAR} "0.0.0" PARENT_SCOPE)
+        message(WARNING "No git tag found, using version 0.0.0. Consider creating a git tag for proper versioning.")
+    endif()
+endfunction()
+
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
@@ -18,6 +40,15 @@ function(_cpp_library_setup_core)
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    
+    # Get version from git tags if not provided
+    if(NOT ARG_VERSION)
+        _cpp_library_get_git_version(GIT_VERSION)
+        set(ARG_VERSION "${GIT_VERSION}")
+    endif()
+    
+    # Note: Project declaration is now handled in the main cpp_library_setup function
+    # No need to check ARG_TOP_LEVEL here for project declaration
     
     # Extract the library name without namespace prefix for target naming
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
