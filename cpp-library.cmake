@@ -37,13 +37,22 @@ function(cpp_library_setup)
     )
     set(multiValueArgs
         HEADERS                 # List of header files
-        EXAMPLES               # Example executables to build
-        TESTS                  # Test executables to build  
-        DOCS_EXCLUDE_SYMBOLS   # Symbols to exclude from docs
-        ADDITIONAL_DEPS        # Extra CPM dependencies
+        SOURCES                 # List of source files (optional, for non-header-only)
+        EXAMPLES                # Example executables to build
+        TESTS                   # Test executables to build  
+        DOCS_EXCLUDE_SYMBOLS    # Symbols to exclude from docs
+        ADDITIONAL_DEPS         # Extra CPM dependencies
     )
     
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # Detect sources in <root>/src if SOURCES not provided
+    if(NOT ARG_SOURCES)
+        file(GLOB_RECURSE DETECTED_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "src/*.cpp" "src/*.c" "src/*.cc" "src/*.cxx")
+        if(DETECTED_SOURCES)
+            set(ARG_SOURCES ${DETECTED_SOURCES})
+        endif()
+    endif()
     
     # Validate required arguments
     if(NOT ARG_NAME)
@@ -79,6 +88,7 @@ function(cpp_library_setup)
         DESCRIPTION "${ARG_DESCRIPTION}"
         NAMESPACE "${ARG_NAMESPACE}"
         HEADERS "${ARG_HEADERS}"
+        SOURCES "${ARG_SOURCES}"
         HEADER_DIR "${ARG_HEADER_DIR}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
         TOP_LEVEL "${PROJECT_IS_TOP_LEVEL}"
@@ -103,6 +113,9 @@ function(cpp_library_setup)
     if(NOT ARG_NO_PRESETS)
         _cpp_library_generate_presets(FORCE_INIT ${ARG_FORCE_INIT})
     endif()
+
+    # Copy static template files (like .clang-format, .gitignore, etc.)
+    _cpp_library_copy_templates(FORCE_INIT ${ARG_FORCE_INIT})
     
     # Setup testing (if tests are specified)
     if(BUILD_TESTING AND ARG_TESTS)
