@@ -169,7 +169,7 @@ project(enum-ops)
 set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache" FORCE)
 include(cmake/CPM.cmake)
 
-# Fetch cpp-library via CPM (using local path for development)
+# Fetch cpp-library via CPM
 CPMAddPackage("gh:stlab/cpp-library@3.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
