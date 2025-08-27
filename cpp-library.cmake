@@ -50,38 +50,41 @@ function(_cpp_library_setup_executables)
     
     # Add executables
     foreach(executable IN LISTS ARG_EXECUTABLES)
-        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}/${executable}.cpp")
+        # Extract the base name without extension for target naming
+        get_filename_component(executable_base "${executable}" NAME_WE)
+        
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}/${executable}")
             
             # Check if this is a compile-fail test (has "_fail" in the name)
-            string(FIND "${executable}" "_fail" fail_pos)
+            string(FIND "${executable_base}" "_fail" fail_pos)
             if(fail_pos GREATER -1)
                 # Negative compile test: this executable must fail to compile
-                add_executable(${executable} EXCLUDE_FROM_ALL "${source_dir}/${executable}.cpp")
-                target_link_libraries(${executable} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
+                add_executable(${executable_base} EXCLUDE_FROM_ALL "${source_dir}/${executable}")
+                target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
                 add_test(
-                    NAME compile_${executable}
-                    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${executable}
+                    NAME compile_${executable_base}
+                    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${executable_base}
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
-                set_tests_properties(compile_${executable} PROPERTIES WILL_FAIL TRUE)
+                set_tests_properties(compile_${executable_base} PROPERTIES WILL_FAIL TRUE)
             else()
                 # Regular executable - conditionally build based on preset
-                add_executable(${executable} "${source_dir}/${executable}.cpp")
-                target_link_libraries(${executable} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
+                add_executable(${executable_base} "${source_dir}/${executable}")
+                target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
                 
                 # Only fully build (compile and link) in test preset
                 # In clang-tidy preset, compile with clang-tidy but don't link
                 if(CMAKE_CXX_CLANG_TIDY)
                     # In clang-tidy mode, exclude from all builds but still compile
-                    set_target_properties(${executable} PROPERTIES EXCLUDE_FROM_ALL TRUE)
+                    set_target_properties(${executable_base} PROPERTIES EXCLUDE_FROM_ALL TRUE)
                     # Don't add as a test in clang-tidy mode since we're not linking
                 else()
                     # In test mode, build normally and add as test
-                    add_test(NAME ${executable} COMMAND ${executable})
+                    add_test(NAME ${executable_base} COMMAND ${executable_base})
                     
                     # Set test properties for better IDE integration (only for tests)
                     if(ARG_TYPE STREQUAL "tests")
-                        set_tests_properties(${executable} PROPERTIES
+                        set_tests_properties(${executable_base} PROPERTIES
                             LABELS "doctest"
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         )
@@ -89,7 +92,7 @@ function(_cpp_library_setup_executables)
                 endif()
             endif()
         else()
-            message(WARNING "${ARG_TYPE} file ${source_dir}/${executable}.cpp not found")
+            message(WARNING "${ARG_TYPE} file ${source_dir}/${executable} not found")
         endif()
     endforeach()
     
@@ -107,22 +110,16 @@ function(cpp_library_setup)
         REQUIRES_CPP_VERSION    # C++ version (default: 17)
     )
     set(multiValueArgs
-        HEADERS                 # List of header files
-        SOURCES                 # List of source files (optional, for non-header-only)
-        EXAMPLES                # Example executables to build
-        TESTS                   # Test executables to build  
+        HEADERS                 # List of header filenames (e.g., "your_header.hpp")
+        SOURCES                 # List of source filenames (e.g., "your_library.cpp")
+        EXAMPLES                # Example source files to build (e.g., "example.cpp example_fail.cpp")
+        TESTS                   # Test source files to build (e.g., "tests.cpp")
         DOCS_EXCLUDE_SYMBOLS    # Symbols to exclude from docs
     )
     
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    # Detect sources in <root>/src if SOURCES not provided
-    if(NOT ARG_SOURCES)
-        file(GLOB_RECURSE DETECTED_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "src/*.cpp" "src/*.c" "src/*.cc" "src/*.cxx")
-        if(DETECTED_SOURCES)
-            set(ARG_SOURCES ${DETECTED_SOURCES})
-        endif()
-    endif()
+
     
     # Validate required arguments
     if(NOT ARG_DESCRIPTION)
@@ -177,14 +174,25 @@ function(cpp_library_setup)
     set(PROJECT_VERSION_MINOR ${ARG_VERSION_MINOR} PARENT_SCOPE)
     set(PROJECT_VERSION_PATCH ${ARG_VERSION_PATCH} PARENT_SCOPE)
     
+    # Generate full paths for HEADERS and SOURCES based on conventions
+    set(GENERATED_HEADERS "")
+    foreach(header IN LISTS ARG_HEADERS)
+        list(APPEND GENERATED_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/${ARG_NAMESPACE}/${header}")
+    endforeach()
+    
+    set(GENERATED_SOURCES "")
+    foreach(source IN LISTS ARG_SOURCES)
+        list(APPEND GENERATED_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
+    endforeach()
+    
     # Create the basic library target (always done)
     _cpp_library_setup_core(
         NAME "${ARG_NAME}"
         VERSION "${ARG_VERSION}" 
         DESCRIPTION "${ARG_DESCRIPTION}"
         NAMESPACE "${ARG_NAMESPACE}"
-        HEADERS "${ARG_HEADERS}"
-        SOURCES "${ARG_SOURCES}"
+        HEADERS "${GENERATED_HEADERS}"
+        SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
         TOP_LEVEL "${PROJECT_IS_TOP_LEVEL}"
     )

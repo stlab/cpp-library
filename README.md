@@ -39,11 +39,11 @@ include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 cpp_library_setup(
     DESCRIPTION "Your library description"
     NAMESPACE your_namespace
-    HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/your_namespace/your_header.hpp
-    # Optional: add SOURCES for non-header-only libraries
-    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/your_library.cpp
-    EXAMPLES your_example your_example_fail
-    TESTS your_tests
+    HEADERS your_header.hpp
+    # Add SOURCES for non-header-only libraries (omit for header-only)
+    SOURCES your_library.cpp
+    EXAMPLES your_example.cpp your_example_fail.cpp
+    TESTS your_tests.cpp
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
 )
 ```
@@ -63,27 +63,68 @@ cpp_library_setup(
     # Required parameters
     DESCRIPTION description        # e.g., "Type-safe operators for enums"
     NAMESPACE namespace            # e.g., "stlab"
-    HEADERS header_list            # List of header files
+    HEADERS header_list            # List of header filenames (e.g., "your_header.hpp")
     
-    # Optional: source specification for non-header-only libraries
-    SOURCES source_list            # List of source files (auto-detected from src/ if not provided)
+    # Source specification for non-header-only libraries
+    SOURCES source_list            # List of source filenames (e.g., "your_library.cpp", omit for header-only libraries)
 
     # Optional features
-    [EXAMPLES example_list]        # Example executables to build
-    [TESTS test_list]              # Test executables to build  
+    [EXAMPLES example_list]        # Example source files to build (e.g., "example.cpp example_fail.cpp")
+    [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")  
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
     [FORCE_INIT]                  # Force regeneration of template files
 )
 ```
 
-**Note**: The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`. Version is automatically detected from git tags.
+**Note**: The project name is automatically taken from `PROJECT_NAME` (set by the `project()`
+command). You must call `project(your-library)` before `cpp_library_setup()`. Version is
+automatically detected from git tags.
+
+**NOTE**: Examples using doctest should have `test` in the name if you want them to be visible in
+the TestMate test explorer.
+
+### Path Conventions
+
+The template uses consistent path conventions for all file specifications:
+
+- **HEADERS**: Filenames only, automatically placed in `include/<namespace>/` directory
+  - Examples: `your_header.hpp`, `enum_ops.hpp` (automatically becomes `include/your_namespace/your_header.hpp`)
+- **SOURCES**: Filenames only, automatically placed in `src/` directory (omit for header-only libraries)
+  - Examples: `your_library.cpp`, `implementation.cpp` (automatically becomes `src/your_library.cpp`)
+- **EXAMPLES**: Source files with `.cpp` extension, located in `examples/` directory
+  - Examples: `example.cpp`, `example_fail.cpp`
+- **TESTS**: Source files with `.cpp` extension, located in `tests/` directory
+  - Examples: `tests.cpp`, `unit_tests.cpp`
+
+The template automatically generates the full paths based on these conventions. HEADERS are placed in `include/<namespace>/` and SOURCES are placed in `src/`.
+
+### Library Types
+
+**Header-only libraries**: Specify only `HEADERS`, omit `SOURCES`
+```cmake
+cpp_library_setup(
+    DESCRIPTION "Header-only library"
+    NAMESPACE my_lib
+    HEADERS my_header.hpp
+    # No SOURCES needed for header-only
+)
+```
+
+**Non-header-only libraries**: Specify both `HEADERS` and `SOURCES`
+```cmake
+cpp_library_setup(
+    DESCRIPTION "Library with implementation"
+    NAMESPACE my_lib
+    HEADERS my_header.hpp
+    SOURCES my_library.cpp implementation.cpp
+)
+```
 
 ## Features
 ### Non-Header-Only Library Support
 
-- **Automatic detection of sources in `src/`**: If source files are present in `src/`, the template will build a regular (static) library instead of header-only INTERFACE target.
-    Specify sources manually with the `SOURCES` argument, or let the template auto-detect files in `src/`.
+- **Non-header-only library support**: For libraries with source files, specify them explicitly with the `SOURCES` argument as filenames (e.g., `"your_library.cpp"`).
     Both header-only and compiled libraries are supported seamlessly.
 
 ### Automated Infrastructure
@@ -177,9 +218,9 @@ include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 cpp_library_setup(
     DESCRIPTION "Type-safe operators for enums"
     NAMESPACE stlab
-    HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/stlab/enum_ops.hpp
-    EXAMPLES enum_ops_example enum_ops_example_fail
-    TESTS enum_ops_tests
+    HEADERS enum_ops.hpp
+    EXAMPLES enum_ops_example_test.cpp enum_ops_example_fail.cpp
+    TESTS enum_ops_tests.cpp
     DOCS_EXCLUDE_SYMBOLS "stlab::implementation"
 )
 ```
@@ -202,9 +243,9 @@ cpp_library_setup(
 
 3. **Add your headers** to `include/your_namespace/`
 
-4. **Add examples** to `examples/` (use `_fail` suffix for compile-fail tests)
+4. **Add examples** to `examples/` (use `_fail` suffix for compile-fail tests, e.g., `example.cpp`, `example_fail.cpp`)
 
-5. **Add tests** to `tests/` (use `_fail` suffix for compile-fail tests)
+5. **Add tests** to `tests/` (use `_fail` suffix for compile-fail tests, e.g., `tests.cpp`, `tests_fail.cpp`)
 
 6. **Build and test**:
    ```bash
