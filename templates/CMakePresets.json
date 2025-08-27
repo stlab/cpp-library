@@ -73,7 +73,7 @@
   "buildPresets": [
     { "name": "default", "displayName": "Default Build", "configurePreset": "default" },
     { "name": "test", "displayName": "Build Tests", "configurePreset": "test" },
-    { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": ["docs"] },
+    { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": "docs" },
     { "name": "clang-tidy", "displayName": "Build with Clang-Tidy", "configurePreset": "clang-tidy" },
     { "name": "init", "displayName": "Initialize Templates", "configurePreset": "init" }
   ],

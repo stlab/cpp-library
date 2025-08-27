@@ -1,0 +1,20 @@
+/*
+    Fix for doxygen-awesome-css@2.3.4
+
+    https://github.com/jothepro/doxygen-awesome-css/issues/186
+
+*/
+
+table.memberdecls .memItemLeft,
+table.memberdecls .memItemRight,
+table.memberdecls .memTemplItemLeft,
+table.memberdecls .memTemplItemRight,
+table.memberdecls .memTemplParams {
+    padding-top: unset;
+    border-top: unset;
+}
+
+table.memberdecls .memTemplParams {
+    border-bottom: 0;
+    padding-bottom: 0;
+}

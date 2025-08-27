@@ -57,13 +57,24 @@ function(_cpp_library_setup_docs)
         configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
     endif()
     
-    # Add custom target for documentation
-    add_custom_target(docs
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating API documentation with Doxygen"
-        VERBATIM
-    )
+    # Add custom target for documentation with proper stderr capture
+    if(WIN32)
+        # On Windows, use PowerShell to redirect stderr to stdout
+        add_custom_target(docs
+            COMMAND PowerShell -Command "& { ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT} 2>&1 }"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen"
+            VERBATIM
+        )
+    else()
+        # On Unix-like systems, use shell redirection
+        add_custom_target(docs
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT} 2>&1
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen"
+            VERBATIM
+        )
+    endif()
     
     # Ensure the output directory exists
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
