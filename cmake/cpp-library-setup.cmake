@@ -141,6 +141,8 @@ function(_cpp_library_copy_templates)
         ".gitattributes"
         ".vscode/extensions.json"
         "docs/index.html"
+        "CMakePresets.json"
+        ".github/workflows/ci.yml"
     )
 
     foreach(template_file IN LISTS TEMPLATE_FILES)

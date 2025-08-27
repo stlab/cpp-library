@@ -15,8 +15,6 @@ include(CTest)
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")  
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
-include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-presets.cmake")
-include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
 # Shared function to handle examples and tests consistently
 function(_cpp_library_setup_executables)
@@ -101,9 +99,6 @@ endfunction()
 # Main entry point function - users call this to set up their library
 function(cpp_library_setup)
     # Parse arguments
-    set(options 
-        FORCE_INIT             # Force regeneration of template files
-    )
     set(oneValueArgs
         DESCRIPTION             # Description string
         NAMESPACE               # Namespace (e.g., "stlab")
@@ -117,10 +112,8 @@ function(cpp_library_setup)
         DOCS_EXCLUDE_SYMBOLS    # Symbols to exclude from docs
     )
     
-    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-
-    
     # Validate required arguments
     if(NOT ARG_DESCRIPTION)
         message(FATAL_ERROR "cpp_library_setup: DESCRIPTION is required")
@@ -141,15 +134,6 @@ function(cpp_library_setup)
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
         set(ARG_REQUIRES_CPP_VERSION 17)
-    endif()
-    
-    # Set default for FORCE_INIT (can be overridden via -DCPP_LIBRARY_FORCE_INIT=ON)
-    if(NOT DEFINED ARG_FORCE_INIT)
-        set(ARG_FORCE_INIT FALSE)
-    endif()
-    
-    if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
-        set(ARG_FORCE_INIT TRUE)
     endif()
     
     # Get version from git tags
@@ -212,15 +196,8 @@ function(cpp_library_setup)
         )
     endif()
     
-    # Generate CMakePresets.json
-    if(ARG_FORCE_INIT)
-        _cpp_library_generate_presets(FORCE_INIT)
-    else()
-        _cpp_library_generate_presets()
-    endif()
-
-    # Copy static template files (like .clang-format, .gitignore, etc.)
-    if(ARG_FORCE_INIT)
+    # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
+    if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
         _cpp_library_copy_templates(FORCE_INIT)
     else()
         _cpp_library_copy_templates()
@@ -246,21 +223,7 @@ function(cpp_library_setup)
         )
     endif()
     
-    # Setup CI
-    if(ARG_FORCE_INIT)
-        _cpp_library_setup_ci(
-            NAME "${ARG_NAME}"
-            VERSION "${ARG_VERSION}"
-            DESCRIPTION "${ARG_DESCRIPTION}"
-            FORCE_INIT
-        )
-    else()
-        _cpp_library_setup_ci(
-            NAME "${ARG_NAME}"
-            VERSION "${ARG_VERSION}"
-            DESCRIPTION "${ARG_DESCRIPTION}"
-        )
-    endif()
+
     
     # Build examples if specified (only when BUILD_TESTING is enabled)
     if(BUILD_TESTING AND ARG_EXAMPLES)

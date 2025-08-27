@@ -73,7 +73,6 @@ cpp_library_setup(
     [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")  
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
-    [FORCE_INIT]                  # Force regeneration of template files
 )
 ```
 
@@ -83,6 +82,23 @@ automatically detected from git tags.
 
 **NOTE**: Examples using doctest should have `test` in the name if you want them to be visible in
 the TestMate test explorer.
+
+### Template Regeneration
+
+To force regeneration of template files (CMakePresets.json, CI workflows, etc.), you can use the `init` preset:
+
+```bash
+cmake --preset=init
+cmake --build --preset=init
+```
+
+Alternatively, you can set the CMake variable `CPP_LIBRARY_FORCE_INIT` to `ON`:
+
+```bash
+cmake -DCPP_LIBRARY_FORCE_INIT=ON .
+```
+
+This will regenerate all template files, overwriting any existing ones.
 
 ### Path Conventions
 
@@ -170,7 +186,7 @@ cpp_library_setup(
   - `test`: Debug build with testing
   - `docs`: Documentation generation
   - `clang-tidy`: Static analysis
-  - `init`: Template regeneration
+  - `init`: Template regeneration (forces regeneration of CMakePresets.json, CI workflows, etc.)
 
 ### CI/CD Features
 
@@ -252,6 +268,12 @@ cpp_library_setup(
    cmake --preset=test
    cmake --build --preset=test
    ctest --preset=test
+   ```
+
+7. **Regenerate templates** (if needed):
+   ```bash
+   cmake --preset=init
+   cmake --build --preset=init
    ```
 
 ## Template Files Generated
