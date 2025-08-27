@@ -95,7 +95,7 @@ cmake --build --preset=init
 Alternatively, you can set the CMake variable `CPP_LIBRARY_FORCE_INIT` to `ON`:
 
 ```bash
-cmake -DCPP_LIBRARY_FORCE_INIT=ON .
+cmake -DCPP_LIBRARY_FORCE_INIT=ON -B build/init
 ```
 
 This will regenerate all template files, overwriting any existing ones.
