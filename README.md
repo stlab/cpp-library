@@ -2,14 +2,14 @@
 
 [![License][license-badge]][license-link]
 
-Modern CMake template for C++ header-only libraries with comprehensive infrastructure.
+Modern CMake template for C++ libraries with comprehensive infrastructure.
 
 [license-badge]: https://img.shields.io/badge/license-BSL%201.0-blue.svg
 [license-link]: https://github.com/stlab/cpp-library/blob/main/LICENSE
 
 ## Overview
 
-`cpp-library` provides a standardized CMake infrastructure template for header-only C++ libraries. It eliminates boilerplate and provides consistent patterns for:
+`cpp-library` provides a standardized CMake infrastructure template for C++ libraries. It eliminates boilerplate and provides consistent patterns for:
 
 - **Project Declaration**: Uses existing `project()` declaration with automatic git tag-based versioning
 - **Library Setup**: INTERFACE targets with proper installation and package config
