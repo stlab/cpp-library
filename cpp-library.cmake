@@ -18,6 +18,83 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-presets.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
+# Shared function to handle examples and tests consistently
+function(_cpp_library_setup_executables)
+    set(oneValueArgs
+        NAME
+        NAMESPACE
+        TYPE
+    )
+    set(multiValueArgs
+        EXECUTABLES
+    )
+    
+    cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    
+    # Extract the clean library name for linking
+    string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    
+    # Download doctest dependency via CPM
+    if(NOT TARGET doctest::doctest)
+        CPMAddPackage("gh:doctest/doctest@2.4.12")
+    endif()
+    
+    # Determine source directory based on type
+    if(ARG_TYPE STREQUAL "examples")
+        set(source_dir "examples")
+    elseif(ARG_TYPE STREQUAL "tests")
+        set(source_dir "tests")
+    else()
+        message(FATAL_ERROR "_cpp_library_setup_executables: TYPE must be 'examples' or 'tests'")
+    endif()
+    
+    # Add executables
+    foreach(executable IN LISTS ARG_EXECUTABLES)
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}/${executable}.cpp")
+            
+            # Check if this is a compile-fail test (has "_fail" in the name)
+            string(FIND "${executable}" "_fail" fail_pos)
+            if(fail_pos GREATER -1)
+                # Negative compile test: this executable must fail to compile
+                add_executable(${executable} EXCLUDE_FROM_ALL "${source_dir}/${executable}.cpp")
+                target_link_libraries(${executable} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
+                add_test(
+                    NAME compile_${executable}
+                    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${executable}
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+                set_tests_properties(compile_${executable} PROPERTIES WILL_FAIL TRUE)
+            else()
+                # Regular executable - conditionally build based on preset
+                add_executable(${executable} "${source_dir}/${executable}.cpp")
+                target_link_libraries(${executable} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
+                
+                # Only fully build (compile and link) in test preset
+                # In clang-tidy preset, compile with clang-tidy but don't link
+                if(CMAKE_CXX_CLANG_TIDY)
+                    # In clang-tidy mode, exclude from all builds but still compile
+                    set_target_properties(${executable} PROPERTIES EXCLUDE_FROM_ALL TRUE)
+                    # Don't add as a test in clang-tidy mode since we're not linking
+                else()
+                    # In test mode, build normally and add as test
+                    add_test(NAME ${executable} COMMAND ${executable})
+                    
+                    # Set test properties for better IDE integration (only for tests)
+                    if(ARG_TYPE STREQUAL "tests")
+                        set_tests_properties(${executable} PROPERTIES
+                            LABELS "doctest"
+                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        )
+                    endif()
+                endif()
+            endif()
+        else()
+            message(WARNING "${ARG_TYPE} file ${source_dir}/${executable}.cpp not found")
+        endif()
+    endforeach()
+    
+endfunction()
+
 # Main entry point function - users call this to set up their library
 function(cpp_library_setup)
     # Parse arguments
@@ -73,7 +150,8 @@ function(cpp_library_setup)
     if(NOT DEFINED ARG_FORCE_INIT)
         set(ARG_FORCE_INIT FALSE)
     endif()
-    if(CPP_LIBRARY_FORCE_INIT)
+    
+    if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
         set(ARG_FORCE_INIT TRUE)
     endif()
     
@@ -116,8 +194,8 @@ function(cpp_library_setup)
         return()  # Early return for lightweight consumer mode
     endif()
     
-    # Create symlink to compile_commands.json for clangd
-    if(CMAKE_EXPORT_COMPILE_COMMANDS)
+    # Create symlink to compile_commands.json for clangd (only when BUILD_TESTING is enabled)
+    if(CMAKE_EXPORT_COMPILE_COMMANDS AND BUILD_TESTING)
         add_custom_target(clangd_compile_commands ALL
             COMMAND ${CMAKE_COMMAND} -E create_symlink 
                 ${CMAKE_BINARY_DIR}/compile_commands.json
@@ -127,17 +205,26 @@ function(cpp_library_setup)
     endif()
     
     # Generate CMakePresets.json
-    _cpp_library_generate_presets(FORCE_INIT ${ARG_FORCE_INIT})
+    if(ARG_FORCE_INIT)
+        _cpp_library_generate_presets(FORCE_INIT)
+    else()
+        _cpp_library_generate_presets()
+    endif()
 
     # Copy static template files (like .clang-format, .gitignore, etc.)
-    _cpp_library_copy_templates(FORCE_INIT ${ARG_FORCE_INIT})
+    if(ARG_FORCE_INIT)
+        _cpp_library_copy_templates(FORCE_INIT)
+    else()
+        _cpp_library_copy_templates()
+    endif()
     
     # Setup testing (if tests are specified)
     if(BUILD_TESTING AND ARG_TESTS)
-        _cpp_library_setup_testing(
+        _cpp_library_setup_executables(
             NAME "${ARG_NAME}"
             NAMESPACE "${ARG_NAMESPACE}" 
-            TESTS "${ARG_TESTS}"
+            TYPE "tests"
+            EXECUTABLES "${ARG_TESTS}"
         )
     endif()
     
@@ -152,41 +239,29 @@ function(cpp_library_setup)
     endif()
     
     # Setup CI
-    _cpp_library_setup_ci(
-        NAME "${ARG_NAME}"
-        VERSION "${ARG_VERSION}"
-        DESCRIPTION "${ARG_DESCRIPTION}"
-        FORCE_INIT ${ARG_FORCE_INIT}
-    )
+    if(ARG_FORCE_INIT)
+        _cpp_library_setup_ci(
+            NAME "${ARG_NAME}"
+            VERSION "${ARG_VERSION}"
+            DESCRIPTION "${ARG_DESCRIPTION}"
+            FORCE_INIT
+        )
+    else()
+        _cpp_library_setup_ci(
+            NAME "${ARG_NAME}"
+            VERSION "${ARG_VERSION}"
+            DESCRIPTION "${ARG_DESCRIPTION}"
+        )
+    endif()
     
-    # Build examples if specified  
-    if(ARG_EXAMPLES)
-        foreach(example IN LISTS ARG_EXAMPLES)
-            if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/${example}.cpp")
-                string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
-                
-                # Check if this is a compile-fail test (has "_fail" in the name)
-                string(FIND "${example}" "_fail" fail_pos)
-                if(fail_pos GREATER -1)
-                    # Negative compile test: this example must fail to compile
-                    add_executable(${example} EXCLUDE_FROM_ALL "examples/${example}.cpp")
-                    target_link_libraries(${example} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
-                    add_test(
-                        NAME compile_${example}
-                        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${example}
-                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                    )
-                    set_tests_properties(compile_${example} PROPERTIES WILL_FAIL TRUE)
-                else()
-                    # Regular example
-                    add_executable(${example} "examples/${example}.cpp")
-                    target_link_libraries(${example} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
-                    add_test(NAME ${example} COMMAND ${example})
-                endif()
-            else()
-                message(WARNING "Example file examples/${example}.cpp not found")
-            endif()
-        endforeach()
+    # Build examples if specified (only when BUILD_TESTING is enabled)
+    if(BUILD_TESTING AND ARG_EXAMPLES)
+        _cpp_library_setup_executables(
+            NAME "${ARG_NAME}"
+            NAMESPACE "${ARG_NAMESPACE}" 
+            TYPE "examples"
+            EXECUTABLES "${ARG_EXAMPLES}"
+        )
     endif()
     
 endfunction()

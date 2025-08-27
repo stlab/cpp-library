@@ -29,7 +29,7 @@ cmake_minimum_required(VERSION 3.20)
 # Project declaration - cpp_library_setup will use this name and detect version from git tags
 project(your-library)
 
-set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache")
+set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
@@ -166,7 +166,7 @@ cmake_minimum_required(VERSION 3.20)
 project(enum-ops)
 
 # Setup cpp-library infrastructure
-set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cpm-cache CACHE PATH "CPM cache" FORCE)
+set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache" FORCE)
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
@@ -204,7 +204,7 @@ cpp_library_setup(
 
 4. **Add examples** to `examples/` (use `_fail` suffix for compile-fail tests)
 
-5. **Add tests** to `tests/`
+5. **Add tests** to `tests/` (use `_fail` suffix for compile-fail tests)
 
 6. **Build and test**:
    ```bash

@@ -14,11 +14,15 @@ function(_cpp_library_setup_ci)
     
     # Only generate CI files if they don't exist (unless forcing)
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml" OR ARG_FORCE_INIT)
-        if(ARG_FORCE_INIT)
-            message(STATUS "Force regenerating .github/workflows/ci.yml")
-        endif()
         # Create .github/workflows directory
         file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows")
+        
+        # Show appropriate message
+        if(ARG_FORCE_INIT)
+            message(STATUS "Force regenerating .github/workflows/ci.yml")
+        else()
+            message(STATUS "Generating .github/workflows/ci.yml from template")
+        endif()
         
         # Determine template source
         if(DEFINED CPP_LIBRARY_CI_TEMPLATE)

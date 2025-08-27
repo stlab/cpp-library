@@ -11,12 +11,15 @@ function(_cpp_library_generate_presets)
         return()
     endif()
     
-    if(ARG_FORCE_INIT)
-        message(STATUS "Force regenerating CMakePresets.json")
-    endif()
-    
     set(PRESETS_TEMPLATE ${CPP_LIBRARY_ROOT}/templates/CMakePresets.json.in)
     set(PRESETS_OUT ${CMAKE_CURRENT_SOURCE_DIR}/CMakePresets.json)
+    
+    # Show appropriate message
+    if(ARG_FORCE_INIT)
+        message(STATUS "Force regenerating CMakePresets.json")
+    else()
+        message(STATUS "Generating CMakePresets.json from template")
+    endif()
     
     # Configure the presets template
     configure_file(${PRESETS_TEMPLATE} ${PRESETS_OUT} @ONLY)

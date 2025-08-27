@@ -9,6 +9,7 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_CXX_EXTENSIONS": "OFF"
       }
@@ -31,9 +32,13 @@
       "displayName": "Documentation Configuration",
       "description": "Configuration for building documentation",
       "binaryDir": "${sourceDir}/build/docs",
-      "inherits": "test",
+      "generator": "Ninja",
       "cacheVariables": {
-        "BUILD_DOCS": "ON"
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "OFF",
+        "BUILD_DOCS": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF"
       }
     },
     {
@@ -41,8 +46,12 @@
       "displayName": "Clang-Tidy Configuration",
       "description": "Configuration for running clang-tidy static analysis",
       "binaryDir": "${sourceDir}/build/clang-tidy",
-      "inherits": "test",
+      "generator": "Ninja",
       "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_TESTING": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
         "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
       }
     },
@@ -51,8 +60,12 @@
       "displayName": "Initialize Templates",
       "description": "Force regeneration of template files (CMakePresets.json, CI, etc.)",
       "binaryDir": "${sourceDir}/build/init",
-      "inherits": "test",
+      "generator": "Ninja",
       "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "OFF",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
         "CPP_LIBRARY_FORCE_INIT": "ON"
       }
     }
