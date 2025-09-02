@@ -33,7 +33,7 @@ set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
-CPMAddPackage("gh:stlab/cpp-library@4.0.0")
+CPMAddPackage("gh:stlab/cpp-library@4.0.1")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 cpp_library_setup(
@@ -227,7 +227,7 @@ set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache" FORCE
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
-CPMAddPackage("gh:stlab/cpp-library@4.0.0")
+CPMAddPackage("gh:stlab/cpp-library@4.0.1")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Configure library (handles both lightweight and full modes automatically)
