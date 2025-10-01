@@ -172,7 +172,7 @@ cpp_library_setup(
 ### Documentation Features
 
 - **Doxygen integration** with modern configuration
-- **doxygen-awesome-css@2.3.4** theme for beautiful output
+- **doxygen-awesome-css@2.4.0** theme for beautiful output
 - **Symbol exclusion** support for implementation details
 - **GitHub Pages deployment** via CI
 - **Custom Doxyfile support** (falls back to template)

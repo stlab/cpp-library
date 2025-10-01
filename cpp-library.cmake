@@ -34,6 +34,7 @@ function(_cpp_library_setup_executables)
     
     # Download doctest dependency via CPM
     if(NOT TARGET doctest::doctest)
+        # https://github.com/doctest/doctest
         CPMAddPackage("gh:doctest/doctest@2.4.12")
     endif()
     
