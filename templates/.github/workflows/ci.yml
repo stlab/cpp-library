@@ -49,17 +49,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@v1
-
-      - name: Setup Clang
-        uses: egor-tensin/setup-clang@v1
-        with:
-          version: latest
-
-      - name: Install clang-tidy
-        run: sudo apt-get update && sudo apt-get install -y clang-tidy
-
       - name: Configure CMake with clang-tidy
         run: cmake --preset=clang-tidy
 
