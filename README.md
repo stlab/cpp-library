@@ -28,7 +28,10 @@ cmake_minimum_required(VERSION 3.20)
 # Project declaration - cpp_library_setup will use this name and detect version from git tags
 project(your-library)
 
-set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
+# Setup cpp-library infrastructure
+if(PROJECT_IS_TOP_LEVEL)
+    set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
+endif()
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
@@ -173,7 +176,7 @@ cpp_library_setup(
 ### Documentation Features
 
 - **Doxygen integration** with modern configuration
-- **doxygen-awesome-css@2.4.0** theme for beautiful output
+- **doxygen-awesome-css@2.4.1** theme for beautiful output
 - **Symbol exclusion** support for implementation details
 - **GitHub Pages deployment** via CI
 - **Custom Doxyfile support** (falls back to template)
@@ -224,7 +227,9 @@ cmake_minimum_required(VERSION 3.20)
 project(enum-ops)
 
 # Setup cpp-library infrastructure
-set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache" FORCE)
+if(PROJECT_IS_TOP_LEVEL)
+    set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
+endif()
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library via CPM
