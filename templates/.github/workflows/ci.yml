@@ -5,9 +5,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   release:
     types: [published]
 
@@ -32,42 +32,42 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-    - name: Configure CMake
-      run: cmake --preset=test
+      - name: Configure CMake
+        run: cmake --preset=test
 
-    - name: Build
-      run: cmake --build --preset=test
+      - name: Build
+        run: cmake --build --preset=test
 
-    - name: Test
-      run: ctest --preset=test
+      - name: Test
+        run: ctest --preset=test
 
   clang-tidy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-    - name: Setup Ninja
-      uses: ashutoshvarma/setup-ninja@master
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@v1
 
-    - name: Setup Clang
-      uses: egor-tensin/setup-clang@v1
-      with:
-        version: latest
+      - name: Setup Clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
 
-    - name: Install clang-tidy
-      run: sudo apt-get update && sudo apt-get install -y clang-tidy
+      - name: Install clang-tidy
+        run: sudo apt-get update && sudo apt-get install -y clang-tidy
 
-    - name: Configure CMake with clang-tidy
-      run: cmake --preset=clang-tidy
+      - name: Configure CMake with clang-tidy
+        run: cmake --preset=clang-tidy
 
-    - name: Build with clang-tidy
-      run: cmake --build --preset=clang-tidy
+      - name: Build with clang-tidy
+        run: cmake --build --preset=clang-tidy
 
-    - name: Run tests with clang-tidy
-      run: ctest --preset=clang-tidy
+      - name: Run tests with clang-tidy
+        run: ctest --preset=clang-tidy
 
   docs:
     runs-on: ubuntu-latest
@@ -76,27 +76,27 @@ jobs:
       id-token: write
       pages: write
       contents: read
-    
+
     steps:
-    - uses: actions/checkout@v5
-      
-    - name: Install Doxygen
-      uses: ssciwr/doxygen-install@v1
-    
-    - name: Configure CMake
-      run: cmake --preset=docs
-    
-    - name: Build Documentation
-      run: cmake --build --preset=docs
-    
-    - name: Setup Pages
-      uses: actions/configure-pages@v5
+      - uses: actions/checkout@v5
 
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: build/docs/html
+      - name: Install Doxygen
+        uses: ssciwr/doxygen-install@v1
 
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Configure CMake
+        run: cmake --preset=docs
+
+      - name: Build Documentation
+        run: cmake --build --preset=docs
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/docs/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
