@@ -12,7 +12,6 @@ Modern CMake template for C++ libraries with comprehensive infrastructure.
 `cpp-library` provides a standardized CMake infrastructure template for C++ libraries. It eliminates boilerplate and provides consistent patterns for:
 
 - **Project Declaration**: Uses existing `project()` declaration with automatic git tag-based versioning
-- **Library Setup**: INTERFACE targets with proper installation and package config
 - **Testing**: Integrated doctest with CTest and compile-fail test support
 - **Documentation**: Doxygen with doxygen-awesome-css theme
 - **Development Tools**: clangd integration, CMakePresets.json, clang-tidy support
@@ -64,13 +63,13 @@ cpp_library_setup(
     DESCRIPTION description        # e.g., "Type-safe operators for enums"
     NAMESPACE namespace            # e.g., "stlab"
     HEADERS header_list            # List of header filenames (e.g., "your_header.hpp")
-    
+
     # Source specification for non-header-only libraries
     SOURCES source_list            # List of source filenames (e.g., "your_library.cpp", omit for header-only libraries)
 
     # Optional features
     [EXAMPLES example_list]        # Example source files to build (e.g., "example.cpp example_fail.cpp")
-    [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")  
+    [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
 )
@@ -118,6 +117,7 @@ The template automatically generates the full paths based on these conventions. 
 ### Library Types
 
 **Header-only libraries**: Specify only `HEADERS`, omit `SOURCES`
+
 ```cmake
 cpp_library_setup(
     DESCRIPTION "Header-only library"
@@ -128,6 +128,7 @@ cpp_library_setup(
 ```
 
 **Non-header-only libraries**: Specify both `HEADERS` and `SOURCES`
+
 ```cmake
 cpp_library_setup(
     DESCRIPTION "Library with implementation"
@@ -138,15 +139,15 @@ cpp_library_setup(
 ```
 
 ## Features
+
 ### Non-Header-Only Library Support
 
 - **Non-header-only library support**: For libraries with source files, specify them explicitly with the `SOURCES` argument as filenames (e.g., `"your_library.cpp"`).
-    Both header-only and compiled libraries are supported seamlessly.
+  Both header-only and compiled libraries are supported seamlessly.
 
 ### Automated Infrastructure
 
 - **CMakePresets.json**: Generates standard presets (default, test, docs, clang-tidy, init)
-- **Installation**: Modern CMake package config with FILE_SET headers
 - **Testing**: doctest integration with CTest and compile-fail test support
 - **Documentation**: Doxygen with doxygen-awesome-css theme
 - **Development**: clangd compile_commands.json symlink
@@ -155,12 +156,12 @@ cpp_library_setup(
 ### Smart Defaults
 
 - **C++17** standard requirement (configurable)
-- **Ninja** generator in presets  
+- **Ninja** generator in presets
 - **Debug** builds for testing, **Release** for default
 - **Build isolation** with separate build directories
 - **Two-mode operation**: Full infrastructure when top-level, lightweight when consumed
 - **Automatic version detection**: Version is automatically extracted from git tags (e.g., `v1.2.3` becomes `1.2.3`)
-- **Always-enabled features**: CI/CD, CMakePresets.json, and proper installation are always generated
+- **Always-enabled features**: CI/CD, and CMakePresets.json, are always generated
 
 ### Testing Features
 
@@ -244,13 +245,14 @@ cpp_library_setup(
 ## Quick Start
 
 1. **Initialize a new project**:
+
    ```bash
    # Clone or create your project
    mkdir my-library && cd my-library
-   
+
     # Create basic structure
     mkdir -p include/your_namespace src examples tests cmake
-   
+
    # Add CPM.cmake
    curl -L https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake -o cmake/CPM.cmake
    ```
@@ -264,6 +266,7 @@ cpp_library_setup(
 5. **Add tests** to `tests/` (use `_fail` suffix for compile-fail tests, e.g., `tests.cpp`, `tests_fail.cpp`)
 
 6. **Build and test**:
+
    ```bash
    cmake --preset=test
    cmake --build --preset=test
@@ -280,11 +283,11 @@ cpp_library_setup(
 
 The template automatically generates:
 
- - **CMakePresets.json**: Build configurations for different purposes
- - **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline
- - **.gitignore**: Standard ignores for C++ projects
- - **src/**: Source directory for non-header-only libraries (auto-detected)
- - **Package config files**: For proper CMake integration
+- **CMakePresets.json**: Build configurations for different purposes
+- **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline
+- **.gitignore**: Standard ignores for C++ projects
+- **src/**: Source directory for non-header-only libraries (auto-detected)
+- **Package config files**: For proper CMake integration
 
 ## License
 
