@@ -20,7 +20,7 @@ Modern CMake template for C++ libraries with comprehensive infrastructure.
 
 ## Usage
 
-Use CPMAddPackage to fetch cpp-library directly in your CMakeLists.txt:
+Install [CPM](https://github.com/cpm-cmake/CPM.cmake) and use `CPMAddPackage` to fetch cpp-library directly in your CMakeLists.txt:
 
 ```cmake
 cmake_minimum_required(VERSION 3.20)
@@ -49,6 +49,36 @@ cpp_library_setup(
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
 )
 ```
+
+## Using Your Library
+
+To consume a library using cpp-library, use [CPM](https://github.com/cpm-cmake/CPM.cmake) or `FetchContent`.
+
+```cmake
+CPMAddPackage("gh:your-org/your-library@1.0.0")
+target_link_libraries(executable your_namespace::your-library)
+```
+
+### Target Naming
+
+For `project(your-library)`, `cpp_library_setup` will create a target called `your-library`.
+
+The utility will additionally create an alias target based on the `NAMESPACE` option, `your_namespace::your-library`.
+
+If your project name starts with the namespace followed by a dash, the namespace in the project ma,e is stripped from the alias target:
+
+```cmake
+... # skip skip
+project(namespace-library)
+... # skip skip skip
+
+cpp_library_setup(
+  NAMESPACE namespace
+  ...
+)
+```
+
+Results in  `namespace-library` and `namespace::library`.
 
 ### Prerequisites
 
