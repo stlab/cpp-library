@@ -197,6 +197,28 @@ cpp_library_setup(
 - Version is automatically detected from git tags (see [Version Tagging](#version-tagging)).
 - Examples using doctest should include `test` in the filename to be visible in the [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter) extension for VS Code test explorer.
 
+### Target Naming
+
+For `project(your-library)`, `cpp_library_setup` will create a target called `your-library`.
+
+The utility will additionally create an alias target based on the `NAMESPACE` option: `your_namespace::your-library`.
+
+If your project name starts with the namespace followed by a dash, the namespace in the project name is stripped from the alias target:
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+project(namespace-library)
+
+# ... CPM setup ...
+
+cpp_library_setup(
+    NAMESPACE namespace
+    # ...
+)
+```
+
+Results in `namespace-library` and `namespace::library` targets.
+
 ### Path Conventions
 
 The template uses consistent path conventions for all file specifications:
