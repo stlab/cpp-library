@@ -77,9 +77,9 @@ jobs:
           project(test-find-package CXX)
 
           set(CMAKE_PREFIX_PATH "${{ runner.temp }}/install")
-          find_package(\${PROJECT_NAME} REQUIRED)
+          find_package(${PROJECT_NAME} REQUIRED)
 
-          message(STATUS "Successfully found \${PROJECT_NAME}")
+          message(STATUS "Successfully found ${PROJECT_NAME}")
           EOF
 
           # Test find_package
@@ -110,12 +110,12 @@ jobs:
 
           # CPMFindPackage tries find_package first, then falls back to CPMAddPackage
           CPMFindPackage(
-              NAME \${PROJECT_NAME}
+              NAME ${PROJECT_NAME}
               GITHUB_REPOSITORY ${{ github.repository }}
               GIT_TAG ${{ github.sha }}
           )
 
-          message(STATUS "Successfully acquired \${PROJECT_NAME} via CPMFindPackage")
+          message(STATUS "Successfully acquired ${PROJECT_NAME} via CPMFindPackage")
           EOF
 
           # Test CPMFindPackage (should find the installed version first)
