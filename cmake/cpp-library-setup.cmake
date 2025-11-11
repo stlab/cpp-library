@@ -53,11 +53,12 @@ function(_cpp_library_setup_core)
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
 
     if(ARG_SOURCES)
-        # Create a regular library if sources are present
-        add_library(${ARG_NAME} STATIC ${ARG_SOURCES})
+        # Create a library with sources (respects BUILD_SHARED_LIBS variable)
+        add_library(${ARG_NAME} ${ARG_SOURCES})
         add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
         )
         target_compile_features(${ARG_NAME} PUBLIC cxx_std_${ARG_REQUIRES_CPP_VERSION})
         if(ARG_HEADERS)
@@ -74,6 +75,7 @@ function(_cpp_library_setup_core)
         add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
         )
         target_compile_features(${ARG_NAME} INTERFACE cxx_std_${ARG_REQUIRES_CPP_VERSION})
         if(ARG_HEADERS)
@@ -84,6 +86,16 @@ function(_cpp_library_setup_core)
                 FILES ${ARG_HEADERS}
             )
         endif()
+    endif()
+    
+    # Setup installation when building as top-level project
+    if(ARG_TOP_LEVEL)
+        _cpp_library_setup_install(
+            NAME "${ARG_NAME}"
+            VERSION "${ARG_VERSION}"
+            NAMESPACE "${ARG_NAMESPACE}"
+            HEADERS "${ARG_HEADERS}"
+        )
     endif()
 
 endfunction()

@@ -12,15 +12,17 @@ Modern CMake template for C++ libraries with comprehensive infrastructure.
 `cpp-library` provides a standardized CMake infrastructure template for C++ libraries. It eliminates boilerplate and provides consistent patterns for:
 
 - **Project Declaration**: Uses existing `project()` declaration with automatic git tag-based versioning
-- **Testing**: Integrated doctest with CTest and compile-fail test support
-- **Documentation**: Doxygen with doxygen-awesome-css theme
-- **Development Tools**: clangd integration, CMakePresets.json, clang-tidy support
-- **CI/CD**: GitHub Actions workflows with multi-platform testing
-- **Dependency Management**: CPM.cmake integration
+- **Library Setup**: INTERFACE targets for header-only libraries, static/shared libraries for compiled libraries
+- **Installation**: CMake package config generation with proper header and library installation
+- **Testing**: Integrated [doctest](https://github.com/doctest/doctest) with CTest and compile-fail test support
+- **Documentation**: [Doxygen](https://www.doxygen.nl/) with [doxygen-awesome-css](https://github.com/jothepro/doxygen-awesome-css) theme
+- **Development Tools**: [clangd](https://clangd.llvm.org/) integration, CMakePresets.json, [clang-tidy](https://clang.llvm.org/extra/clang-tidy/) support
+- **CI/CD**: [GitHub Actions](https://docs.github.com/en/actions) workflows with multi-platform testing and installation verification
+- **Dependency Management**: [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) integration
 
 ## Usage
 
-Use CPMAddPackage to fetch cpp-library directly in your CMakeLists.txt:
+Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 
 ```cmake
 cmake_minimum_required(VERSION 3.20)
@@ -28,7 +30,7 @@ cmake_minimum_required(VERSION 3.20)
 # Project declaration - cpp_library_setup will use this name and detect version from git tags
 project(your-library)
 
-# Setup cpp-library infrastructure
+# Only set CPM cache when building as top-level project
 if(PROJECT_IS_TOP_LEVEL)
     set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
 endif()
@@ -50,11 +52,122 @@ cpp_library_setup(
 )
 ```
 
-### Prerequisites
+### Getting Started
 
-- **CPM.cmake**: Must be included before using cpp-library
-- **CMake 3.20+**: Required for modern CMake features
-- **C++17+**: Default requirement (configurable)
+Before using cpp-library, you'll need:
+
+- **CMake 3.20+** - [Download here](https://cmake.org/download/)
+- **A C++17+ compiler** - GCC 7+, Clang 5+, MSVC 2017+, or Apple Clang 9+
+
+#### Step 1: Install CPM.cmake
+
+[CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) is required for dependency management. [Add it to your project](https://github.com/cpm-cmake/CPM.cmake?tab=readme-ov-file#adding-cpm):
+
+```bash
+mkdir -p cmake
+wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
+```
+
+Create the standard directory structure:
+
+```bash
+mkdir -p include/your_namespace examples tests
+```
+
+#### Step 2: Create your CMakeLists.txt
+
+Create a `CMakeLists.txt` file following the example shown at the [beginning of the Usage section](#usage).
+
+#### Step 3: Build and test
+
+```bash
+cmake --preset=test
+cmake --build --preset=test
+ctest --preset=test
+```
+
+### Consuming Libraries Built with cpp-library
+
+#### Using CPMAddPackage (recommended)
+
+The preferred way to consume a library built with cpp-library is via [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake):
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+project(my-app)
+
+include(cmake/CPM.cmake)
+
+# Fetch the library directly from GitHub
+CPMAddPackage("gh:your-org/your-library@1.0.0")
+
+add_executable(my-app main.cpp)
+target_link_libraries(my-app PRIVATE your_namespace::your-library)
+```
+
+The library will be automatically fetched and built as part of your project.
+
+#### Installation (optional)
+
+Installation is optional and typically not required when using CPM. If you need to install your library (e.g., for system-wide deployment or use with a package manager) use:
+
+```bash
+# Build and install to default system location
+cmake --preset=default
+cmake --build --preset=default
+cmake --install build/default
+
+# Install to custom prefix
+cmake --install build/default --prefix /opt/mylib
+```
+
+For information about using installed packages with `find_package()`, see the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake) about [controlling how dependencies are found](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
+
+### Updating cpp-library
+
+To update to the latest version of cpp-library in your project:
+
+#### Step 1: Update the version in CMakeLists.txt
+
+Change the version tag in your `CPMAddPackage` call:
+
+```cmake
+CPMAddPackage("gh:stlab/cpp-library@4.1.0")  # Update version here
+```
+
+#### Step 2: Regenerate template files
+
+Use the `init` preset to regenerate `CMakePresets.json` and CI workflows with the latest templates:
+
+```bash
+cmake --preset=init
+cmake --build --preset=init
+```
+
+This ensures your project uses the latest presets and CI configurations from the updated cpp-library version.
+
+### Setting Up GitHub Repository
+
+#### Version Tagging
+
+cpp-library automatically detects your library version from git tags. To version your library:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Tags should follow [semantic versioning](https://semver.org/) (e.g., `v1.0.0`, `v2.1.3`).
+
+#### GitHub Pages Deployment
+
+To enable automatic documentation deployment to GitHub Pages:
+
+1. Go to your repository **Settings** → **Pages**
+2. Under **Source**, select **GitHub Actions**
+3. Push a commit to trigger the CI workflow
+
+Your documentation will be automatically built and deployed to `https://your-org.github.io/your-library/` on every push to the main branch.
 
 ## API Reference
 
@@ -78,29 +191,11 @@ cpp_library_setup(
 )
 ```
 
-**Note**: The project name is automatically taken from `PROJECT_NAME` (set by the `project()`
-command). You must call `project(your-library)` before `cpp_library_setup()`. Version is
-automatically detected from git tags.
+**Notes:**
 
-**NOTE**: Examples using doctest should have `test` in the name if you want them to be visible in
-the TestMate test explorer.
-
-### Template Regeneration
-
-To force regeneration of template files (CMakePresets.json, CI workflows, etc.), you can use the `init` preset:
-
-```bash
-cmake --preset=init
-cmake --build --preset=init
-```
-
-Alternatively, you can set the CMake variable `CPP_LIBRARY_FORCE_INIT` to `ON`:
-
-```bash
-cmake -DCPP_LIBRARY_FORCE_INIT=ON -B build/init
-```
-
-This will regenerate all template files, overwriting any existing ones.
+- The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
+- Version is automatically detected from git tags (see [Version Tagging](#version-tagging)).
+- Examples using doctest should include `test` in the filename to be visible in the [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter) extension for VS Code test explorer.
 
 ### Path Conventions
 
@@ -114,8 +209,6 @@ The template uses consistent path conventions for all file specifications:
   - Examples: `example.cpp`, `example_fail.cpp`
 - **TESTS**: Source files with `.cpp` extension, located in `tests/` directory
   - Examples: `tests.cpp`, `unit_tests.cpp`
-
-The template automatically generates the full paths based on these conventions. HEADERS are placed in `include/<namespace>/` and SOURCES are placed in `src/`.
 
 ### Library Types
 
@@ -141,158 +234,54 @@ cpp_library_setup(
 )
 ```
 
-## Features
+Libraries with sources build as static libraries by default. Set `BUILD_SHARED_LIBS=ON` to build shared libraries instead.
 
-### Non-Header-Only Library Support
+## Reference
 
-- **Non-header-only library support**: For libraries with source files, specify them explicitly with the `SOURCES` argument as filenames (e.g., `"your_library.cpp"`).
-  Both header-only and compiled libraries are supported seamlessly.
+### CMake Presets
 
-### Automated Infrastructure
+cpp-library generates a `CMakePresets.json` file with the following configurations:
 
-- **CMakePresets.json**: Generates standard presets (default, test, docs, clang-tidy, init)
-- **Testing**: doctest integration with CTest and compile-fail test support
-- **Documentation**: Doxygen with doxygen-awesome-css theme
-- **Development**: clangd compile_commands.json symlink
-- **CI/CD**: GitHub Actions workflows with multi-platform testing and documentation deployment
-
-### Smart Defaults
-
-- **C++17** standard requirement (configurable)
-- **Ninja** generator in presets
-- **Debug** builds for testing, **Release** for default
-- **Build isolation** with separate build directories
-- **Two-mode operation**: Full infrastructure when top-level, lightweight when consumed
-- **Automatic version detection**: Version is automatically extracted from git tags (e.g., `v1.2.3` becomes `1.2.3`)
-- **Always-enabled features**: CI/CD, and CMakePresets.json, are always generated
-
-### Testing Features
-
-- **doctest@2.4.12** for unit testing
-- **Compile-fail tests**: Automatic detection for examples with `_fail` suffix
-- **CTest integration**: Proper test registration and labeling
-- **Multi-directory support**: Checks both `tests/` directories
-
-### Documentation Features
-
-- **Doxygen integration** with modern configuration
-- **doxygen-awesome-css@2.4.1** theme for beautiful output
-- **Symbol exclusion** support for implementation details
-- **GitHub Pages deployment** via CI
-- **Custom Doxyfile support** (falls back to template)
-
-### Development Tools
-
-- **clang-tidy integration** via CMakePresets.json
-- **clangd support** with compile_commands.json symlink
-- **CMakePresets.json** with multiple configurations:
-  - `default`: Release build
-  - `test`: Debug build with testing
-  - `docs`: Documentation generation
-  - `clang-tidy`: Static analysis
-  - `init`: Template regeneration (forces regeneration of CMakePresets.json, CI workflows, etc.)
-
-### CI/CD Features
-
-- **Multi-platform testing**: Ubuntu, macOS, Windows
-- **Multi-compiler support**: GCC, Clang, MSVC
-- **Static analysis**: clang-tidy integration
-- **Documentation deployment**: Automatic GitHub Pages deployment
-- **Template generation**: CI workflow generation
-
-### Dependency Management
-
-- **CPM.cmake** integration for seamless fetching
-- **Automatic caching** via CPM's built-in mechanisms
-- **Version pinning** for reliable builds
-- **Git tag versioning** for reliable updates
+- **`default`**: Release build for production use
+- **`test`**: Debug build with testing enabled
+- **`docs`**: Documentation generation with Doxygen
+- **`clang-tidy`**: Static analysis build
+- **`install`**: Local installation test (installs to `build/install/prefix`)
+- **`init`**: Template regeneration (regenerates CMakePresets.json, CI workflows, etc.)
 
 ### Version Management
 
-- **Automatic git tag detection**: Version is automatically extracted from the latest git tag
-- **Fallback versioning**: Uses `0.0.0` if no git tag is found (with warning)
-- **Tag format support**: Supports both `v1.2.3` and `1.2.3` tag formats
+Version is automatically detected from git tags:
 
-## Example Projects
+- Supports `v1.2.3` and `1.2.3` tag formats
+- Falls back to `0.0.0` if no tag is found (with warning)
+- Version used in CMake package config files
 
-This template is used by:
+### Testing
 
-- [stlab/enum-ops](https://github.com/stlab/enum-ops) - Type-safe operators for enums
-- [stlab/copy-on-write](https://github.com/stlab/copy-on-write) - Copy-on-write wrapper
-
-### Real Usage Example (enum-ops)
-
-```cmake
-cmake_minimum_required(VERSION 3.20)
-project(enum-ops)
-
-# Setup cpp-library infrastructure
-if(PROJECT_IS_TOP_LEVEL)
-    set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
-endif()
-include(cmake/CPM.cmake)
-
-# Fetch cpp-library via CPM
-CPMAddPackage("gh:stlab/cpp-library@4.0.3")
-include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
-
-# Configure library (handles both lightweight and full modes automatically)
-cpp_library_setup(
-    DESCRIPTION "Type-safe operators for enums"
-    NAMESPACE stlab
-    HEADERS enum_ops.hpp
-    EXAMPLES enum_ops_example_test.cpp enum_ops_example_fail.cpp
-    TESTS enum_ops_tests.cpp
-    DOCS_EXCLUDE_SYMBOLS "stlab::implementation"
-)
-```
-
-## Quick Start
-
-1. **Initialize a new project**:
-
-   ```bash
-   # Clone or create your project
-   mkdir my-library && cd my-library
-
-    # Create basic structure
-    mkdir -p include/your_namespace src examples tests cmake
-
-   # Add CPM.cmake
-   curl -L https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake -o cmake/CPM.cmake
-   ```
-
-2. **Create CMakeLists.txt** with the usage example above
-
-3. **Add your headers** to `include/your_namespace/`
-
-4. **Add examples** to `examples/` (use `_fail` suffix for compile-fail tests, e.g., `example.cpp`, `example_fail.cpp`)
-
-5. **Add tests** to `tests/` (use `_fail` suffix for compile-fail tests, e.g., `tests.cpp`, `tests_fail.cpp`)
-
-6. **Build and test**:
-
-   ```bash
-   cmake --preset=test
-   cmake --build --preset=test
-   ctest --preset=test
-   ```
-
-7. **Regenerate templates** (if needed):
-   ```bash
-   cmake --preset=init
-   cmake --build --preset=init
-   ```
+- **Test framework**: [doctest](https://github.com/doctest/doctest)
+- **Compile-fail tests**: Automatically detected via `_fail` suffix in filenames
+- **Test discovery**: Scans `tests/` and `examples/` directories
+- **CTest integration**: All tests registered with CTest for IDE integration
 
 ## Template Files Generated
 
-The template automatically generates:
+cpp-library automatically generates infrastructure files on first configuration and when using the `init` preset:
 
-- **CMakePresets.json**: Build configurations for different purposes
-- **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline
-- **.gitignore**: Standard ignores for C++ projects
-- **src/**: Source directory for non-header-only libraries (auto-detected)
-- **Package config files**: For proper CMake integration
+- **CMakePresets.json**: Build configurations (default, test, docs, clang-tidy, install, init)
+- **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline with testing and documentation deployment
+- **.gitignore**: Standard C++ project ignores
+- **.vscode/extensions.json**: Recommended VS Code extensions
+- **Package config files**: `<Package>Config.cmake` for CMake integration (when building as top-level project)
+
+These files are generated automatically. To regenerate with the latest templates, use `cmake --preset=init`.
+
+## Example Projects
+
+See these projects using cpp-library:
+
+- [stlab/enum-ops](https://github.com/stlab/enum-ops) - Type-safe operators for enums
+- [stlab/copy-on-write](https://github.com/stlab/copy-on-write) - Copy-on-write wrapper
 
 ## License
 
