@@ -18,7 +18,10 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
-# Shared function to handle examples and tests consistently
+# Creates test or example executables and registers them with CTest.
+# - Precondition: doctest target available via CPM, source files exist in TYPE directory
+# - Postcondition: executables created and added as tests (unless in clang-tidy mode)
+# - Executables with "_fail" suffix are added as negative compilation tests
 function(_cpp_library_setup_executables)
     set(oneValueArgs
         NAME
@@ -99,7 +102,10 @@ function(_cpp_library_setup_executables)
     
 endfunction()
 
-# Main entry point function - users call this to set up their library
+# Sets up a C++ header-only or compiled library with testing, docs, and install support.
+# - Precondition: PROJECT_NAME defined via project(), at least one HEADERS specified
+# - Postcondition: library target created, version set from git tags, optional tests/docs/examples configured
+# - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, docs, and installation
 function(cpp_library_setup)
     # Parse arguments
     set(oneValueArgs
