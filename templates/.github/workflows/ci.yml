@@ -69,7 +69,7 @@ jobs:
           cd ${{ runner.temp }}/test-find-package
 
           # Get project name from CMakeLists.txt
-          PACKAGE_NAME=$(grep -m1 "project(" ${{ github.workspace }}/CMakeLists.txt | sed 's/project(\([^)]*\)).*/\1/' | awk '{print $1}')
+          PACKAGE_NAME=$(grep -m1 "project(" "${{ github.workspace }}/CMakeLists.txt" | sed 's/project(\([^)]*\)).*/\1/' | awk '{print $1}')
 
           # Create test CMakeLists.txt
           cat > CMakeLists.txt << EOF
@@ -97,7 +97,7 @@ jobs:
           curl -L https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake -o cmake/CPM.cmake
 
           # Get project name from CMakeLists.txt
-          PACKAGE_NAME=$(grep -m1 "project(" ${{ github.workspace }}/CMakeLists.txt | sed 's/project(\([^)]*\)).*/\1/' | awk '{print $1}')
+          PACKAGE_NAME=$(grep -m1 "project(" "${{ github.workspace }}/CMakeLists.txt" | sed 's/project(\([^)]*\)).*/\1/' | awk '{print $1}')
 
           # Create test CMakeLists.txt that uses CPMFindPackage
           cat > CMakeLists.txt << EOF
