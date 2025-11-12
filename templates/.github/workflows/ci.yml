@@ -13,21 +13,23 @@ on:
 
 jobs:
   test:
+    name: Test (${{ matrix.name }})
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        compiler: [gcc, clang, msvc]
-        exclude:
-          - os: ubuntu-latest
-            compiler: msvc
-          - os: macos-latest
-            compiler: msvc
-          - os: macos-latest
-            compiler: gcc
-          - os: windows-latest
-            compiler: gcc
-          - os: windows-latest
-            compiler: clang
+        include:
+          - name: Ubuntu GCC
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+          - name: Ubuntu Clang
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+          - name: macOS
+            os: macos-latest
+          - name: Windows
+            os: windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -36,6 +38,9 @@ jobs:
 
       - name: Configure CMake
         run: cmake --preset=test
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
 
       - name: Build
         run: cmake --build --preset=test
@@ -68,8 +73,8 @@ jobs:
           mkdir -p ${{ runner.temp }}/test-find-package
           cd ${{ runner.temp }}/test-find-package
 
-          # Get project name from CMakeLists.txt
-          PACKAGE_NAME=$(grep -m1 "project(" "${{ github.workspace }}/CMakeLists.txt" | sed 's/project(\([^)]*\)).*/\1/' | awk '{print $1}')
+          # Get project name from CMakeLists.txt (handles multi-line project() declarations)
+          PACKAGE_NAME=$(sed -n '/project(/,/)/p' "${{ github.workspace }}/CMakeLists.txt" | tr '\n' ' ' | sed 's/.*project([ \t]*\([^ \t)]*\).*/\1/')
 
           # Convert paths to forward slashes for CMake (works on all platforms)
           INSTALL_PREFIX=$(echo "${{ runner.temp }}/install" | sed 's|\\|/|g')
