@@ -73,22 +73,21 @@ jobs:
           mkdir -p ${{ runner.temp }}/test-find-package
           cd ${{ runner.temp }}/test-find-package
 
-          # Convert paths to forward slashes for CMake (works on all platforms)
-          INSTALL_PREFIX=$(echo "${{ runner.temp }}/install" | sed 's|\\|/|g')
-
           # Create test CMakeLists.txt
           cat > CMakeLists.txt << EOF
           cmake_minimum_required(VERSION 3.20)
           project(test-find-package CXX)
 
-          set(CMAKE_PREFIX_PATH "${INSTALL_PREFIX}")
           find_package(@PROJECT_NAME@ REQUIRED)
 
           message(STATUS "Successfully found @PROJECT_NAME@")
           EOF
 
-          # Test find_package
-          cmake -B build -S .
+          # Convert paths to forward slashes for CMake (works on all platforms)
+          INSTALL_PREFIX=$(echo "${{ runner.temp }}/install" | sed 's|\\|/|g')
+
+          # Test find_package with CMAKE_PREFIX_PATH
+          cmake -B build -S . -DCMAKE_PREFIX_PATH="${INSTALL_PREFIX}"
 
   clang-tidy:
     runs-on: ubuntu-latest
