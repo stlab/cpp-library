@@ -16,6 +16,7 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")  
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
+include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
 # Shared function to handle examples and tests consistently
 function(_cpp_library_setup_executables)

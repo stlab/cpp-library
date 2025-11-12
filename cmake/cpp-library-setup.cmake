@@ -113,27 +113,22 @@ function(_cpp_library_copy_templates)
         ".vscode/extensions.json"
         "docs/index.html"
         "CMakePresets.json"
-        ".github/workflows/ci.yml"
     )
 
     foreach(template_file IN LISTS TEMPLATE_FILES)
         set(source_file "${CPP_LIBRARY_ROOT}/templates/${template_file}")
         set(dest_file "${CMAKE_CURRENT_SOURCE_DIR}/${template_file}")
 
-        # Check if template file exists
-        if(EXISTS "${source_file}")
-            # Copy if file doesn't exist or FORCE_INIT is enabled
-            if(NOT EXISTS "${dest_file}" OR ARG_FORCE_INIT)
-                # Create directory if needed
-                get_filename_component(dest_dir "${dest_file}" DIRECTORY)
-                file(MAKE_DIRECTORY "${dest_dir}")
-
-                # Copy the file
-                file(COPY "${source_file}" DESTINATION "${dest_dir}")
-                message(STATUS "Copied template file: ${template_file}")
-            endif()
-        else()
+        if(EXISTS "${source_file}" AND (NOT EXISTS "${dest_file}" OR ARG_FORCE_INIT))
+            get_filename_component(dest_dir "${dest_file}" DIRECTORY)
+            file(MAKE_DIRECTORY "${dest_dir}")
+            file(COPY "${source_file}" DESTINATION "${dest_dir}")
+            message(STATUS "Copied template file: ${template_file}")
+        elseif(NOT EXISTS "${source_file}")
             message(WARNING "Template file not found: ${source_file}")
         endif()
     endforeach()
+    
+    # Setup CI workflow with PROJECT_NAME substitution
+    _cpp_library_setup_ci(${ARG_FORCE_INIT})
 endfunction()

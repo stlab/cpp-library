@@ -73,9 +73,6 @@ jobs:
           mkdir -p ${{ runner.temp }}/test-find-package
           cd ${{ runner.temp }}/test-find-package
 
-          # Get project name from CMakeLists.txt (handles multi-line project() declarations)
-          PACKAGE_NAME=$(sed -n '/project(/,/)/p' "${{ github.workspace }}/CMakeLists.txt" | tr '\n' ' ' | sed 's/.*project([ \t]*\([^ \t)]*\).*/\1/')
-
           # Convert paths to forward slashes for CMake (works on all platforms)
           INSTALL_PREFIX=$(echo "${{ runner.temp }}/install" | sed 's|\\|/|g')
 
@@ -85,9 +82,9 @@ jobs:
           project(test-find-package CXX)
 
           set(CMAKE_PREFIX_PATH "${INSTALL_PREFIX}")
-          find_package(${PACKAGE_NAME} REQUIRED)
+          find_package(@PROJECT_NAME@ REQUIRED)
 
-          message(STATUS "Successfully found ${PACKAGE_NAME}")
+          message(STATUS "Successfully found @PROJECT_NAME@")
           EOF
 
           # Test find_package
