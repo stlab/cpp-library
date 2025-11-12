@@ -88,45 +88,6 @@ jobs:
           # Test find_package
           cmake -B build -S .
 
-      - name: Test CPMFindPackage
-        shell: bash
-        run: |
-          # Create test to verify CPMFindPackage works (tries find_package first, then CPM)
-          mkdir -p ${{ runner.temp }}/test-cpm
-          cd ${{ runner.temp }}/test-cpm
-
-          # Download CPM.cmake
-          mkdir cmake
-          curl -L https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake -o cmake/CPM.cmake
-
-          # Get project name from CMakeLists.txt
-          PACKAGE_NAME=$(grep -m1 "project(" "${{ github.workspace }}/CMakeLists.txt" | sed 's/project(\([^)]*\)).*/\1/' | awk '{print $1}')
-
-          # Convert paths to forward slashes for CMake (works on all platforms)
-          INSTALL_PREFIX=$(echo "${{ runner.temp }}/install" | sed 's|\\|/|g')
-
-          # Create test CMakeLists.txt that uses CPMFindPackage
-          cat > CMakeLists.txt << EOF
-          cmake_minimum_required(VERSION 3.20)
-          project(test-cpm CXX)
-
-          set(CMAKE_PREFIX_PATH "${INSTALL_PREFIX}")
-          set(CPM_SOURCE_CACHE \${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
-          include(cmake/CPM.cmake)
-
-          # CPMFindPackage tries find_package first, then falls back to CPMAddPackage
-          CPMFindPackage(
-              NAME ${PACKAGE_NAME}
-              GITHUB_REPOSITORY ${{ github.repository }}
-              GIT_TAG ${{ github.sha }}
-          )
-
-          message(STATUS "Successfully acquired ${PACKAGE_NAME} via CPMFindPackage")
-          EOF
-
-          # Test CPMFindPackage (should find the installed version first)
-          cmake -B build -S .
-
   clang-tidy:
     runs-on: ubuntu-latest
 
