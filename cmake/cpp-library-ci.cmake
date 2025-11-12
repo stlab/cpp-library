@@ -4,8 +4,9 @@
 #
 # This module handles GitHub Actions workflow generation with PROJECT_NAME substitution
 
-# Function to configure CI workflow template
-# Arguments: force_init (boolean) - whether to overwrite existing file
+# Generates GitHub Actions CI workflow from template with PROJECT_NAME substitution.
+# - Postcondition: .github/workflows/ci.yml created from template if not present
+# - With force_init: overwrites existing workflow file
 function(_cpp_library_setup_ci force_init)
     set(ci_template "${CPP_LIBRARY_ROOT}/templates/.github/workflows/ci.yml.in")
     set(ci_dest "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml")

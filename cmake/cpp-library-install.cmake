@@ -12,8 +12,10 @@
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-# Function to setup installation for a library target
-# This should be called from _cpp_library_setup_core when PROJECT_IS_TOP_LEVEL
+# Configures CMake install rules for library target and package config files.
+# - Precondition: NAME, VERSION, and NAMESPACE specified; target NAME exists
+# - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
+# - Supports header-only (INTERFACE) and compiled libraries, uses SameMajorVersion compatibility
 function(_cpp_library_setup_install)
     set(oneValueArgs
         NAME        # Target name (e.g., "stlab-enum-ops")

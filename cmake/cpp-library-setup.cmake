@@ -2,7 +2,8 @@
 #
 # cpp-library-setup.cmake - Core library setup functionality
 
-# Function to get version from git tags
+# Returns version string from latest git tag, falling back to "0.0.0".
+# - Postcondition: OUTPUT_VAR set to version string with 'v' prefix removed
 function(_cpp_library_get_git_version OUTPUT_VAR)
     # Try to get version from git tags
     execute_process(
@@ -24,6 +25,9 @@ function(_cpp_library_get_git_version OUTPUT_VAR)
     endif()
 endfunction()
 
+# Creates library target (INTERFACE or compiled) with headers and proper configuration.
+# - Precondition: NAME, NAMESPACE, and REQUIRES_CPP_VERSION specified
+# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME, install configured if TOP_LEVEL
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
@@ -100,7 +104,9 @@ function(_cpp_library_setup_core)
 
 endfunction()
 
-# Function to copy static template files
+# Copies template files (.clang-format, .gitignore, etc.) to project root if not present.
+# - Postcondition: missing template files copied to project, CI workflow configured with PROJECT_NAME substitution
+# - With FORCE_INIT: overwrites existing files
 function(_cpp_library_copy_templates)
     set(options FORCE_INIT)
     cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
