@@ -41,6 +41,11 @@ jobs:
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
+        if: ${{ matrix.cc }}
+
+      - name: Configure CMake
+        run: cmake --preset=test
+        if: ${{ !matrix.cc }}
 
       - name: Build
         run: cmake --build --preset=test
