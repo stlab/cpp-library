@@ -2,9 +2,16 @@
 #
 # cpp-library-setup.cmake - Core library setup functionality
 
-# Returns version string from latest git tag, falling back to "0.0.0".
-# - Postcondition: OUTPUT_VAR set to version string with 'v' prefix removed
+# Returns version string from PROJECT_VERSION (if set), git tag (with 'v' prefix removed), or 
+#    "0.0.0" fallback
 function(_cpp_library_get_git_version OUTPUT_VAR)
+    # If PROJECT_VERSION is already set (e.g., by vcpkg or other package manager),
+    # use it instead of trying to query git (which may not be available in source archives)
+    if(DEFINED PROJECT_VERSION AND NOT PROJECT_VERSION STREQUAL "")
+        set(${OUTPUT_VAR} "${PROJECT_VERSION}" PARENT_SCOPE)
+        return()
+    endif()
+    
     # Try to get version from git tags
     execute_process(
         COMMAND git describe --tags --abbrev=0
@@ -96,6 +103,7 @@ function(_cpp_library_setup_core)
     if(ARG_TOP_LEVEL)
         _cpp_library_setup_install(
             NAME "${ARG_NAME}"
+            PACKAGE_NAME "${CLEAN_NAME}"
             VERSION "${ARG_VERSION}"
             NAMESPACE "${ARG_NAMESPACE}"
             HEADERS "${ARG_HEADERS}"

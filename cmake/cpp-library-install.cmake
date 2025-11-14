@@ -13,14 +13,15 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # Configures CMake install rules for library target and package config files.
-# - Precondition: NAME, VERSION, and NAMESPACE specified; target NAME exists
+# - Precondition: NAME, PACKAGE_NAME, VERSION, and NAMESPACE specified; target NAME exists
 # - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
 # - Supports header-only (INTERFACE) and compiled libraries, uses SameMajorVersion compatibility
 function(_cpp_library_setup_install)
     set(oneValueArgs
-        NAME        # Target name (e.g., "stlab-enum-ops")
-        VERSION     # Version string (e.g., "1.2.3")
-        NAMESPACE   # Namespace for alias (e.g., "stlab")
+        NAME            # Target name (e.g., "stlab-enum-ops")
+        PACKAGE_NAME    # Package name for find_package() (e.g., "enum-ops")
+        VERSION         # Version string (e.g., "1.2.3")
+        NAMESPACE       # Namespace for alias (e.g., "stlab")
     )
     set(multiValueArgs
         HEADERS     # List of header file paths (for FILE_SET support check)
@@ -31,6 +32,9 @@ function(_cpp_library_setup_install)
     # Validate required arguments
     if(NOT ARG_NAME)
         message(FATAL_ERROR "_cpp_library_setup_install: NAME is required")
+    endif()
+    if(NOT ARG_PACKAGE_NAME)
+        message(FATAL_ERROR "_cpp_library_setup_install: PACKAGE_NAME is required")
     endif()
     if(NOT ARG_VERSION)
         message(FATAL_ERROR "_cpp_library_setup_install: VERSION is required")
@@ -64,7 +68,7 @@ function(_cpp_library_setup_install)
     # Generate package version file
     # Uses SameMajorVersion compatibility (e.g., 2.1.0 is compatible with 2.0.0)
     write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_NAME}ConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}ConfigVersion.cmake"
         VERSION ${ARG_VERSION}
         COMPATIBILITY SameMajorVersion
     )
@@ -72,7 +76,7 @@ function(_cpp_library_setup_install)
     # Generate package config file from template
     configure_file(
         "${CPP_LIBRARY_ROOT}/templates/Config.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"
         @ONLY
     )
     
@@ -80,16 +84,16 @@ function(_cpp_library_setup_install)
     # This allows downstream projects to use find_package(package-name)
     # and link against namespace::target
     install(EXPORT ${ARG_NAME}Targets
-        FILE ${ARG_NAME}Targets.cmake
+        FILE ${ARG_PACKAGE_NAME}Targets.cmake
         NAMESPACE ${ARG_NAMESPACE}::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_NAME}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_PACKAGE_NAME}
     )
     
     # Install package config and version files
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_NAME}Config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_NAME}ConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_NAME}
+        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_PACKAGE_NAME}
     )
     
 endfunction()
