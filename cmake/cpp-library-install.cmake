@@ -12,6 +12,58 @@
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+# Generates find_dependency() calls for target's INTERFACE link libraries
+# - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES
+# - Postcondition: OUTPUT_VAR contains newline-separated find_dependency() calls for public dependencies
+# - Handles common patterns: namespace::target from CPM, Qt5/Qt6::Component, Threads::Threads, etc.
+function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
+    get_target_property(LINK_LIBS ${TARGET_NAME} INTERFACE_LINK_LIBRARIES)
+    
+    if(NOT LINK_LIBS)
+        set(${OUTPUT_VAR} "" PARENT_SCOPE)
+        return()
+    endif()
+    
+    set(DEPENDENCY_LIST "")
+    
+    foreach(LIB IN LISTS LINK_LIBS)
+        # Skip generator expressions (typically BUILD_INTERFACE dependencies)
+        if(LIB MATCHES "^\\$<")
+            continue()
+        endif()
+        
+        # Parse namespaced target: PackageName::Component
+        if(LIB MATCHES "^([^:]+)::(.+)$")
+            set(PKG_NAME "${CMAKE_MATCH_1}")
+            set(COMPONENT "${CMAKE_MATCH_2}")
+            
+            # Determine find_dependency() call based on package pattern
+            if(PKG_NAME STREQUAL NAMESPACE)
+                # Internal dependency: use component as package name (e.g., stlab::copy-on-write → copy-on-write)
+                list(APPEND DEPENDENCY_LIST "find_dependency(${COMPONENT})")
+            elseif(PKG_NAME STREQUAL "Threads")
+                list(APPEND DEPENDENCY_LIST "find_dependency(Threads)")
+            elseif(PKG_NAME MATCHES "^Qt[56]$")
+                # Qt with component (e.g., Qt5::Core → find_dependency(Qt5 COMPONENTS Core))
+                list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME} COMPONENTS ${COMPONENT})")
+            else()
+                # Generic package (e.g., libdispatch::libdispatch → libdispatch)
+                list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME})")
+            endif()
+        endif()
+    endforeach()
+    
+    # Remove duplicates and convert to newline-separated string
+    if(DEPENDENCY_LIST)
+        list(REMOVE_DUPLICATES DEPENDENCY_LIST)
+        list(JOIN DEPENDENCY_LIST "\n" DEPENDENCY_LINES)
+    else()
+        set(DEPENDENCY_LINES "")
+    endif()
+    
+    set(${OUTPUT_VAR} "${DEPENDENCY_LINES}" PARENT_SCOPE)
+endfunction()
+
 # Configures CMake install rules for library target and package config files.
 # - Precondition: NAME, PACKAGE_NAME, VERSION, and NAMESPACE specified; target NAME exists
 # - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
@@ -65,6 +117,9 @@ function(_cpp_library_setup_install)
         )
     endif()
     
+    # Generate find_dependency() calls for package dependencies
+    _cpp_library_generate_dependencies(PACKAGE_DEPENDENCIES ${ARG_NAME} ${ARG_NAMESPACE})
+    
     # Generate package version file
     # Uses SameMajorVersion compatibility (e.g., 2.1.0 is compatible with 2.0.0)
     write_basic_package_version_file(
@@ -74,6 +129,7 @@ function(_cpp_library_setup_install)
     )
     
     # Generate package config file from template
+    # PACKAGE_DEPENDENCIES will be substituted via @PACKAGE_DEPENDENCIES@
     configure_file(
         "${CPP_LIBRARY_ROOT}/templates/Config.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"

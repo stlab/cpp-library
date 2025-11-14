@@ -123,6 +123,46 @@ cmake --install build/default --prefix /opt/mylib
 
 For information about using installed packages with `find_package()`, see the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake) about [controlling how dependencies are found](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
 
+#### Dependency Handling in Installed Packages
+
+cpp-library automatically generates correct `find_dependency()` calls in the installed CMake package configuration files by introspecting your target's `INTERFACE_LINK_LIBRARIES`. This ensures downstream users can find and link all required dependencies.
+
+**How it works:**
+
+When you link dependencies to your target using `target_link_libraries()`, cpp-library analyzes these links during installation and generates appropriate `find_dependency()` calls. For example:
+
+```cmake
+# In your library's CMakeLists.txt
+add_library(my-lib INTERFACE)
+
+# Link dependencies - these will be automatically handled during installation
+target_link_libraries(my-lib INTERFACE
+    stlab::copy-on-write    # Internal CPM dependency
+    stlab::enum-ops         # Internal CPM dependency
+    Threads::Threads        # System dependency
+)
+```
+
+When installed, the generated `my-libConfig.cmake` will include:
+
+```cmake
+include(CMakeFindDependencyMacro)
+
+# Find dependencies required by this package
+find_dependency(copy-on-write)
+find_dependency(enum-ops)
+find_dependency(Threads)
+
+include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
+```
+
+**Supported dependency patterns:**
+
+- **CPM/Internal dependencies** (`namespace::target`): Automatically mapped to their package names (e.g., `stlab::copy-on-write` → `find_dependency(copy-on-write)`)
+- **Threading** (`Threads::Threads`): Generates `find_dependency(Threads)`
+- **Qt libraries** (`Qt5::Core`, `Qt6::Widgets`): Generates `find_dependency(Qt5 COMPONENTS Core)` with proper components
+- **Generic packages** (`PackageName::Target`): Generates `find_dependency(PackageName)`
+
 ### Updating cpp-library
 
 To update to the latest version of cpp-library in your project:
