@@ -6,7 +6,8 @@
 # This file is kept for backward compatibility but the actual implementation
 # is now in the _cpp_library_setup_executables function.
 
-# Legacy function - now delegates to the consolidated implementation
+# Delegates to _cpp_library_setup_executables for backward compatibility.
+# - Postcondition: test executables configured via _cpp_library_setup_executables
 function(_cpp_library_setup_testing)
     set(oneValueArgs
         NAME

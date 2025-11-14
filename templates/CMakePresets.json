@@ -68,6 +68,20 @@
         "CMAKE_CXX_EXTENSIONS": "OFF",
         "CPP_LIBRARY_FORCE_INIT": "ON"
       }
+    },
+    {
+      "name": "install",
+      "displayName": "Local Install Test",
+      "description": "Configuration for testing installation locally (installs to build/install/prefix)",
+      "binaryDir": "${sourceDir}/build/install",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "OFF",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/prefix"
+      }
     }
   ],
   "buildPresets": [
@@ -75,7 +89,8 @@
     { "name": "test", "displayName": "Build Tests", "configurePreset": "test" },
     { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": "docs" },
     { "name": "clang-tidy", "displayName": "Build with Clang-Tidy", "configurePreset": "clang-tidy" },
-    { "name": "init", "displayName": "Initialize Templates", "configurePreset": "init" }
+    { "name": "init", "displayName": "Initialize Templates", "configurePreset": "init" },
+    { "name": "install", "displayName": "Build for Local Install", "configurePreset": "install" }
   ],
   "testPresets": [
     { "name": "test", "displayName": "Run All Tests", "configurePreset": "test", "output": { "outputOnFailure": true } },

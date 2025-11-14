@@ -2,6 +2,9 @@
 #
 # cpp-library-docs.cmake - Documentation setup with Doxygen
 
+# Creates 'docs' target for generating API documentation with Doxygen and doxygen-awesome-css theme.
+# - Precondition: NAME, VERSION, and DESCRIPTION specified; Doxygen available
+# - Postcondition: 'docs' custom target created, Doxyfile configured, theme downloaded via CPM
 function(_cpp_library_setup_docs)
     set(oneValueArgs
         NAME
