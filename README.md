@@ -156,12 +156,35 @@ find_dependency(Threads)
 include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
 ```
 
-**Supported dependency patterns:**
+**Default dependency handling:**
 
-- **CPM/Internal dependencies** (`namespace::target`): Automatically mapped to their package names (e.g., `stlab::copy-on-write` → `find_dependency(copy-on-write)`)
-- **Threading** (`Threads::Threads`): Generates `find_dependency(Threads)`
-- **Qt libraries** (`Qt5::Core`, `Qt6::Widgets`): Generates `find_dependency(Qt5 COMPONENTS Core)` with proper components
-- **Generic packages** (`PackageName::Target`): Generates `find_dependency(PackageName)`
+- **cpp-library dependencies** (matching your project's `NAMESPACE`): Automatically mapped to their package names (e.g., `stlab::copy-on-write` → `find_dependency(copy-on-write)`)
+- **Other packages**: Uses the package name only by default (e.g., `PackageName::Target` → `find_dependency(PackageName)`)
+
+**Custom dependency mappings:**
+
+For dependencies that require special `find_dependency()` syntax (e.g., Qt with COMPONENTS), use `cpp_library_map_dependency()` to specify the exact call:
+
+```cmake
+# Map Qt components to use COMPONENTS syntax
+cpp_library_map_dependency("Qt5::Core" "Qt5 COMPONENTS Core")
+cpp_library_map_dependency("Qt5::Widgets" "Qt5 COMPONENTS Widgets")
+
+# Then link as usual
+target_link_libraries(my-lib INTERFACE
+    Qt5::Core
+    Qt5::Widgets
+    Threads::Threads  # Works automatically, no mapping needed
+)
+```
+
+The generated config file will use your custom mappings where specified:
+
+```cmake
+find_dependency(Qt5 COMPONENTS Core)
+find_dependency(Qt5 COMPONENTS Widgets)
+find_dependency(Threads)  # Automatic from Threads::Threads
+```
 
 ### Updating cpp-library
 
@@ -258,6 +281,44 @@ cpp_library_setup(
 ```
 
 Results in `namespace-library` and `namespace::library` targets.
+
+### `cpp_library_map_dependency`
+
+```cmake
+cpp_library_map_dependency(target find_dependency_call)
+```
+
+Registers a custom dependency mapping for `find_dependency()` generation in installed CMake package config files.
+
+**Parameters:**
+
+- `target`: The namespaced target (e.g., `"Qt5::Core"`, `"Threads::Threads"`)
+- `find_dependency_call`: The exact arguments to pass to `find_dependency()` (e.g., `"Qt5 COMPONENTS Core"`, `"Threads"`)
+
+**When to use:**
+
+- Dependencies requiring `COMPONENTS` syntax (e.g., Qt)
+- Dependencies requiring `OPTIONAL_COMPONENTS` or other special arguments
+- Dependencies where the target name pattern doesn't match the desired `find_dependency()` call
+
+**Note:** Most common dependencies like `Threads::Threads`, `Boost::filesystem`, etc. work automatically with the default behavior and don't need mapping.
+
+**Example:**
+
+```cmake
+# Register mappings for dependencies needing special syntax
+cpp_library_map_dependency("Qt5::Core" "Qt5 COMPONENTS Core")
+cpp_library_map_dependency("Qt5::Widgets" "Qt5 COMPONENTS Widgets")
+
+# Then link normally
+target_link_libraries(my-target INTERFACE
+    Qt5::Core
+    Qt5::Widgets
+    Threads::Threads  # No mapping needed
+)
+```
+
+See [Dependency Handling in Installed Packages](#dependency-handling-in-installed-packages) for more details.
 
 ### Path Conventions
 

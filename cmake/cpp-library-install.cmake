@@ -12,10 +12,19 @@
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+# Registers a custom dependency mapping for find_dependency() generation
+# - Precondition: TARGET is a namespaced target (e.g., "Qt5::Core", "Qt5::Widgets")
+# - Postcondition: FIND_DEPENDENCY_CALL stored for TARGET, used in package config generation
+# - Example: cpp_library_map_dependency("Qt5::Core" "Qt5 COMPONENTS Core")
+function(cpp_library_map_dependency TARGET FIND_DEPENDENCY_CALL)
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${TARGET} "${FIND_DEPENDENCY_CALL}")
+endfunction()
+
 # Generates find_dependency() calls for target's INTERFACE link libraries
 # - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES
 # - Postcondition: OUTPUT_VAR contains newline-separated find_dependency() calls for public dependencies
-# - Handles common patterns: namespace::target from CPM, Qt5/Qt6::Component, Threads::Threads, etc.
+# - Uses cpp_library_map_dependency() mappings if registered, otherwise uses defaults
+# - Automatically handles cpp-library dependencies (matching NAMESPACE)
 function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     get_target_property(LINK_LIBS ${TARGET_NAME} INTERFACE_LINK_LIBRARIES)
     
@@ -37,17 +46,18 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
             set(PKG_NAME "${CMAKE_MATCH_1}")
             set(COMPONENT "${CMAKE_MATCH_2}")
             
-            # Determine find_dependency() call based on package pattern
-            if(PKG_NAME STREQUAL NAMESPACE)
-                # Internal dependency: use component as package name (e.g., stlab::copy-on-write → copy-on-write)
+            # Check for custom mapping first
+            get_property(CUSTOM_MAPPING GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${LIB})
+            
+            if(CUSTOM_MAPPING)
+                # Use custom mapping (e.g., "Qt5 COMPONENTS Core" for Qt5::Core)
+                list(APPEND DEPENDENCY_LIST "find_dependency(${CUSTOM_MAPPING})")
+            elseif(PKG_NAME STREQUAL NAMESPACE)
+                # Internal cpp-library dependency: use component as package name
+                # (e.g., stlab::copy-on-write → find_dependency(copy-on-write))
                 list(APPEND DEPENDENCY_LIST "find_dependency(${COMPONENT})")
-            elseif(PKG_NAME STREQUAL "Threads")
-                list(APPEND DEPENDENCY_LIST "find_dependency(Threads)")
-            elseif(PKG_NAME MATCHES "^Qt[56]$")
-                # Qt with component (e.g., Qt5::Core → find_dependency(Qt5 COMPONENTS Core))
-                list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME} COMPONENTS ${COMPONENT})")
             else()
-                # Generic package (e.g., libdispatch::libdispatch → libdispatch)
+                # Default: use package name only (e.g., libdispatch::libdispatch → find_dependency(libdispatch))
                 list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME})")
             endif()
         endif()
