@@ -33,14 +33,15 @@ function(_cpp_library_get_git_version OUTPUT_VAR)
 endfunction()
 
 # Creates library target (INTERFACE or compiled) with headers and proper configuration.
-# - Precondition: NAME, NAMESPACE, and REQUIRES_CPP_VERSION specified
-# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME, install configured if TOP_LEVEL
+# - Precondition: NAME, NAMESPACE, PACKAGE_NAME, and REQUIRES_CPP_VERSION specified
+# - Postcondition: library target created with alias NAMESPACE::PACKAGE_NAME, install configured if TOP_LEVEL
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
         VERSION
         DESCRIPTION
         NAMESPACE
+        PACKAGE_NAME
         REQUIRES_CPP_VERSION
         TOP_LEVEL
     )
@@ -60,13 +61,10 @@ function(_cpp_library_setup_core)
     # Note: Project declaration is now handled in the main cpp_library_setup function
     # No need to check ARG_TOP_LEVEL here for project declaration
 
-    # Extract the library name without namespace prefix for target naming
-    string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
-
     if(ARG_SOURCES)
         # Create a library with sources (respects BUILD_SHARED_LIBS variable)
         add_library(${ARG_NAME} ${ARG_SOURCES})
-        add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
+        add_library(${ARG_NAMESPACE}::${ARG_PACKAGE_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
@@ -83,7 +81,7 @@ function(_cpp_library_setup_core)
     else()
         # Header-only INTERFACE target
         add_library(${ARG_NAME} INTERFACE)
-        add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
+        add_library(${ARG_NAMESPACE}::${ARG_PACKAGE_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
@@ -103,7 +101,7 @@ function(_cpp_library_setup_core)
     if(ARG_TOP_LEVEL)
         _cpp_library_setup_install(
             NAME "${ARG_NAME}"
-            PACKAGE_NAME "${CLEAN_NAME}"
+            PACKAGE_NAME "${ARG_PACKAGE_NAME}"
             VERSION "${ARG_VERSION}"
             NAMESPACE "${ARG_NAMESPACE}"
             HEADERS "${ARG_HEADERS}"

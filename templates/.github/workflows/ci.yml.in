@@ -83,9 +83,9 @@ jobs:
           cmake_minimum_required(VERSION 3.20)
           project(test-find-package CXX)
 
-          find_package(@PROJECT_NAME@ REQUIRED)
+          find_package(@PACKAGE_NAME@ REQUIRED)
 
-          message(STATUS "Successfully found @PROJECT_NAME@")
+          message(STATUS "Successfully found @PACKAGE_NAME@")
           EOF
 
           # Convert paths to forward slashes for CMake (works on all platforms)

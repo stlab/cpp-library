@@ -140,6 +140,9 @@ function(cpp_library_setup)
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
     
+    # Calculate PACKAGE_NAME (clean name without namespace prefix) for template substitution
+    string(REPLACE "${ARG_NAMESPACE}-" "" PACKAGE_NAME "${ARG_NAME}")
+    
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
         set(ARG_REQUIRES_CPP_VERSION 17)
@@ -184,6 +187,7 @@ function(cpp_library_setup)
         VERSION "${ARG_VERSION}" 
         DESCRIPTION "${ARG_DESCRIPTION}"
         NAMESPACE "${ARG_NAMESPACE}"
+        PACKAGE_NAME "${PACKAGE_NAME}"
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
