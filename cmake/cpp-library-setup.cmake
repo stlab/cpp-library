@@ -2,13 +2,13 @@
 #
 # cpp-library-setup.cmake - Core library setup functionality
 
-# Returns version string from PROJECT_VERSION (if set), git tag (with 'v' prefix removed), or 
+# Returns version string from CPP_LIBRARY_VERSION cache variable (if set), git tag (with 'v' prefix removed), or 
 #    "0.0.0" fallback
 function(_cpp_library_get_git_version OUTPUT_VAR)
-    # If PROJECT_VERSION is already set (e.g., by vcpkg or other package manager),
+    # If CPP_LIBRARY_VERSION is set (e.g., by vcpkg or other package manager via -DCPP_LIBRARY_VERSION=x.y.z),
     # use it instead of trying to query git (which may not be available in source archives)
-    if(DEFINED PROJECT_VERSION AND NOT PROJECT_VERSION STREQUAL "")
-        set(${OUTPUT_VAR} "${PROJECT_VERSION}" PARENT_SCOPE)
+    if(DEFINED CPP_LIBRARY_VERSION AND NOT CPP_LIBRARY_VERSION STREQUAL "")
+        set(${OUTPUT_VAR} "${CPP_LIBRARY_VERSION}" PARENT_SCOPE)
         return()
     endif()
     
@@ -33,8 +33,8 @@ function(_cpp_library_get_git_version OUTPUT_VAR)
 endfunction()
 
 # Creates library target (INTERFACE or compiled) with headers and proper configuration.
-# - Precondition: NAME, NAMESPACE, PACKAGE_NAME, and REQUIRES_CPP_VERSION specified
-# - Postcondition: library target created with alias NAMESPACE::PACKAGE_NAME, install configured if TOP_LEVEL
+# - Precondition: NAME, NAMESPACE, PACKAGE_NAME, CLEAN_NAME, and REQUIRES_CPP_VERSION specified
+# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME, install configured if TOP_LEVEL
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
@@ -42,6 +42,7 @@ function(_cpp_library_setup_core)
         DESCRIPTION
         NAMESPACE
         PACKAGE_NAME
+        CLEAN_NAME
         REQUIRES_CPP_VERSION
         TOP_LEVEL
     )
@@ -64,7 +65,7 @@ function(_cpp_library_setup_core)
     if(ARG_SOURCES)
         # Create a library with sources (respects BUILD_SHARED_LIBS variable)
         add_library(${ARG_NAME} ${ARG_SOURCES})
-        add_library(${ARG_NAMESPACE}::${ARG_PACKAGE_NAME} ALIAS ${ARG_NAME})
+        add_library(${ARG_NAMESPACE}::${ARG_CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
@@ -81,7 +82,7 @@ function(_cpp_library_setup_core)
     else()
         # Header-only INTERFACE target
         add_library(${ARG_NAME} INTERFACE)
-        add_library(${ARG_NAMESPACE}::${ARG_PACKAGE_NAME} ALIAS ${ARG_NAME})
+        add_library(${ARG_NAMESPACE}::${ARG_CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>

@@ -16,6 +16,7 @@ include(CMakePackageConfigHelpers)
 # - Precondition: TARGET is a namespaced target (e.g., "Qt5::Core", "Qt5::Widgets")
 # - Postcondition: FIND_DEPENDENCY_CALL stored for TARGET, used in package config generation
 # - Example: cpp_library_map_dependency("Qt5::Core" "Qt5 COMPONENTS Core")
+# - Note: Most dependencies work automatically; only use for special syntax (COMPONENTS, etc.)
 function(cpp_library_map_dependency TARGET FIND_DEPENDENCY_CALL)
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${TARGET} "${FIND_DEPENDENCY_CALL}")
 endfunction()
@@ -24,7 +25,8 @@ endfunction()
 # - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES
 # - Postcondition: OUTPUT_VAR contains newline-separated find_dependency() calls for public dependencies
 # - Uses cpp_library_map_dependency() mappings if registered, otherwise uses defaults
-# - Automatically handles cpp-library dependencies (namespace::package → find_dependency(package))
+# - cpp-library dependencies: namespace::namespace → find_dependency(namespace), namespace::component → find_dependency(namespace-component)
+# - External dependencies: name::name → find_dependency(name), name::component → find_dependency(name)
 function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     get_target_property(LINK_LIBS ${TARGET_NAME} INTERFACE_LINK_LIBRARIES)
     
@@ -53,11 +55,17 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
                 # Use custom mapping (e.g., "Qt5 COMPONENTS Core" for Qt5::Core)
                 list(APPEND DEPENDENCY_LIST "find_dependency(${CUSTOM_MAPPING})")
             elseif(PKG_NAME STREQUAL NAMESPACE)
-                # Internal cpp-library dependency: use component as package name
-                # (e.g., stlab::copy-on-write → find_dependency(copy-on-write))
-                list(APPEND DEPENDENCY_LIST "find_dependency(${COMPONENT})")
+                # Internal cpp-library dependency
+                if(PKG_NAME STREQUAL COMPONENT)
+                    # Namespace and component match: namespace::namespace → find_dependency(namespace)
+                    list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME})")
+                else()
+                    # Different names: namespace::component → find_dependency(namespace-component)
+                    list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME}-${COMPONENT})")
+                endif()
             else()
-                # Default: use package name only (e.g., libdispatch::libdispatch → find_dependency(libdispatch))
+                # External dependency: use package name only
+                # (e.g., Threads::Threads → find_dependency(Threads), Boost::filesystem → find_dependency(Boost))
                 list(APPEND DEPENDENCY_LIST "find_dependency(${PKG_NAME})")
             endif()
         endif()
@@ -81,7 +89,7 @@ endfunction()
 function(_cpp_library_setup_install)
     set(oneValueArgs
         NAME            # Target name (e.g., "stlab-enum-ops")
-        PACKAGE_NAME    # Package name for find_package() (e.g., "enum-ops")
+        PACKAGE_NAME    # Package name for find_package() (e.g., "stlab-enum-ops")
         VERSION         # Version string (e.g., "1.2.3")
         NAMESPACE       # Namespace for alias (e.g., "stlab")
     )

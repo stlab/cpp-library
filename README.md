@@ -149,8 +149,8 @@ When installed, the generated `my-libConfig.cmake` will include:
 include(CMakeFindDependencyMacro)
 
 # Find dependencies required by this package
-find_dependency(copy-on-write)
-find_dependency(enum-ops)
+find_dependency(stlab-copy-on-write)
+find_dependency(stlab-enum-ops)
 find_dependency(Threads)
 
 include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
@@ -158,8 +158,13 @@ include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
 
 **Default dependency handling:**
 
-- **cpp-library dependencies** (matching your project's `NAMESPACE`): Automatically mapped to their package names (e.g., `stlab::copy-on-write` → `find_dependency(copy-on-write)`)
-- **Other packages**: Uses the package name only by default (e.g., `PackageName::Target` → `find_dependency(PackageName)`)
+- **cpp-library dependencies** (matching your project's `NAMESPACE`):
+  - When namespace and component match: `namespace::namespace` → `find_dependency(namespace)`
+  - When they differ: `namespace::component` → `find_dependency(namespace-component)`
+  - Example: `stlab::copy-on-write` → `find_dependency(stlab-copy-on-write)`
+- **Other packages**: Uses the package name only by default
+  - Example: `Threads::Threads` → `find_dependency(Threads)`
+  - Example: `Boost::filesystem` → `find_dependency(Boost)`
 
 **Custom dependency mappings:**
 
@@ -222,6 +227,8 @@ git push origin v1.0.0
 
 Tags should follow [semantic versioning](https://semver.org/) (e.g., `v1.0.0`, `v2.1.3`).
 
+Alternatively, you can override the version using `-DCPP_LIBRARY_VERSION=x.y.z` (useful for package managers). See [Version Management](#version-management) for details.
+
 #### GitHub Pages Deployment
 
 To enable automatic documentation deployment to GitHub Pages:
@@ -257,30 +264,52 @@ cpp_library_setup(
 **Notes:**
 
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
-- Version is automatically detected from git tags (see [Version Tagging](#version-tagging)).
+- Version is automatically detected from git tags, or can be overridden with `-DCPP_LIBRARY_VERSION=x.y.z` (see [Version Management](#version-management)).
 - Examples using doctest should include `test` in the filename to be visible in the [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter) extension for VS Code test explorer.
 
 ### Target Naming
 
-For `project(your-library)`, `cpp_library_setup` will create a target called `your-library`.
+**Recommended Pattern** (collision-safe):
 
-The utility will additionally create an alias target based on the `NAMESPACE` option: `your_namespace::your-library`.
-
-If your project name starts with the namespace followed by a dash, the namespace in the project name is stripped from the alias target:
+Use the component name as your project name, and specify the organizational namespace separately:
 
 ```cmake
-cmake_minimum_required(VERSION 3.20)
-project(namespace-library)
-
-# ... CPM setup ...
+project(enum-ops)  # Component name only
 
 cpp_library_setup(
-    NAMESPACE namespace
+    NAMESPACE stlab  # Organizational namespace
     # ...
 )
 ```
 
-Results in `namespace-library` and `namespace::library` targets.
+This produces:
+
+- Target name: `enum-ops`
+- Package name: `stlab-enum-ops` (used in `find_package(stlab-enum-ops)`)
+- Target alias: `stlab::enum-ops` (used in `target_link_libraries()`)
+
+**Alternative Patterns:**
+
+You can also use `project(namespace-component)` - the namespace prefix will be detected and stripped from the target alias:
+
+```cmake
+project(stlab-enum-ops)  # Includes namespace prefix
+
+cpp_library_setup(
+    NAMESPACE stlab
+    # ...
+)
+```
+
+Produces the same result as above.
+
+**Single-component namespace** (e.g., `project(stlab)` with `NAMESPACE stlab`):
+
+- Target name: `stlab`
+- Package name: `stlab` (used in `find_package(stlab)`)
+- Target alias: `stlab::stlab` (used in `target_link_libraries()`)
+
+All package names include the namespace prefix for collision prevention.
 
 ### `cpp_library_map_dependency`
 
@@ -379,6 +408,15 @@ Version is automatically detected from git tags:
 - Supports `v1.2.3` and `1.2.3` tag formats
 - Falls back to `0.0.0` if no tag is found (with warning)
 - Version used in CMake package config files
+
+For package managers or CI systems building from source archives without git history, you can override the version using the `CPP_LIBRARY_VERSION` cache variable:
+
+```bash
+cmake -DCPP_LIBRARY_VERSION=1.2.3 -B build
+cmake --build build
+```
+
+This is particularly useful for vcpkg, Conan, or other package managers that don't have access to git tags.
 
 ### Testing
 

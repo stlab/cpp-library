@@ -34,8 +34,8 @@ function(_cpp_library_setup_executables)
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     
-    # Extract the clean library name for linking
-    string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    # Extract the clean library name for linking (strip namespace prefix if present)
+    string(REGEX REPLACE "^${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
     # Download doctest dependency via CPM
     if(NOT TARGET doctest::doctest)
@@ -140,8 +140,17 @@ function(cpp_library_setup)
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
     
-    # Calculate PACKAGE_NAME (clean name without namespace prefix) for template substitution
-    string(REPLACE "${ARG_NAMESPACE}-" "" PACKAGE_NAME "${ARG_NAME}")
+    # Calculate clean name (without namespace prefix) for target alias
+    # If PROJECT_NAME starts with NAMESPACE-, strip it; otherwise use PROJECT_NAME as-is
+    string(REGEX REPLACE "^${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    
+    # Always prefix package name with namespace for collision prevention
+    # Special case: if namespace equals clean name, don't duplicate (e.g., stlab::stlab → stlab)
+    if(ARG_NAMESPACE STREQUAL CLEAN_NAME)
+        set(PACKAGE_NAME "${ARG_NAMESPACE}")
+    else()
+        set(PACKAGE_NAME "${ARG_NAMESPACE}-${CLEAN_NAME}")
+    endif()
     
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
@@ -188,6 +197,7 @@ function(cpp_library_setup)
         DESCRIPTION "${ARG_DESCRIPTION}"
         NAMESPACE "${ARG_NAMESPACE}"
         PACKAGE_NAME "${PACKAGE_NAME}"
+        CLEAN_NAME "${CLEAN_NAME}"
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
