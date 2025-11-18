@@ -58,6 +58,17 @@ jobs:
           cmake --preset=default
           cmake --build --preset=default
           cmake --install build/default --prefix ${{ runner.temp }}/install
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        if: ${{ matrix.cc }}
+
+      - name: Build and Install
+        run: |
+          cmake --preset=default
+          cmake --build --preset=default
+          cmake --install build/default --prefix ${{ runner.temp }}/install
+        if: ${{ !matrix.cc }}
 
       - name: Test find_package
         shell: bash
