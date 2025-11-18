@@ -111,9 +111,10 @@ function(_cpp_library_setup_core)
 endfunction()
 
 # Copies template files (.clang-format, .gitignore, etc.) to project root if not present.
-# - Postcondition: missing template files copied to project, CI workflow configured with PROJECT_NAME substitution
+# - Precondition: PACKAGE_NAME must be passed as first parameter
+# - Postcondition: missing template files copied to project, CI workflow configured with PACKAGE_NAME substitution
 # - With FORCE_INIT: overwrites existing files
-function(_cpp_library_copy_templates)
+function(_cpp_library_copy_templates PACKAGE_NAME)
     set(options FORCE_INIT)
     cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
 
@@ -141,6 +142,6 @@ function(_cpp_library_copy_templates)
         endif()
     endforeach()
     
-    # Setup CI workflow with PROJECT_NAME substitution
-    _cpp_library_setup_ci(${ARG_FORCE_INIT})
+    # Setup CI workflow with PACKAGE_NAME substitution
+    _cpp_library_setup_ci("${PACKAGE_NAME}" ${ARG_FORCE_INIT})
 endfunction()

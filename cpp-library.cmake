@@ -211,9 +211,9 @@ function(cpp_library_setup)
     
     # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
     if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
-        _cpp_library_copy_templates(FORCE_INIT)
+        _cpp_library_copy_templates("${PACKAGE_NAME}" FORCE_INIT)
     else()
-        _cpp_library_copy_templates()
+        _cpp_library_copy_templates("${PACKAGE_NAME}")
     endif()
     
     # Setup testing (if tests are specified)

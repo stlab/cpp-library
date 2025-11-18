@@ -24,7 +24,7 @@ endfunction()
 # - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES
 # - Postcondition: OUTPUT_VAR contains newline-separated find_dependency() calls for public dependencies
 # - Uses cpp_library_map_dependency() mappings if registered, otherwise uses defaults
-# - Automatically handles cpp-library dependencies (matching NAMESPACE)
+# - Automatically handles cpp-library dependencies (namespace::package → find_dependency(package))
 function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     get_target_property(LINK_LIBS ${TARGET_NAME} INTERFACE_LINK_LIBRARIES)
     
