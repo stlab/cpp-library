@@ -30,9 +30,10 @@ cmake_minimum_required(VERSION 3.20)
 # Project declaration - cpp_library_setup will use this name and detect version from git tags
 project(your-library)
 
-# Only set CPM cache when building as top-level project
-if(PROJECT_IS_TOP_LEVEL)
-    set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache/cpm CACHE PATH "CPM cache")
+# Setup CPM
+if(PROJECT_IS_TOP_LEVEL AND NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
+    set(CPM_SOURCE_CACHE "${CMAKE_SOURCE_DIR}/.cache/cpm" CACHE PATH "CPM source cache")
+    message(STATUS "Setting cpm cache dir to: ${CPM_SOURCE_CACHE}")
 endif()
 include(cmake/CPM.cmake)
 
@@ -99,13 +100,16 @@ project(my-app)
 include(cmake/CPM.cmake)
 
 # Fetch the library directly from GitHub
-CPMAddPackage("gh:your-org/your-library@1.0.0")
+# Note: Repository name must match the package name (including namespace prefix)
+CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
 
 add_executable(my-app main.cpp)
-target_link_libraries(my-app PRIVATE your_namespace::your-library)
+target_link_libraries(my-app PRIVATE stlab::enum-ops)
 ```
 
 The library will be automatically fetched and built as part of your project.
+
+**Important:** For CPM compatibility, especially with `CPM_USE_LOCAL_PACKAGES`, your GitHub repository name should match the package name. For a library with package name `stlab-enum-ops`, name your repository `stlab/stlab-enum-ops`, not `stlab/enum-ops`. This ensures CPM's abbreviated syntax works correctly with both source fetching and local package finding.
 
 #### Installation (optional)
 
@@ -216,6 +220,17 @@ This ensures your project uses the latest presets and CI configurations from the
 
 ### Setting Up GitHub Repository
 
+#### Repository Naming
+
+**Critical:** Your GitHub repository name must match your package name for CPM compatibility.
+
+For the recommended pattern (`project(enum-ops)` with `NAMESPACE stlab`):
+
+- Package name will be: `stlab-enum-ops`
+- Repository should be: `github.com/stlab/stlab-enum-ops`
+
+This ensures `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` works correctly with both source builds and `CPM_USE_LOCAL_PACKAGES`.
+
 #### Version Tagging
 
 cpp-library automatically detects your library version from git tags. To version your library:
@@ -287,6 +302,7 @@ This produces:
 - Target name: `enum-ops`
 - Package name: `stlab-enum-ops` (used in `find_package(stlab-enum-ops)`)
 - Target alias: `stlab::enum-ops` (used in `target_link_libraries()`)
+- GitHub repository should be named: `stlab/stlab-enum-ops` (for CPM compatibility)
 
 **Alternative Patterns:**
 
@@ -441,8 +457,10 @@ These files are generated automatically. To regenerate with the latest templates
 
 See these projects using cpp-library:
 
-- [stlab/enum-ops](https://github.com/stlab/enum-ops) - Type-safe operators for enums
-- [stlab/copy-on-write](https://github.com/stlab/copy-on-write) - Copy-on-write wrapper
+- [stlab/stlab-enum-ops](https://github.com/stlab/stlab-enum-ops) - Type-safe operators for enums
+- [stlab/stlab-copy-on-write](https://github.com/stlab/stlab-copy-on-write) - Copy-on-write wrapper
+
+Note: Repository names include the namespace prefix for CPM compatibility and collision prevention.
 
 ## License
 
