@@ -20,7 +20,76 @@ Modern CMake template for C++ libraries with comprehensive infrastructure.
 - **CI/CD**: [GitHub Actions](https://docs.github.com/en/actions) workflows with multi-platform testing and installation verification
 - **Dependency Management**: [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) integration
 
-## Usage
+## Quick Start
+
+The easiest way to create a new library project using cpp-library is with the `setup.cmake` script. This interactive script will guide you through creating a new project with the correct structure, downloading dependencies, and generating all necessary files.
+
+### Using setup.cmake
+
+**Interactive mode:**
+
+```bash
+cmake -P <(curl -sSL https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake)
+```
+
+Or download and run:
+
+```bash
+curl -O https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake
+cmake -P setup.cmake
+```
+
+The script will prompt you for:
+
+- **Library name** (e.g., `my-library`)
+- **Namespace** (e.g., `mycompany`)
+- **Description**
+- **Header-only library?** (yes/no)
+- **Include examples?** (yes/no)
+- **Include tests?** (yes/no)
+
+**Non-interactive mode:**
+
+```bash
+cmake -P setup.cmake -- \
+  --name=my-library \
+  --namespace=mycompany \
+  --description="My awesome library" \
+  --header-only=yes \
+  --examples=yes \
+  --tests=yes
+```
+
+The script will:
+
+1. Create the project directory structure
+2. Download CPM.cmake
+3. Generate CMakeLists.txt with correct configuration
+4. Create template header files
+5. Create example and test files (if requested)
+6. Initialize a git repository
+
+After setup completes:
+
+```bash
+cd my-library
+cmake --preset=test
+cmake --build --preset=test
+ctest --preset=test
+```
+
+To regenerate template files (CMakePresets.json, CI workflows):
+
+```bash
+cmake --preset=init
+cmake --build --preset=init
+```
+
+## Manual Setup
+
+If you prefer to set up your project manually, or need to integrate cpp-library into an existing project, follow these steps.
+
+### Usage
 
 Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 
