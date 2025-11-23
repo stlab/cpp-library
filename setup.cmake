@@ -85,21 +85,22 @@ endforeach()
 
 # Helper function to prompt user for input
 function(prompt_user PROMPT_TEXT OUTPUT_VAR DEFAULT_VALUE)
+    # Display prompt using CMake message (goes to console)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E echo_append "${PROMPT_TEXT}")
+    
     if(CMAKE_HOST_WIN32)
         # Windows: Use PowerShell for input
         execute_process(
-            COMMAND powershell -NoProfile -Command "Write-Host -NoNewline '${PROMPT_TEXT}'; Read-Host"
+            COMMAND powershell -NoProfile -Command "$Host.UI.ReadLine()"
             OUTPUT_VARIABLE USER_INPUT
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
         )
     else()
-        # Unix: Use bash/sh for input
+        # Unix: Read from stdin using shell
         execute_process(
-            COMMAND bash -c "read -p '${PROMPT_TEXT}' input && echo -n \"$input\""
+            COMMAND sh -c "read input && printf '%s' \"$input\""
             OUTPUT_VARIABLE USER_INPUT
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
         )
     endif()
     
@@ -177,8 +178,23 @@ message("Include examples: ${ARG_EXAMPLES}")
 message("Include tests:    ${ARG_TESTS}")
 message("")
 
-# Create project directory
-set(PROJECT_DIR "${CMAKE_CURRENT_LIST_DIR}/${ARG_NAME}")
+# Get current working directory
+if(CMAKE_HOST_WIN32)
+    execute_process(
+        COMMAND powershell -NoProfile -Command "Get-Location | Select-Object -ExpandProperty Path"
+        OUTPUT_VARIABLE CURRENT_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+else()
+    execute_process(
+        COMMAND pwd
+        OUTPUT_VARIABLE CURRENT_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+endif()
+
+# Create project directory in current working directory
+set(PROJECT_DIR "${CURRENT_DIR}/${ARG_NAME}")
 if(EXISTS "${PROJECT_DIR}")
     message(FATAL_ERROR "Directory '${ARG_NAME}' already exists!")
 endif()
@@ -365,10 +381,13 @@ message("\n=== Setup Complete! ===\n")
 message("Your library has been created in: ${ARG_NAME}/")
 message("\nNext steps:")
 message("  cd ${ARG_NAME}")
+message("\n  # Generate template files (CMakePresets.json, CI workflows, etc.)")
+message("  cmake -B build -DCPP_LIBRARY_FORCE_INIT=ON")
+message("\n  # Now you can use the presets:")
 message("  cmake --preset=test")
 message("  cmake --build --preset=test")
 message("  ctest --preset=test")
-message("\nTo regenerate template files (CMakePresets.json, CI workflows):")
+message("\nTo regenerate template files later:")
 message("  cmake --preset=init")
 message("  cmake --build --preset=init")
 message("\nFor more information, visit: https://github.com/stlab/cpp-library")

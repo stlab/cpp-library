@@ -73,12 +73,17 @@ After setup completes:
 
 ```bash
 cd my-library
+
+# Generate template files (CMakePresets.json, CI workflows, etc.)
+cmake -B build -DCPP_LIBRARY_FORCE_INIT=ON
+
+# Now you can use the presets
 cmake --preset=test
 cmake --build --preset=test
 ctest --preset=test
 ```
 
-To regenerate template files (CMakePresets.json, CI workflows):
+To regenerate template files later:
 
 ```bash
 cmake --preset=init
