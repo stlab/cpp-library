@@ -34,10 +34,9 @@ function(cpp_library_enable_dependency_tracking)
     message(STATUS "cpp-library: Dependency tracking will be enabled during project() call")
 endfunction()
 
-# Include CTest for testing support
-include(CTest)
-
 # Include all the component modules
+# Note: CTest is NOT included here because it requires project() to be called first.
+# It will be included in cpp_library_setup() which is called after project().
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")  
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
@@ -165,6 +164,9 @@ function(cpp_library_setup)
         message(FATAL_ERROR "cpp_library_setup: PROJECT_NAME must be defined. Call project() before cpp_library_setup()")
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
+    
+    # Include CTest for testing support (must be after project())
+    include(CTest)
     
     # Calculate clean name (without namespace prefix) for target alias
     # If PROJECT_NAME starts with NAMESPACE-, strip it; otherwise use PROJECT_NAME as-is
