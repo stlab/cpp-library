@@ -98,3 +98,12 @@ mock_target_links(test26_target "MyPackage::MyPackage")
 _cpp_library_generate_dependencies(RESULT test26_target "mylib")
 verify_output("${RESULT}" "find_dependency(MyPackage 2.0.0 CONFIG)" "Test 26")
 
+# Test 27: Regex metacharacters in version numbers (bug fix verification)
+run_test("Version with dots - regex escaping")
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_OpenCV" "OpenCV 4.5.3 COMPONENTS core imgproc")
+set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "OpenCV")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+mock_target_links(test27_target "OpenCV::core" "OpenCV::imgproc")
+_cpp_library_generate_dependencies(RESULT test27_target "mylib")
+verify_output("${RESULT}" "find_dependency(OpenCV 4.5.3 COMPONENTS core imgproc)" "Test 27")
+

@@ -35,17 +35,8 @@ get_property(_CPP_LIBRARY_PROVIDER_INSTALLED GLOBAL PROPERTY _CPP_LIBRARY_PROVID
 if(_CPP_LIBRARY_PROVIDER_INSTALLED)
     return()
 endif()
-set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
 
-# Install the dependency provider
-cmake_language(SET_DEPENDENCY_PROVIDER _cpp_library_dependency_provider
-    SUPPORTED_METHODS 
-        FIND_PACKAGE
-        FETCHCONTENT_MAKEAVAILABLE_SERIAL
-)
-
-message(STATUS "cpp-library: Dependency tracking enabled")
-
+# Define all functions BEFORE installing the provider
 # The dependency provider implementation
 # This function is called before every find_package() and FetchContent_MakeAvailable()
 function(_cpp_library_dependency_provider method)
@@ -171,4 +162,15 @@ function(_cpp_library_get_all_tracked_deps OUTPUT_VAR)
     get_property(ALL_DEPS GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS)
     set(${OUTPUT_VAR} "${ALL_DEPS}" PARENT_SCOPE)
 endfunction()
+
+# Now install the dependency provider (after all functions are defined)
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+
+cmake_language(SET_DEPENDENCY_PROVIDER _cpp_library_dependency_provider
+    SUPPORTED_METHODS 
+        FIND_PACKAGE
+        FETCHCONTENT_MAKEAVAILABLE_SERIAL
+)
+
+message(STATUS "cpp-library: Dependency tracking enabled")
 
