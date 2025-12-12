@@ -203,91 +203,39 @@ For information about using installed packages with `find_package()`, see the [C
 
 #### Dependency Handling in Installed Packages
 
-cpp-library automatically generates correct `find_dependency()` calls in the installed CMake package configuration files by tracking your `find_package()` and `CPMAddPackage()` calls. This ensures downstream users can find and link all required dependencies when using your installed library.
-
-**Setup: Enable Dependency Tracking (CMake 3.24+ Required)**
-
-Enable dependency tracking to capture the exact syntax of your dependency requests:
+cpp-library automatically generates `find_dependency()` calls in the installed CMake package configuration. Call `cpp_library_enable_dependency_tracking()` before `project()`:
 
 ```cmake
 cmake_minimum_required(VERSION 3.24)
-
-# Setup CPM (before project())
 include(cmake/CPM.cmake)
 
-# Fetch cpp-library (before project())
 CPMAddPackage("gh:stlab/cpp-library@5.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
-# Enable dependency tracking (before project())
-cpp_library_enable_dependency_tracking()
-
-# Now call project() - this activates tracking
+cpp_library_enable_dependency_tracking()  # Before project()
 project(my-library)
 
-# All dependencies from here are tracked with exact versions and syntax
-CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
+# Add dependencies
 CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
 find_package(Boost 1.79 COMPONENTS filesystem)
 
-# Setup your library
 cpp_library_setup(
     DESCRIPTION "My library"
     NAMESPACE mylib
     HEADERS mylib.hpp
 )
 
-# Link dependencies - cpp-library knows exactly how they were added
 target_link_libraries(my-library INTERFACE
-    stlab::copy-on-write    # Tracked: CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
-    stlab::enum-ops         # Tracked: CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
-    Boost::filesystem       # Tracked: find_package(Boost 1.79 COMPONENTS filesystem)
+    stlab::enum-ops
+    Boost::filesystem
 )
 ```
 
-When installed, the generated `my-libraryConfig.cmake` will include:
+**Non-namespaced targets:** For targets like `opencv_core`, add an explicit mapping:
 
 ```cmake
-include(CMakeFindDependencyMacro)
-
-# Find dependencies with exact syntax from your build
-find_dependency(stlab-copy-on-write 2.1.0)
-find_dependency(stlab-enum-ops 1.0.0)
-find_dependency(Boost 1.79 COMPONENTS filesystem)
-
-include("${CMAKE_CURRENT_LIST_DIR}/my-libraryTargets.cmake")
-```
-
-**Key benefits:**
-- ✅ Perfect accuracy - captures exact `find_package()` syntax including COMPONENTS
-- ✅ Handles conditional dependencies automatically
-- ✅ Works seamlessly with CPM and find_package
-- ✅ No manual mapping needed for namespaced dependencies
-
-**Special Case: Non-namespaced Targets**
-
-For non-namespaced targets (like `opencv_core`), the provider cannot determine which package they came from. Use `cpp_library_map_dependency()` to map them:
-
-```cmake
-# Non-namespaced targets require explicit mapping
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
-cpp_library_map_dependency("opencv_imgproc" "OpenCV 4.5.0")
-
-cpp_library_setup(...)
-
-target_link_libraries(my-library INTERFACE
-    opencv_core
-    opencv_imgproc
-)
 ```
-
-Generated config:
-
-```cmake
-find_dependency(OpenCV 4.5.0)  # Mapped from opencv_core and opencv_imgproc
-```
-
-**Note:** Namespaced targets like `Qt6::Core` and `Boost::filesystem` work automatically - the provider tracks the original `find_package()` calls and handles component merging automatically.
 
 ### Updating cpp-library
 
@@ -411,87 +359,15 @@ This produces:
 cpp_library_map_dependency(target find_dependency_call)
 ```
 
-Registers a custom dependency mapping for `find_dependency()` generation in installed CMake package config files.
-
-**Parameters:**
-
-- `target`: The target name, either namespaced (e.g., `"Qt5::Core"`, `"stlab::enum-ops"`) or non-namespaced (e.g., `"opencv_core"`)
-- `find_dependency_call`: The complete arguments to pass to `find_dependency()`, including version and any special syntax (e.g., `"Qt5 5.15.0 COMPONENTS Core"`, `"OpenCV 4.5.0"`)
-
-**When to use:**
-
-- **Required** for non-namespaced targets (e.g., `opencv_core`) - these cannot be automatically detected
-- When automatic version detection fails (cpp-library will generate an error with a helpful example)
-- Dependencies requiring `COMPONENTS` or other special `find_package()` syntax
-- When you need to override automatically detected versions
-
-**Automatic behavior:**
-
-For namespaced targets (e.g., `Namespace::Target`), cpp-library automatically detects dependency versions from CMake's `<PackageName>_VERSION` variable (set by `find_package()` or CPM after fetching). Most namespaced dependencies work automatically without any mapping needed. If automatic detection fails, you'll get a clear error message showing exactly how to fix it.
-
-**Example 1 - Non-namespaced targets (required):**
+Maps non-namespaced targets to their package. Required only for targets like `opencv_core` where the package name cannot be inferred:
 
 ```cmake
-# Non-namespaced targets must be explicitly mapped
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
-cpp_library_map_dependency("opencv_imgproc" "OpenCV 4.5.0")
 
-target_link_libraries(my-target INTERFACE
-    opencv_core
-    opencv_imgproc
-)
+target_link_libraries(my-target INTERFACE opencv_core)
 ```
 
-**Example 2 - Custom syntax (Qt with COMPONENTS):**
-
-```cmake
-# Register mappings for dependencies needing COMPONENTS syntax
-# Note: Multiple components of the same package are automatically merged
-cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
-cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
-cpp_library_map_dependency("Qt6::Network" "Qt6 6.5.0 COMPONENTS Network")
-
-# Then link normally
-target_link_libraries(my-target INTERFACE
-    Qt6::Core
-    Qt6::Widgets
-    Qt6::Network
-)
-
-# Generated config will contain a single merged find_dependency() call:
-# find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets Network)
-```
-
-**Example 3 - Version override:**
-
-```cmake
-# Fetch dependencies
-CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
-CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
-
-# If automatic version detection fails, you'll get an error like:
-# "Cannot determine version for dependency stlab::enum-ops..."
-# The error message will show you the exact fix:
-cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
-cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 2.1.0")
-
-# Link as usual
-target_link_libraries(my-target INTERFACE
-    stlab::enum-ops
-    stlab::copy-on-write
-)
-```
-
-The generated config file will include your mappings (note merged Qt components):
-
-```cmake
-find_dependency(OpenCV 4.5.0)                          # From Example 1
-find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets Network) # From Example 2 (merged)
-find_dependency(stlab-enum-ops 1.0.0)                  # From Example 3
-find_dependency(stlab-copy-on-write 2.1.0)             # From Example 3
-```
-
-**Note:** Version constraints in `find_dependency()` specify *minimum* versions. Consuming projects can override these with their own version requirements in `find_package()` or `CPMAddPackage()`.
+Namespaced targets like `Qt6::Core` and `Boost::filesystem` are tracked automatically.
 
 ### Path Conventions
 
@@ -592,46 +468,26 @@ Note: Repository names include the namespace prefix for CPM compatibility and co
 
 ## Troubleshooting
 
-### Version Detection Fails
-
-**Problem**: Error message: "Cannot determine version for dependency..."
-
-**Solution**: Add explicit version mapping before `cpp_library_setup()`:
-```cmake
-cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
-```
-
-The error message shows the exact line to add.
-
 ### Non-Namespaced Target Error
 
-**Problem**: "Cannot automatically handle non-namespaced dependency: opencv_core"
+**Problem**: Error about non-namespaced dependency like `opencv_core`
 
-**Solution**: Non-namespaced targets must be explicitly mapped:
+**Solution**: Map the target to its package:
 ```cmake
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
 ```
 
-### Component Merging Not Working
+### Dependency Not Tracked
 
-**Problem**: Multiple Qt/Boost components generate separate `find_dependency()` calls
+**Problem**: Error that a dependency was not tracked
 
-**Solution**: Ensure all components have **identical** package name, version, and additional arguments:
-```cmake
-# ✓ Correct - will merge
-cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
-cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
+**Solution**: Ensure `cpp_library_enable_dependency_tracking()` is called before `project()`, and all dependencies are added after `project()` but before `cpp_library_setup()`.
 
-# ✗ Wrong - won't merge (different versions)
-cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
-cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.4.0 COMPONENTS Widgets")
-```
+### CPM Repository Name Mismatch
 
-### CPM Cannot Find Package
+**Problem**: `CPMAddPackage()` fails with `CPM_USE_LOCAL_PACKAGES`
 
-**Problem**: `CPMAddPackage("gh:stlab/enum-ops@1.0.0")` fails with `CPM_USE_LOCAL_PACKAGES`
-
-**Solution**: Repository name must match package name. If package name is `stlab-enum-ops`, repository must be `stlab/stlab-enum-ops`, not `stlab/enum-ops`.
+**Solution**: Repository name must match package name. For package `stlab-enum-ops`, use repository `stlab/stlab-enum-ops`, not `stlab/enum-ops`.
 
 ## Development
 
