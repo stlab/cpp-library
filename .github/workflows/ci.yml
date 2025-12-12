@@ -50,7 +50,7 @@ jobs:
           # Create CMakeLists.txt that uses cpp-library
           cat > CMakeLists.txt << 'EOF'
           cmake_minimum_required(VERSION 3.20)
-          project(test-library VERSION 1.0.0)
+          project(test VERSION 1.0.0)
           
           include(../cmake/CPM.cmake)
           CPMAddPackage(NAME cpp-library SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
