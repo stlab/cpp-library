@@ -99,22 +99,25 @@ If you prefer to set up your project manually, or need to integrate cpp-library 
 Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 
-# Project declaration - cpp_library_setup will use this name and detect version from git tags
-project(your-library)
-
-# Setup CPM
-if(PROJECT_IS_TOP_LEVEL AND NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
+# Setup CPM cache before project()
+if(NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
     set(CPM_SOURCE_CACHE "${CMAKE_SOURCE_DIR}/.cache/cpm" CACHE PATH "CPM source cache")
-    message(STATUS "Setting cpm cache dir to: ${CPM_SOURCE_CACHE}")
 endif()
 include(cmake/CPM.cmake)
 
-# Fetch cpp-library via CPM (update to latest version)
-CPMAddPackage("gh:stlab/cpp-library@4.0.3")  # Check for latest version
+# Fetch cpp-library before project()
+CPMAddPackage("gh:stlab/cpp-library@5.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
+# Enable dependency tracking before project()
+cpp_library_enable_dependency_tracking()
+
+# Now declare project
+project(your-library)
+
+# Setup library
 cpp_library_setup(
     DESCRIPTION "Your library description"
     NAMESPACE your_namespace
@@ -131,7 +134,7 @@ cpp_library_setup(
 
 Before using cpp-library, you'll need:
 
-- **CMake 3.20+** - [Download here](https://cmake.org/download/)
+- **CMake 3.24+** - [Download here](https://cmake.org/download/)
 - **A C++17+ compiler** - GCC 7+, Clang 5+, MSVC 2017+, or Apple Clang 9+
 
 #### Step 1: Install CPM.cmake
@@ -168,7 +171,7 @@ ctest --preset=test
 The preferred way to consume a library built with cpp-library is via [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake):
 
 ```cmake
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 project(my-app)
 
 include(cmake/CPM.cmake)
