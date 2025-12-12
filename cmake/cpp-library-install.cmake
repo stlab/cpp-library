@@ -53,23 +53,6 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
         return()
     endif()
     
-    # Verify dependency provider is installed
-    get_property(PROVIDER_INSTALLED GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED)
-    if(NOT PROVIDER_INSTALLED)
-        message(FATAL_ERROR 
-            "cpp-library: Dependency provider not installed.\n"
-            "You must call cpp_library_enable_dependency_tracking() before project().\n"
-            "\n"
-            "Example:\n"
-            "    cmake_minimum_required(VERSION 3.24)\n"
-            "    include(cmake/CPM.cmake)\n"
-            "    CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")\n"
-            "    include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)\n"
-            "    cpp_library_enable_dependency_tracking()\n"
-            "    project(my-library)\n"
-        )
-    endif()
-    
     # Process each linked library
     foreach(LIB IN LISTS LINK_LIBS)
         # Skip generator expressions (typically BUILD_INTERFACE dependencies)
@@ -104,7 +87,7 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
 endfunction()
 
 # Resolve dependency using tracked provider data
-# - Precondition: LIB is a target name, NAMESPACE is the project namespace, provider installed
+# - Precondition: LIB is a target name, NAMESPACE is the project namespace
 # - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or error is raised
 function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
     # Parse the target name to extract package name
@@ -138,17 +121,33 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                 set(${OUTPUT_VAR} "${FIND_PACKAGE_NAME}" PARENT_SCOPE)
                 message(DEBUG "cpp-library: System package ${FIND_PACKAGE_NAME} (no tracking needed)")
             else()
-                # Not tracked and not a system package - error
-                message(FATAL_ERROR 
-                    "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.\n"
-                    "This may happen if:\n"
-                    "  - The dependency was added after cpp_library_setup()\n"
-                    "  - The dependency was added in a subdirectory\n"
-                    "  - cpp_library_enable_dependency_tracking() was not called before project()\n"
-                    "\n"
-                    "Make sure all CPMAddPackage() and find_package() calls happen AFTER project()\n"
-                    "and BEFORE cpp_library_setup().\n"
-                )
+                # Not tracked and not a system package - check if provider is installed
+                get_property(PROVIDER_INSTALLED GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED)
+                if(NOT PROVIDER_INSTALLED)
+                    message(FATAL_ERROR 
+                        "cpp-library: Dependency provider not installed.\n"
+                        "You must call cpp_library_enable_dependency_tracking() before project().\n"
+                        "\n"
+                        "Example:\n"
+                        "    cmake_minimum_required(VERSION 3.24)\n"
+                        "    include(cmake/CPM.cmake)\n"
+                        "    CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")\n"
+                        "    include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)\n"
+                        "    cpp_library_enable_dependency_tracking()\n"
+                        "    project(my-library)\n"
+                    )
+                else()
+                    # Provider is installed but dependency wasn't tracked
+                    message(FATAL_ERROR 
+                        "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.\n"
+                        "This may happen if:\n"
+                        "  - The dependency was added after cpp_library_setup()\n"
+                        "  - The dependency was added in a subdirectory\n"
+                        "\n"
+                        "Make sure all CPMAddPackage() and find_package() calls happen AFTER project()\n"
+                        "and BEFORE cpp_library_setup().\n"
+                    )
+                endif()
             endif()
         endif()
     else()

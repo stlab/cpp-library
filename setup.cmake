@@ -236,11 +236,14 @@ endif()
 
 # Create main header file
 set(HEADER_FILE "${ARG_NAME}.hpp")
+# Sanitize name for use in header guards (replace hyphens with underscores and convert to uppercase)
+string(REPLACE "-" "_" HEADER_GUARD_NAME "${ARG_NAME}")
+string(TOUPPER "${ARG_NAMESPACE}_${HEADER_GUARD_NAME}_HPP" HEADER_GUARD_NAME)
 file(WRITE "${PROJECT_DIR}/include/${ARG_NAMESPACE}/${HEADER_FILE}"
 "// SPDX-License-Identifier: BSL-1.0
 
-#ifndef ${ARG_NAMESPACE}_${ARG_NAME}_HPP
-#define ${ARG_NAMESPACE}_${ARG_NAME}_HPP
+#ifndef ${HEADER_GUARD_NAME}
+#define ${HEADER_GUARD_NAME}
 
 namespace ${ARG_NAMESPACE} {
 
@@ -248,7 +251,7 @@ namespace ${ARG_NAMESPACE} {
 
 } // namespace ${ARG_NAMESPACE}
 
-#endif // ${ARG_NAMESPACE}_${ARG_NAME}_HPP
+#endif // ${HEADER_GUARD_NAME}
 ")
 
 # Create source file if not header-only

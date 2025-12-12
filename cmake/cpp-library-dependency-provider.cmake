@@ -96,10 +96,15 @@ function(_cpp_library_track_find_package package_name)
     # Check if this package was already tracked and merge components if needed
     get_property(EXISTING_CALL GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${package_name}")
     if(EXISTING_CALL)
-        # Parse existing components
+        # Parse existing components (match until ) or OPTIONAL_COMPONENTS)
         set(EXISTING_COMPONENTS "")
-        if(EXISTING_CALL MATCHES "COMPONENTS +([^O][^ ]*( +[^O][^ ]*)*)")
-            string(REGEX REPLACE " +" ";" EXISTING_COMPONENTS "${CMAKE_MATCH_1}")
+        if(EXISTING_CALL MATCHES "COMPONENTS +([^ )]+( +[^ )]+)*)")
+            set(TEMP_MATCH "${CMAKE_MATCH_1}")
+            # If OPTIONAL_COMPONENTS is present, only take everything before it
+            if(TEMP_MATCH MATCHES "^(.+) +OPTIONAL_COMPONENTS")
+                set(TEMP_MATCH "${CMAKE_MATCH_1}")
+            endif()
+            string(REGEX REPLACE " +" ";" EXISTING_COMPONENTS "${TEMP_MATCH}")
         endif()
         
         # Merge new components with existing ones (deduplicate)
