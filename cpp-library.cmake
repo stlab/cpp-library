@@ -60,7 +60,7 @@ function(_cpp_library_setup_executables)
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     
     # Extract the clean library name for linking (strip namespace prefix if present)
-    string(REGEX REPLACE "^${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
     # Download doctest dependency via CPM
     if(NOT TARGET doctest::doctest)
