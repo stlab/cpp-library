@@ -203,11 +203,11 @@ For information about using installed packages with `find_package()`, see the [C
 
 #### Dependency Handling in Installed Packages
 
-cpp-library automatically generates correct `find_dependency()` calls in the installed CMake package configuration files. This ensures downstream users can find and link all required dependencies when using your installed library.
+cpp-library automatically generates correct `find_dependency()` calls in the installed CMake package configuration files by tracking your `find_package()` and `CPMAddPackage()` calls. This ensures downstream users can find and link all required dependencies when using your installed library.
 
-**Recommended: Dependency Tracking (CMake 3.24+)**
+**Setup: Enable Dependency Tracking (CMake 3.24+ Required)**
 
-The best approach is to enable dependency tracking, which captures the exact `find_package()` and `CPMAddPackage()` calls you make:
+Enable dependency tracking to capture the exact syntax of your dependency requests:
 
 ```cmake
 cmake_minimum_required(VERSION 3.24)
@@ -262,73 +262,32 @@ include("${CMAKE_CURRENT_LIST_DIR}/my-libraryTargets.cmake")
 - ✅ Perfect accuracy - captures exact `find_package()` syntax including COMPONENTS
 - ✅ Handles conditional dependencies automatically
 - ✅ Works seamlessly with CPM and find_package
-- ✅ No manual mapping needed for most dependencies
+- ✅ No manual mapping needed for namespaced dependencies
 
-**Fallback: Introspection Method (CMake < 3.24)**
+**Special Case: Non-namespaced Targets**
 
-For CMake versions before 3.24, cpp-library falls back to introspecting `INTERFACE_LINK_LIBRARIES` and `<PackageName>_VERSION` variables:
-
-```cmake
-cmake_minimum_required(VERSION 3.20)
-project(my-library)
-
-# ... setup CPM and cpp-library ...
-
-# Dependencies are added normally
-CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
-
-cpp_library_setup(
-    DESCRIPTION "My library"
-    NAMESPACE mylib
-    HEADERS mylib.hpp
-)
-
-target_link_libraries(my-library INTERFACE stlab::enum-ops)
-```
-
-If version detection fails with this method, you'll get a clear error:
-
-```
-Cannot determine version for dependency stlab::enum-ops.
-The version variable stlab_enum_ops_VERSION is not set.
-
-Solution 1 (recommended): Use cpp_library_enable_dependency_tracking() with CMake 3.24+
-    cmake_minimum_required(VERSION 3.24)
-    ...
-    cpp_library_enable_dependency_tracking()
-    project(my-library)
-
-Solution 2: Add explicit mapping:
-    cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
-```
-
-**Custom dependency mapping:**
-
-For special cases (non-namespaced targets, custom syntax, or overrides), use `cpp_library_map_dependency()`:
+For non-namespaced targets (like `opencv_core`), the provider cannot determine which package they came from. Use `cpp_library_map_dependency()` to map them:
 
 ```cmake
-# Example 1: Non-namespaced targets (required)
+# Non-namespaced targets require explicit mapping
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
-
-# Example 2: Qt with COMPONENTS (components automatically merged)
-cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
-cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
+cpp_library_map_dependency("opencv_imgproc" "OpenCV 4.5.0")
 
 cpp_library_setup(...)
 
 target_link_libraries(my-library INTERFACE
     opencv_core
-    Qt6::Core
-    Qt6::Widgets
+    opencv_imgproc
 )
 ```
 
 Generated config:
 
 ```cmake
-find_dependency(OpenCV 4.5.0)
-find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets)  # Components merged
+find_dependency(OpenCV 4.5.0)  # Mapped from opencv_core and opencv_imgproc
 ```
+
+**Note:** Namespaced targets like `Qt6::Core` and `Boost::filesystem` work automatically - the provider tracks the original `find_package()` calls and handles component merging automatically.
 
 ### Updating cpp-library
 

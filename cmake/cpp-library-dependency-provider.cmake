@@ -22,12 +22,12 @@
 #   CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
 #   find_package(Boost 1.79 COMPONENTS filesystem)
 
-# Only install the provider once, and only if we're using CMake 3.24+
+# Require CMake 3.24+ for dependency provider support
 if(CMAKE_VERSION VERSION_LESS "3.24")
-    message(WARNING 
-        "cpp-library dependency tracking requires CMake 3.24+, current version is ${CMAKE_VERSION}.\n"
-        "Dependency tracking will be disabled. Install will use fallback introspection method.")
-    return()
+    message(FATAL_ERROR 
+        "cpp-library requires CMake 3.24+ for dependency tracking.\n"
+        "Current version is ${CMAKE_VERSION}.\n"
+        "Please upgrade CMake or use an older version of cpp-library.")
 endif()
 
 # Check if provider is already installed (avoid double-installation)

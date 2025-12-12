@@ -65,17 +65,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/my-libraryTargets.cmake")
 4. **Conditional Dependencies**: Only dependencies actually linked are included
 5. **System Package Detection**: Common packages like Threads don't require versions
 
-## Fallback for CMake < 3.24
+## CMake Version Requirement
 
-If using CMake 3.20-3.23, simply omit cpp_library_enable_dependency_tracking():
+cpp-library requires CMake 3.24+ for dependency provider support. This is a hard requirement.
 
-```cmake
-cmake_minimum_required(VERSION 3.20)
-project(my-library)
-
-# Rest of the build...
-# cpp-library will use introspection method with helpful error messages
-```
+If you need to use CMake 3.20-3.23, use an older version of cpp-library that supports the introspection method.
 
 ## Handling Special Cases
 
@@ -90,15 +84,16 @@ cpp_library_map_dependency("opencv_imgproc" "OpenCV 4.5.0")
 target_link_libraries(my-library INTERFACE opencv_core opencv_imgproc)
 ```
 
-### Version Overrides
+### Manual Overrides (Rare)
 
-Custom mappings override tracked dependencies:
+Custom mappings can override tracked dependencies if needed:
 
 ```cmake
-# Even if provider tracked stlab-enum-ops@2.0.0
-# This mapping takes precedence:
-cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.5.0")
+# If you need to override what the provider tracked:
+cpp_library_map_dependency("SomePackage::Component" "SomePackage 2.0.0 CONFIG")
 ```
+
+This is rarely needed since the provider captures the original syntax accurately.
 
 ## Testing Your Installation
 

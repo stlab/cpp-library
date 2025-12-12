@@ -36,13 +36,13 @@ function(cpp_library_map_dependency TARGET FIND_DEPENDENCY_CALL)
 endfunction()
 
 # Generates find_dependency() calls for target's INTERFACE link libraries
-# - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES
+# - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES, dependency provider installed
 # - Postcondition: OUTPUT_VAR contains newline-separated find_dependency() calls for public dependencies
-# - Primary method: Uses dependency tracking data from cpp_library_dependency_provider (CMake 3.24+)
-# - Fallback method: Uses cpp_library_map_dependency() mappings and <PackageName>_VERSION introspection
-# - Automatically includes version constraints from tracked find_package() calls when available
-# - Common system packages (Threads, OpenMP, etc.) are exempt from version requirements
+# - Uses dependency tracking data from cpp_library_dependency_provider to generate accurate calls
+# - Automatically includes version constraints from tracked find_package() calls
+# - Common system packages (Threads, OpenMP, etc.) are handled automatically
 # - Merges multiple components of the same package into a single find_dependency() call with COMPONENTS
+# - cpp_library_map_dependency() can override tracked dependencies for non-namespaced targets or special cases
 # - cpp-library dependencies: namespace::namespace → find_dependency(namespace VERSION), namespace::component → find_dependency(namespace-component VERSION)
 # - External dependencies: name::name → find_dependency(name VERSION), name::component → find_dependency(name VERSION)
 function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
@@ -53,8 +53,22 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
         return()
     endif()
     
-    # Check if dependency provider tracking is available
+    # Verify dependency provider is installed
     get_property(PROVIDER_INSTALLED GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED)
+    if(NOT PROVIDER_INSTALLED)
+        message(FATAL_ERROR 
+            "cpp-library: Dependency provider not installed.\n"
+            "You must call cpp_library_enable_dependency_tracking() before project().\n"
+            "\n"
+            "Example:\n"
+            "    cmake_minimum_required(VERSION 3.24)\n"
+            "    include(cmake/CPM.cmake)\n"
+            "    CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")\n"
+            "    include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)\n"
+            "    cpp_library_enable_dependency_tracking()\n"
+            "    project(my-library)\n"
+        )
+    endif()
     
     # Process each linked library
     foreach(LIB IN LISTS LINK_LIBS)
@@ -65,20 +79,16 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
         
         set(FIND_DEP_CALL "")
         
-        # Check for custom mapping first (always respected, even with provider)
+        # Check for custom mapping first (allows overrides for non-namespaced targets)
         get_property(CUSTOM_MAPPING GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${LIB})
         
         if(CUSTOM_MAPPING)
             # Use explicit custom mapping
             set(FIND_DEP_CALL "${CUSTOM_MAPPING}")
             message(DEBUG "cpp-library: Using custom mapping for ${LIB}: ${CUSTOM_MAPPING}")
-        elseif(PROVIDER_INSTALLED)
-            # Try to use tracked dependency data from provider
-            set(FIND_DEP_CALL "")
-            _cpp_library_resolve_with_provider("${LIB}" "${NAMESPACE}" FIND_DEP_CALL)
         else()
-            # Fallback to introspection method (old behavior)
-            _cpp_library_resolve_with_introspection("${LIB}" "${NAMESPACE}" FIND_DEP_CALL)
+            # Use tracked dependency data from provider
+            _cpp_library_resolve_dependency("${LIB}" "${NAMESPACE}" FIND_DEP_CALL)
         endif()
         
         # Add the dependency to the merged list
@@ -93,10 +103,10 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     set(${OUTPUT_VAR} "${DEPENDENCY_LINES}" PARENT_SCOPE)
 endfunction()
 
-# Resolve dependency using tracked provider data (CMake 3.24+ with dependency provider)
-# - Precondition: PROVIDER_INSTALLED is true, LIB is a target name, NAMESPACE is the project namespace
-# - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or empty if not found
-function(_cpp_library_resolve_with_provider LIB NAMESPACE OUTPUT_VAR)
+# Resolve dependency using tracked provider data
+# - Precondition: LIB is a target name, NAMESPACE is the project namespace, provider installed
+# - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or error is raised
+function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
     # Parse the target name to extract package name
     if(LIB MATCHES "^([^:]+)::(.+)$")
         set(PKG_NAME "${CMAKE_MATCH_1}")
@@ -122,99 +132,39 @@ function(_cpp_library_resolve_with_provider LIB NAMESPACE OUTPUT_VAR)
             # Found tracked data - use it directly
             set(${OUTPUT_VAR} "${TRACKED_CALL}" PARENT_SCOPE)
             message(DEBUG "cpp-library: Using tracked dependency for ${LIB}: ${TRACKED_CALL}")
-            return()
         else()
             # Not tracked - check if it's a system package
             if(FIND_PACKAGE_NAME IN_LIST _CPP_LIBRARY_SYSTEM_PACKAGES)
                 set(${OUTPUT_VAR} "${FIND_PACKAGE_NAME}" PARENT_SCOPE)
                 message(DEBUG "cpp-library: System package ${FIND_PACKAGE_NAME} (no tracking needed)")
-                return()
             else()
-                # Not tracked and not a system package - warn and fall back to introspection
-                message(WARNING 
-                    "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked by the dependency provider.\n"
-                    "This may happen if the dependency was added after cpp_library_setup() or in a subdirectory.\n"
-                    "Falling back to introspection method.")
-                _cpp_library_resolve_with_introspection("${LIB}" "${NAMESPACE}" RESULT)
-                set(${OUTPUT_VAR} "${RESULT}" PARENT_SCOPE)
-                return()
+                # Not tracked and not a system package - error
+                message(FATAL_ERROR 
+                    "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.\n"
+                    "This may happen if:\n"
+                    "  - The dependency was added after cpp_library_setup()\n"
+                    "  - The dependency was added in a subdirectory\n"
+                    "  - cpp_library_enable_dependency_tracking() was not called before project()\n"
+                    "\n"
+                    "Make sure all CPMAddPackage() and find_package() calls happen AFTER project()\n"
+                    "and BEFORE cpp_library_setup().\n"
+                )
             endif()
-        endif()
-    else()
-        # Non-namespaced target - cannot use provider data
-        message(WARNING 
-            "cpp-library: Non-namespaced dependency ${LIB} cannot be resolved with provider.\n"
-            "Falling back to introspection method.")
-        _cpp_library_resolve_with_introspection("${LIB}" "${NAMESPACE}" RESULT)
-        set(${OUTPUT_VAR} "${RESULT}" PARENT_SCOPE)
-        return()
-    endif()
-endfunction()
-
-# Resolve dependency using introspection (fallback for CMake < 3.24 or when provider not used)
-# - Precondition: LIB is a target name, NAMESPACE is the project namespace
-# - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or empty if resolution fails
-function(_cpp_library_resolve_with_introspection LIB NAMESPACE OUTPUT_VAR)
-    # Parse as namespaced target
-    if(LIB MATCHES "^([^:]+)::(.+)$")
-        set(PKG_NAME "${CMAKE_MATCH_1}")
-        set(COMPONENT "${CMAKE_MATCH_2}")
-        
-        # Determine package name
-        if(PKG_NAME STREQUAL NAMESPACE)
-            # Internal cpp-library dependency
-            if(PKG_NAME STREQUAL COMPONENT)
-                set(FIND_PACKAGE_NAME "${PKG_NAME}")
-            else()
-                set(FIND_PACKAGE_NAME "${PKG_NAME}-${COMPONENT}")
-            endif()
-        else()
-            # External dependency
-            set(FIND_PACKAGE_NAME "${PKG_NAME}")
-        endif()
-        
-        # Check if system package
-        if(FIND_PACKAGE_NAME IN_LIST _CPP_LIBRARY_SYSTEM_PACKAGES)
-            set(${OUTPUT_VAR} "${FIND_PACKAGE_NAME}" PARENT_SCOPE)
-            return()
-        endif()
-        
-        # Try to look up <PackageName>_VERSION
-        string(REPLACE "-" "_" VERSION_VAR_NAME "${FIND_PACKAGE_NAME}")
-        
-        if(DEFINED ${VERSION_VAR_NAME}_VERSION AND NOT "${${VERSION_VAR_NAME}_VERSION}" STREQUAL "")
-            set(${OUTPUT_VAR} "${FIND_PACKAGE_NAME} ${${VERSION_VAR_NAME}_VERSION}" PARENT_SCOPE)
-            return()
-        else()
-            # Version not found - generate error
-            message(FATAL_ERROR 
-                "Cannot determine version for dependency ${LIB} (package: ${FIND_PACKAGE_NAME}).\n"
-                "The version variable ${VERSION_VAR_NAME}_VERSION is not set.\n"
-                "\n"
-                "Solution 1 (recommended): Use cpp_library_enable_dependency_tracking() with CMake 3.24+\n"
-                "    cmake_minimum_required(VERSION 3.24)\n"
-                "    include(cmake/CPM.cmake)\n"
-                "    CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")\n"
-                "    include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)\n"
-                "    cpp_library_enable_dependency_tracking()\n"
-                "    project(${CMAKE_PROJECT_NAME})\n"
-                "\n"
-                "Solution 2: Add explicit mapping:\n"
-                "    cpp_library_map_dependency(\"${LIB}\" \"${FIND_PACKAGE_NAME} <VERSION>\")\n"
-                "\n"
-                "Replace <VERSION> with the actual version requirement.\n"
-            )
         endif()
     else()
         # Non-namespaced target - requires explicit mapping
         message(FATAL_ERROR 
-            "Cannot automatically handle non-namespaced dependency: ${LIB}\n"
+            "cpp-library: Non-namespaced dependency '${LIB}' cannot be automatically resolved.\n"
             "\n"
-            "Add a cpp_library_map_dependency() call before cpp_library_setup():\n"
+            "Non-namespaced targets (like 'opencv_core') don't indicate which package they came from.\n"
+            "You must use cpp_library_map_dependency() to map the target to its package:\n"
+            "\n"
             "    cpp_library_map_dependency(\"${LIB}\" \"<PACKAGE_NAME> <VERSION>\")\n"
             "\n"
-            "For example, for opencv_core:\n"
-            "    cpp_library_map_dependency(\"opencv_core\" \"OpenCV 4.5.0\")\n"
+            "For example, if ${LIB} comes from OpenCV:\n"
+            "    cpp_library_map_dependency(\"${LIB}\" \"OpenCV 4.5.0\")\n"
+            "\n"
+            "Add this mapping BEFORE cpp_library_setup().\n"
         )
     endif()
 endfunction()
