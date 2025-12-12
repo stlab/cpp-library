@@ -203,102 +203,131 @@ For information about using installed packages with `find_package()`, see the [C
 
 #### Dependency Handling in Installed Packages
 
-cpp-library automatically generates correct `find_dependency()` calls in the installed CMake package configuration files by introspecting your target's `INTERFACE_LINK_LIBRARIES`. This ensures downstream users can find and link all required dependencies.
+cpp-library automatically generates correct `find_dependency()` calls in the installed CMake package configuration files. This ensures downstream users can find and link all required dependencies when using your installed library.
 
-**How it works:**
+**Recommended: Dependency Tracking (CMake 3.24+)**
 
-When you link dependencies to your target using `target_link_libraries()`, cpp-library analyzes these links during installation and generates appropriate `find_dependency()` calls with version constraints. The process is automatic, but if version detection fails, you'll get a helpful error message with the exact fix.
+The best approach is to enable dependency tracking, which captures the exact `find_package()` and `CPMAddPackage()` calls you make:
 
 ```cmake
-# In your library's CMakeLists.txt
-add_library(my-lib INTERFACE)
+cmake_minimum_required(VERSION 3.24)
 
-# Fetch dependencies with versions
+# Setup CPM (before project())
+include(cmake/CPM.cmake)
+
+# Fetch cpp-library (before project())
+CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+
+# Enable dependency tracking (before project())
+cpp_library_enable_dependency_tracking()
+
+# Now call project() - this activates tracking
+project(my-library)
+
+# All dependencies from here are tracked with exact versions and syntax
 CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
 CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
+find_package(Boost 1.79 COMPONENTS filesystem)
 
-# Link dependencies - automatic version detection will handle these
-target_link_libraries(my-lib INTERFACE
-    stlab::copy-on-write    # Version auto-detected from stlab_copy_on_write_VERSION
-    stlab::enum-ops         # Version auto-detected from stlab_enum_ops_VERSION
-    Threads::Threads        # System dependency (no version needed)
+# Setup your library
+cpp_library_setup(
+    DESCRIPTION "My library"
+    NAMESPACE mylib
+    HEADERS mylib.hpp
+)
+
+# Link dependencies - cpp-library knows exactly how they were added
+target_link_libraries(my-library INTERFACE
+    stlab::copy-on-write    # Tracked: CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
+    stlab::enum-ops         # Tracked: CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
+    Boost::filesystem       # Tracked: find_package(Boost 1.79 COMPONENTS filesystem)
 )
 ```
 
-When installed, the generated `my-libConfig.cmake` will include:
+When installed, the generated `my-libraryConfig.cmake` will include:
 
 ```cmake
 include(CMakeFindDependencyMacro)
 
-# Find dependencies required by this package
+# Find dependencies with exact syntax from your build
 find_dependency(stlab-copy-on-write 2.1.0)
 find_dependency(stlab-enum-ops 1.0.0)
-find_dependency(Threads)
+find_dependency(Boost 1.79 COMPONENTS filesystem)
 
-include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/my-libraryTargets.cmake")
 ```
 
-**Default dependency handling:**
+**Key benefits:**
+- ✅ Perfect accuracy - captures exact `find_package()` syntax including COMPONENTS
+- ✅ Handles conditional dependencies automatically
+- ✅ Works seamlessly with CPM and find_package
+- ✅ No manual mapping needed for most dependencies
 
-- **cpp-library dependencies** (matching your project's `NAMESPACE`):
-  - When namespace and component match: `namespace::namespace` → `find_dependency(namespace VERSION)`
-  - When they differ: `namespace::component` → `find_dependency(namespace-component VERSION)`
-  - Example: `stlab::copy-on-write` → `find_dependency(stlab-copy-on-write 2.1.0)`
-- **Other packages**: Uses the package name only
-  - Example: `Threads::Threads` → `find_dependency(Threads)`
-  - Example: `Boost::filesystem` → `find_dependency(Boost VERSION)`
+**Fallback: Introspection Method (CMake < 3.24)**
 
-**Automatic version detection:**
-
-cpp-library automatically includes version constraints by looking up CMake's `<PackageName>_VERSION` variable (set by `find_package()` or CPM). If the version cannot be detected, **you'll get a clear error** during configuration:
-
-```
-Cannot determine version for dependency stlab::enum-ops (package: stlab-enum-ops).
-The version variable stlab_enum_ops_VERSION is not set.
-
-To fix this, add a cpp_library_map_dependency() call before cpp_library_setup():
-
-    cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
-
-Replace <VERSION> with the actual version requirement.
-```
-
-Simply copy the suggested line and add it to your `CMakeLists.txt`:
+For CMake versions before 3.24, cpp-library falls back to introspecting `INTERFACE_LINK_LIBRARIES` and `<PackageName>_VERSION` variables:
 
 ```cmake
-# Fix version detection failures
-cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
-cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 2.1.0")
+cmake_minimum_required(VERSION 3.20)
+project(my-library)
+
+# ... setup CPM and cpp-library ...
+
+# Dependencies are added normally
+CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
 
 cpp_library_setup(
-    # ... rest of setup
+    DESCRIPTION "My library"
+    NAMESPACE mylib
+    HEADERS mylib.hpp
 )
+
+target_link_libraries(my-library INTERFACE stlab::enum-ops)
 ```
 
-**Custom dependency syntax with component merging:**
+If version detection fails with this method, you'll get a clear error:
 
-For dependencies requiring special `find_package()` syntax (e.g., Qt with COMPONENTS), use `cpp_library_map_dependency()` to provide the complete call. Multiple components of the same package are automatically merged:
+```
+Cannot determine version for dependency stlab::enum-ops.
+The version variable stlab_enum_ops_VERSION is not set.
+
+Solution 1 (recommended): Use cpp_library_enable_dependency_tracking() with CMake 3.24+
+    cmake_minimum_required(VERSION 3.24)
+    ...
+    cpp_library_enable_dependency_tracking()
+    project(my-library)
+
+Solution 2: Add explicit mapping:
+    cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
+```
+
+**Custom dependency mapping:**
+
+For special cases (non-namespaced targets, custom syntax, or overrides), use `cpp_library_map_dependency()`:
 
 ```cmake
-# Map Qt components to use COMPONENTS syntax with versions
+# Example 1: Non-namespaced targets (required)
+cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
+
+# Example 2: Qt with COMPONENTS (components automatically merged)
 cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
 cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
-cpp_library_map_dependency("Qt6::Network" "Qt6 6.5.0 COMPONENTS Network")
 
-# Then link as usual
-target_link_libraries(my-lib INTERFACE
+cpp_library_setup(...)
+
+target_link_libraries(my-library INTERFACE
+    opencv_core
     Qt6::Core
     Qt6::Widgets
-    Qt6::Network
-    Threads::Threads  # Works automatically
 )
 ```
 
-The generated config file will merge components into a single call:
+Generated config:
 
 ```cmake
-find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets Network)
-find_dependency(Threads)
+find_dependency(OpenCV 4.5.0)
+find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets)  # Components merged
 ```
 
 ### Updating cpp-library

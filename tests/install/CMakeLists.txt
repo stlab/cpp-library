@@ -46,6 +46,13 @@ macro(run_test TEST_NAME)
         set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${target})
     endforeach()
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_MAPPED_TARGETS "")
+    
+    # Clear dependency provider tracking state
+    get_property(ALL_TRACKED_DEPS GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS)
+    foreach(dep IN LISTS ALL_TRACKED_DEPS)
+        set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${dep}")
+    endforeach()
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "")
 endmacro()
 
 # Helper macro to set up mock link libraries for a test target
@@ -70,6 +77,7 @@ endmacro()
 
 # Include the actual tests
 include(${CMAKE_CURRENT_LIST_DIR}/test_dependency_mapping.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/test_dependency_provider.cmake)
 
 # Print summary
 message(STATUS "")

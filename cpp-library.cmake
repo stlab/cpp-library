@@ -8,6 +8,39 @@
 # Determine the directory where this file is located
 get_filename_component(CPP_LIBRARY_ROOT "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 
+# Enable dependency tracking for accurate find_dependency() generation
+# This function should be called BEFORE project() to install the dependency provider.
+# Requires CMake 3.24+. If called with older CMake, will emit a warning and use fallback.
+#
+# Usage:
+#   cmake_minimum_required(VERSION 3.24)
+#   include(cmake/CPM.cmake)
+#   CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+#   include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+#   
+#   cpp_library_enable_dependency_tracking()  # Must be before project()
+#   
+#   project(my-library)
+#   # Now all find_package/CPM calls are tracked
+function(cpp_library_enable_dependency_tracking)
+    if(CMAKE_VERSION VERSION_LESS "3.24")
+        message(WARNING 
+            "cpp_library_enable_dependency_tracking() requires CMake 3.24+, current version is ${CMAKE_VERSION}.\n"
+            "Dependency tracking will be disabled. Install will use fallback introspection method.")
+        return()
+    endif()
+    
+    # Add the dependency provider to CMAKE_PROJECT_TOP_LEVEL_INCLUDES
+    # This will be processed during the next project() call
+    list(APPEND CMAKE_PROJECT_TOP_LEVEL_INCLUDES 
+        "${CPP_LIBRARY_ROOT}/cmake/cpp-library-dependency-provider.cmake")
+    
+    # Propagate to parent scope so project() sees it
+    set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES "${CMAKE_PROJECT_TOP_LEVEL_INCLUDES}" PARENT_SCOPE)
+    
+    message(STATUS "cpp-library: Dependency tracking will be enabled during project() call")
+endfunction()
+
 # Include CTest for testing support
 include(CTest)
 
