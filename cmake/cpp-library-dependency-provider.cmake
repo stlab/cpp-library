@@ -93,6 +93,59 @@ function(_cpp_library_track_find_package package_name)
         string(APPEND FIND_DEP_CALL " CONFIG")
     endif()
     
+    # Check if this package was already tracked and merge components if needed
+    get_property(EXISTING_CALL GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${package_name}")
+    if(EXISTING_CALL)
+        # Parse existing components
+        set(EXISTING_COMPONENTS "")
+        if(EXISTING_CALL MATCHES "COMPONENTS +([^O][^ ]*( +[^O][^ ]*)*)")
+            string(REGEX REPLACE " +" ";" EXISTING_COMPONENTS "${CMAKE_MATCH_1}")
+        endif()
+        
+        # Merge new components with existing ones (deduplicate)
+        set(MERGED_COMPONENTS ${EXISTING_COMPONENTS})
+        foreach(comp IN LISTS FP_COMPONENTS)
+            if(NOT comp IN_LIST MERGED_COMPONENTS)
+                list(APPEND MERGED_COMPONENTS "${comp}")
+            endif()
+        endforeach()
+        
+        # Rebuild FIND_DEP_CALL with merged components if we have any
+        if(MERGED_COMPONENTS)
+            # Extract base call (package name, version, and flags without components)
+            string(REGEX REPLACE " COMPONENTS.*$" "" BASE_CALL "${EXISTING_CALL}")
+            string(REGEX REPLACE " OPTIONAL_COMPONENTS.*$" "" BASE_CALL "${BASE_CALL}")
+            
+            set(FIND_DEP_CALL "${BASE_CALL}")
+            list(JOIN MERGED_COMPONENTS " " MERGED_COMPONENTS_STR)
+            string(APPEND FIND_DEP_CALL " COMPONENTS ${MERGED_COMPONENTS_STR}")
+            
+            # Add OPTIONAL_COMPONENTS if present in either old or new
+            set(OPT_COMPONENTS ${FP_OPTIONAL_COMPONENTS})
+            if(EXISTING_CALL MATCHES "OPTIONAL_COMPONENTS +([^ ]+( +[^ ]+)*)")
+                string(REGEX REPLACE " +" ";" EXISTING_OPT "${CMAKE_MATCH_1}")
+                foreach(comp IN LISTS EXISTING_OPT)
+                    if(NOT comp IN_LIST OPT_COMPONENTS)
+                        list(APPEND OPT_COMPONENTS "${comp}")
+                    endif()
+                endforeach()
+            endif()
+            if(OPT_COMPONENTS)
+                list(JOIN OPT_COMPONENTS " " OPT_COMPONENTS_STR)
+                string(APPEND FIND_DEP_CALL " OPTIONAL_COMPONENTS ${OPT_COMPONENTS_STR}")
+            endif()
+            
+            # Preserve CONFIG flag if present in either
+            if(EXISTING_CALL MATCHES "CONFIG" OR FP_CONFIG OR FP_NO_MODULE)
+                if(NOT FIND_DEP_CALL MATCHES "CONFIG")
+                    string(APPEND FIND_DEP_CALL " CONFIG")
+                endif()
+            endif()
+        endif()
+        
+        message(DEBUG "cpp-library: Merged find_package(${package_name}) components: ${MERGED_COMPONENTS_STR}")
+    endif()
+    
     # Store the dependency information globally
     # Key: package_name, Value: find_dependency() call syntax
     set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${package_name}" "${FIND_DEP_CALL}")

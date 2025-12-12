@@ -107,3 +107,14 @@ mock_target_links(test27_target "OpenCV::core" "OpenCV::imgproc")
 _cpp_library_generate_dependencies(RESULT test27_target "mylib")
 verify_output("${RESULT}" "find_dependency(OpenCV 4.5.3 COMPONENTS core imgproc)" "Test 27")
 
+# Test 28: Multiple find_package calls with different components should merge (bug fix verification)
+run_test("Multiple find_package calls - component merging")
+# Simulate the result of multiple find_package calls that the provider would have merged
+# (The actual merging happens in the provider, here we verify the install module uses merged data)
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_Qt6" "Qt6 6.5.0 COMPONENTS Core Widgets")
+set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "Qt6")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+mock_target_links(test28_target "Qt6::Core" "Qt6::Widgets")
+_cpp_library_generate_dependencies(RESULT test28_target "mylib")
+verify_output("${RESULT}" "find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets)" "Test 28")
+

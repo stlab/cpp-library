@@ -19,6 +19,9 @@ jobs:
       - name: Run dependency mapping tests
         run: cmake -P tests/install/CMakeLists.txt
 
+      - name: Run provider merging tests
+        run: cmake -P tests/install/test_provider_merge.cmake
+
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
