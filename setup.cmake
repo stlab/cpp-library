@@ -235,8 +235,8 @@ if(NOT STATUS_CODE EQUAL 0)
 endif()
 
 # Create main header file
-set(HEADER_FILE "${ARG_NAME}.hpp")
-file(WRITE "${PROJECT_DIR}/include/${ARG_NAMESPACE}/${HEADER_FILE}"
+set(HEADER_FILENAME "${ARG_NAME}.hpp")
+file(WRITE "${PROJECT_DIR}/include/${ARG_NAMESPACE}/${HEADER_FILENAME}"
 "// SPDX-License-Identifier: BSL-1.0
 
 #ifndef ${ARG_NAMESPACE}_${ARG_NAME}_HPP
