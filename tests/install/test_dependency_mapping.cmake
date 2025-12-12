@@ -1,4 +1,4 @@
-# SPDX-LICENSE-Identifier: BSL-1.0
+# SPDX-License-Identifier: BSL-1.0
 #
 # Unit tests for dependency mapping and merging
 # These tests use cpp_library_map_dependency() for all dependencies since we're not
