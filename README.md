@@ -32,7 +32,7 @@ The easiest way to create a new library project using cpp-library is with the `s
 cmake -P <(curl -sSL https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake)
 ```
 
-Or download and run:
+Or download and run:  
 
 ```bash
 curl -O https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake
@@ -183,7 +183,7 @@ target_link_libraries(my-app PRIVATE stlab::enum-ops)
 
 The library will be automatically fetched and built as part of your project.
 
-**Important:** For CPM compatibility, especially with `CPM_USE_LOCAL_PACKAGES`, your GitHub repository name should match the package name. For a library with package name `stlab-enum-ops`, name your repository `stlab/stlab-enum-ops`, not `stlab/enum-ops`. This ensures CPM's abbreviated syntax works correctly with both source fetching and local package finding.
+**Repository Naming:** Your GitHub repository name must match the package name for CPM compatibility. For a library with package name `stlab-enum-ops`, name your repository `stlab/stlab-enum-ops`. This ensures `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` works correctly with both source builds and `CPM_USE_LOCAL_PACKAGES`.
 
 #### Installation (optional)
 
@@ -207,17 +207,21 @@ cpp-library automatically generates correct `find_dependency()` calls in the ins
 
 **How it works:**
 
-When you link dependencies to your target using `target_link_libraries()`, cpp-library analyzes these links during installation and generates appropriate `find_dependency()` calls. For example:
+When you link dependencies to your target using `target_link_libraries()`, cpp-library analyzes these links during installation and generates appropriate `find_dependency()` calls with version constraints. The process is automatic, but if version detection fails, you'll get a helpful error message with the exact fix.
 
 ```cmake
 # In your library's CMakeLists.txt
 add_library(my-lib INTERFACE)
 
-# Link dependencies - these will be automatically handled during installation
+# Fetch dependencies with versions
+CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
+CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
+
+# Link dependencies - automatic version detection will handle these
 target_link_libraries(my-lib INTERFACE
-    stlab::copy-on-write    # Internal CPM dependency
-    stlab::enum-ops         # Internal CPM dependency
-    Threads::Threads        # System dependency
+    stlab::copy-on-write    # Version auto-detected from stlab_copy_on_write_VERSION
+    stlab::enum-ops         # Version auto-detected from stlab_enum_ops_VERSION
+    Threads::Threads        # System dependency (no version needed)
 )
 ```
 
@@ -227,8 +231,8 @@ When installed, the generated `my-libConfig.cmake` will include:
 include(CMakeFindDependencyMacro)
 
 # Find dependencies required by this package
-find_dependency(stlab-copy-on-write)
-find_dependency(stlab-enum-ops)
+find_dependency(stlab-copy-on-write 2.1.0)
+find_dependency(stlab-enum-ops 1.0.0)
 find_dependency(Threads)
 
 include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
@@ -237,36 +241,64 @@ include("${CMAKE_CURRENT_LIST_DIR}/my-libTargets.cmake")
 **Default dependency handling:**
 
 - **cpp-library dependencies** (matching your project's `NAMESPACE`):
-  - When namespace and component match: `namespace::namespace` → `find_dependency(namespace)`
-  - When they differ: `namespace::component` → `find_dependency(namespace-component)`
-  - Example: `stlab::copy-on-write` → `find_dependency(stlab-copy-on-write)`
-- **Other packages**: Uses the package name only by default
+  - When namespace and component match: `namespace::namespace` → `find_dependency(namespace VERSION)`
+  - When they differ: `namespace::component` → `find_dependency(namespace-component VERSION)`
+  - Example: `stlab::copy-on-write` → `find_dependency(stlab-copy-on-write 2.1.0)`
+- **Other packages**: Uses the package name only
   - Example: `Threads::Threads` → `find_dependency(Threads)`
-  - Example: `Boost::filesystem` → `find_dependency(Boost)`
+  - Example: `Boost::filesystem` → `find_dependency(Boost VERSION)`
 
-**Custom dependency mappings:**
+**Automatic version detection:**
 
-For dependencies that require special `find_dependency()` syntax (e.g., Qt with COMPONENTS), use `cpp_library_map_dependency()` to specify the exact call:
+cpp-library automatically includes version constraints by looking up CMake's `<PackageName>_VERSION` variable (set by `find_package()` or CPM). If the version cannot be detected, **you'll get a clear error** during configuration:
+
+```
+Cannot determine version for dependency stlab::enum-ops (package: stlab-enum-ops).
+The version variable stlab_enum_ops_VERSION is not set.
+
+To fix this, add a cpp_library_map_dependency() call before cpp_library_setup():
+
+    cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
+
+Replace <VERSION> with the actual version requirement.
+```
+
+Simply copy the suggested line and add it to your `CMakeLists.txt`:
 
 ```cmake
-# Map Qt components to use COMPONENTS syntax
-cpp_library_map_dependency("Qt5::Core" "Qt5 COMPONENTS Core")
-cpp_library_map_dependency("Qt5::Widgets" "Qt5 COMPONENTS Widgets")
+# Fix version detection failures
+cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
+cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 2.1.0")
 
-# Then link as usual
-target_link_libraries(my-lib INTERFACE
-    Qt5::Core
-    Qt5::Widgets
-    Threads::Threads  # Works automatically, no mapping needed
+cpp_library_setup(
+    # ... rest of setup
 )
 ```
 
-The generated config file will use your custom mappings where specified:
+**Custom dependency syntax with component merging:**
+
+For dependencies requiring special `find_package()` syntax (e.g., Qt with COMPONENTS), use `cpp_library_map_dependency()` to provide the complete call. Multiple components of the same package are automatically merged:
 
 ```cmake
-find_dependency(Qt5 COMPONENTS Core)
-find_dependency(Qt5 COMPONENTS Widgets)
-find_dependency(Threads)  # Automatic from Threads::Threads
+# Map Qt components to use COMPONENTS syntax with versions
+cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
+cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
+cpp_library_map_dependency("Qt6::Network" "Qt6 6.5.0 COMPONENTS Network")
+
+# Then link as usual
+target_link_libraries(my-lib INTERFACE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Network
+    Threads::Threads  # Works automatically
+)
+```
+
+The generated config file will merge components into a single call:
+
+```cmake
+find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets Network)
+find_dependency(Threads)
 ```
 
 ### Updating cpp-library
@@ -298,12 +330,14 @@ This ensures your project uses the latest presets and CI configurations from the
 
 **Critical:** Your GitHub repository name must match your package name for CPM compatibility.
 
-For the recommended pattern (`project(enum-ops)` with `NAMESPACE stlab`):
+When using `project(enum-ops)` with `NAMESPACE stlab`:
+- Package name: `stlab-enum-ops`
+- Repository name: `stlab/stlab-enum-ops`
 
-- Package name will be: `stlab-enum-ops`
-- Repository should be: `github.com/stlab/stlab-enum-ops`
-
-This ensures `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` works correctly with both source builds and `CPM_USE_LOCAL_PACKAGES`.
+This naming convention:
+- Prevents package name collisions across organizations
+- Enables `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` to work seamlessly
+- Makes `CPM_USE_LOCAL_PACKAGES` work correctly with `find_package(stlab-enum-ops)`
 
 #### Version Tagging
 
@@ -358,8 +392,6 @@ cpp_library_setup(
 
 ### Target Naming
 
-**Recommended Pattern** (collision-safe):
-
 Use the component name as your project name, and specify the organizational namespace separately:
 
 ```cmake
@@ -373,10 +405,10 @@ cpp_library_setup(
 
 This produces:
 
-- Target name: `enum-ops`
-- Package name: `stlab-enum-ops` (used in `find_package(stlab-enum-ops)`)
-- Target alias: `stlab::enum-ops` (used in `target_link_libraries()`)
-- GitHub repository should be named: `stlab/stlab-enum-ops` (for CPM compatibility)
+- **Target name**: `enum-ops`
+- **Package name**: `stlab-enum-ops` (used in `find_package(stlab-enum-ops)`)
+- **Target alias**: `stlab::enum-ops` (used in `target_link_libraries()`)
+- **Repository name**: `stlab/stlab-enum-ops` (must match package name)
 
 **Alternative Patterns:**
 
@@ -393,13 +425,12 @@ cpp_library_setup(
 
 Produces the same result as above.
 
-**Single-component namespace** (e.g., `project(stlab)` with `NAMESPACE stlab`):
+**Special case** — single-component namespace (e.g., `project(stlab)` with `NAMESPACE stlab`):
 
 - Target name: `stlab`
-- Package name: `stlab` (used in `find_package(stlab)`)
-- Target alias: `stlab::stlab` (used in `target_link_libraries()`)
-
-All package names include the namespace prefix for collision prevention.
+- Package name: `stlab`
+- Target alias: `stlab::stlab`
+- Repository name: `stlab/stlab`
 
 ### `cpp_library_map_dependency`
 
@@ -411,33 +442,83 @@ Registers a custom dependency mapping for `find_dependency()` generation in inst
 
 **Parameters:**
 
-- `target`: The namespaced target (e.g., `"Qt5::Core"`, `"Threads::Threads"`)
-- `find_dependency_call`: The exact arguments to pass to `find_dependency()` (e.g., `"Qt5 COMPONENTS Core"`, `"Threads"`)
+- `target`: The target name, either namespaced (e.g., `"Qt5::Core"`, `"stlab::enum-ops"`) or non-namespaced (e.g., `"opencv_core"`)
+- `find_dependency_call`: The complete arguments to pass to `find_dependency()`, including version and any special syntax (e.g., `"Qt5 5.15.0 COMPONENTS Core"`, `"OpenCV 4.5.0"`)
 
 **When to use:**
 
-- Dependencies requiring `COMPONENTS` syntax (e.g., Qt)
-- Dependencies requiring `OPTIONAL_COMPONENTS` or other special arguments
-- Dependencies where the target name pattern doesn't match the desired `find_dependency()` call
+- **Required** for non-namespaced targets (e.g., `opencv_core`) - these cannot be automatically detected
+- When automatic version detection fails (cpp-library will generate an error with a helpful example)
+- Dependencies requiring `COMPONENTS` or other special `find_package()` syntax
+- When you need to override automatically detected versions
 
-**Note:** Most common dependencies like `Threads::Threads`, `Boost::filesystem`, etc. work automatically with the default behavior and don't need mapping.
+**Automatic behavior:**
 
-**Example:**
+For namespaced targets (e.g., `Namespace::Target`), cpp-library automatically detects dependency versions from CMake's `<PackageName>_VERSION` variable (set by `find_package()` or CPM after fetching). Most namespaced dependencies work automatically without any mapping needed. If automatic detection fails, you'll get a clear error message showing exactly how to fix it.
+
+**Example 1 - Non-namespaced targets (required):**
 
 ```cmake
-# Register mappings for dependencies needing special syntax
-cpp_library_map_dependency("Qt5::Core" "Qt5 COMPONENTS Core")
-cpp_library_map_dependency("Qt5::Widgets" "Qt5 COMPONENTS Widgets")
+# Non-namespaced targets must be explicitly mapped
+cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
+cpp_library_map_dependency("opencv_imgproc" "OpenCV 4.5.0")
 
-# Then link normally
 target_link_libraries(my-target INTERFACE
-    Qt5::Core
-    Qt5::Widgets
-    Threads::Threads  # No mapping needed
+    opencv_core
+    opencv_imgproc
 )
 ```
 
-See [Dependency Handling in Installed Packages](#dependency-handling-in-installed-packages) for more details.
+**Example 2 - Custom syntax (Qt with COMPONENTS):**
+
+```cmake
+# Register mappings for dependencies needing COMPONENTS syntax
+# Note: Multiple components of the same package are automatically merged
+cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
+cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
+cpp_library_map_dependency("Qt6::Network" "Qt6 6.5.0 COMPONENTS Network")
+
+# Then link normally
+target_link_libraries(my-target INTERFACE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Network
+)
+
+# Generated config will contain a single merged find_dependency() call:
+# find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets Network)
+```
+
+**Example 3 - Version override:**
+
+```cmake
+# Fetch dependencies
+CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
+CPMAddPackage("gh:stlab/stlab-copy-on-write@2.1.0")
+
+# If automatic version detection fails, you'll get an error like:
+# "Cannot determine version for dependency stlab::enum-ops..."
+# The error message will show you the exact fix:
+cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
+cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 2.1.0")
+
+# Link as usual
+target_link_libraries(my-target INTERFACE
+    stlab::enum-ops
+    stlab::copy-on-write
+)
+```
+
+The generated config file will include your mappings (note merged Qt components):
+
+```cmake
+find_dependency(OpenCV 4.5.0)                          # From Example 1
+find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets Network) # From Example 2 (merged)
+find_dependency(stlab-enum-ops 1.0.0)                  # From Example 3
+find_dependency(stlab-copy-on-write 2.1.0)             # From Example 3
+```
+
+**Note:** Version constraints in `find_dependency()` specify *minimum* versions. Consuming projects can override these with their own version requirements in `find_package()` or `CPMAddPackage()`.
 
 ### Path Conventions
 
@@ -535,6 +616,27 @@ See these projects using cpp-library:
 - [stlab/stlab-copy-on-write](https://github.com/stlab/stlab-copy-on-write) - Copy-on-write wrapper
 
 Note: Repository names include the namespace prefix for CPM compatibility and collision prevention.
+
+## Development
+
+### Running Tests
+
+cpp-library includes unit tests for its dependency mapping and installation logic:
+
+```bash
+# Run unit tests
+cmake -P tests/install/CMakeLists.txt
+```
+
+The test suite covers:
+- Automatic version detection
+- Component merging (Qt, Boost)
+- System packages (Threads, OpenMP, etc.)
+- Custom dependency mappings
+- Internal cpp-library dependencies
+- Edge cases and error handling
+
+See `tests/install/README.md` for more details.
 
 ## License
 

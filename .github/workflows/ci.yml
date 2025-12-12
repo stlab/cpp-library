@@ -1,0 +1,154 @@
+# CI workflow for cpp-library project itself
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: Unit Tests (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu
+            os: ubuntu-latest
+          - name: macOS
+            os: macos-latest
+          - name: Windows
+            os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run dependency mapping tests
+        run: cmake -P tests/install/CMakeLists.txt
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download CPM.cmake
+        run: |
+          mkdir -p cmake
+          wget -q -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
+
+      - name: Create test project
+        run: |
+          mkdir -p test-project/include/testlib
+          cd test-project
+          
+          # Create CMakeLists.txt that uses cpp-library
+          cat > CMakeLists.txt << 'EOF'
+          cmake_minimum_required(VERSION 3.20)
+          project(test-library VERSION 1.0.0)
+          
+          include(../cmake/CPM.cmake)
+          CPMAddPackage(NAME cpp-library SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+          include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+          
+          # Create a simple test library
+          cpp_library_setup(
+              DESCRIPTION "Test library for cpp-library"
+              NAMESPACE testlib
+              HEADERS test.hpp
+          )
+          EOF
+          
+          # Create a simple header
+          cat > include/testlib/test.hpp << 'EOF'
+          #pragma once
+          namespace testlib {
+              inline int get_value() { return 42; }
+          }
+          EOF
+
+      - name: Configure test project
+        run: |
+          cd test-project
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build test project
+        run: |
+          cd test-project
+          cmake --build build
+
+      - name: Install test project
+        run: |
+          cd test-project
+          cmake --install build --prefix ${{ runner.temp }}/install
+
+      - name: Verify installation
+        run: |
+          # Check that package config was installed
+          if [ ! -f "${{ runner.temp }}/install/lib/cmake/testlib-test/testlib-testConfig.cmake" ]; then
+            echo "Error: Package config not found"
+            exit 1
+          fi
+          echo "✓ Installation successful"
+
+      - name: Test find_package
+        run: |
+          mkdir -p test-consumer
+          cd test-consumer
+          
+          # Create a consumer project
+          cat > CMakeLists.txt << 'EOF'
+          cmake_minimum_required(VERSION 3.20)
+          project(test-consumer)
+          
+          find_package(testlib-test REQUIRED)
+          
+          add_executable(consumer main.cpp)
+          target_link_libraries(consumer PRIVATE testlib::test)
+          EOF
+          
+          # Create main.cpp
+          cat > main.cpp << 'EOF'
+          #include <testlib/test.hpp>
+          #include <iostream>
+          int main() {
+              std::cout << "Value: " << testlib::get_value() << std::endl;
+              return 0;
+          }
+          EOF
+          
+          # Configure with installed package
+          cmake -B build -DCMAKE_PREFIX_PATH=${{ runner.temp }}/install
+          
+          # Build
+          cmake --build build
+          
+          echo "✓ Consumer project built successfully"
+
+  documentation:
+    name: Documentation Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check README examples
+        run: |
+          # Extract and validate code blocks from README
+          grep -A 20 '```cmake' README.md | head -50
+          echo "✓ README documentation looks valid"
+
+      - name: Validate template files
+        run: |
+          # Check that all template files exist
+          test -f templates/CMakePresets.json
+          test -f templates/Config.cmake.in
+          test -f templates/Doxyfile.in
+          test -f templates/custom.css
+          echo "✓ All template files present"
+

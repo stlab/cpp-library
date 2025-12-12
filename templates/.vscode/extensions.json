@@ -2,7 +2,6 @@
     "recommendations": [
         "matepek.vscode-catch2-test-adapter",
         "llvm-vs-code-extensions.vscode-clangd",
-        "ms-vscode.live-server",
-        "xaver.clang-format"
+        "ms-vscode.live-server"
     ]
 }

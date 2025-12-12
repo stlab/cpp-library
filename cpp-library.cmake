@@ -208,17 +208,7 @@ function(cpp_library_setup)
     if(NOT PROJECT_IS_TOP_LEVEL)
         return()  # Early return for lightweight consumer mode
     endif()
-    
-    # Create symlink to compile_commands.json for clangd (only when BUILD_TESTING is enabled)
-    if(CMAKE_EXPORT_COMPILE_COMMANDS AND BUILD_TESTING)
-        add_custom_target(clangd_compile_commands ALL
-            COMMAND ${CMAKE_COMMAND} -E create_symlink 
-                ${CMAKE_BINARY_DIR}/compile_commands.json
-                ${CMAKE_SOURCE_DIR}/compile_commands.json
-            COMMENT "Creating symlink to compile_commands.json for clangd"
-        )
-    endif()
-    
+
     # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
     if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
         _cpp_library_copy_templates("${PACKAGE_NAME}" FORCE_INIT)
