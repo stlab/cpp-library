@@ -254,9 +254,9 @@ namespace ${ARG_NAMESPACE} {
 # Create source file if not header-only
 set(SOURCE_FILES "")
 if(NOT ARG_HEADER_ONLY)
-    set(SOURCE_FILE "${ARG_NAME}.cpp")
-    set(SOURCE_FILES "SOURCES ${SOURCE_FILE}")
-    file(WRITE "${PROJECT_DIR}/src/${SOURCE_FILE}"
+    set(SOURCE_FILENAME "${ARG_NAME}.cpp")
+    set(SOURCE_FILES "SOURCES ${SOURCE_FILENAME}")
+    file(WRITE "${PROJECT_DIR}/src/${SOURCE_FILENAME}"
 "// SPDX-License-Identifier: BSL-1.0
 
 #include <${ARG_NAMESPACE}/${HEADER_FILE}>
