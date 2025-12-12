@@ -24,7 +24,8 @@ function(get_target_property OUTPUT_VAR TARGET PROPERTY)
             set(${OUTPUT_VAR} "NOTFOUND" PARENT_SCOPE)
         endif()
     else()
-        _get_target_property(${OUTPUT_VAR} ${TARGET} ${PROPERTY})
+        # For other properties, return NOTFOUND since we're only mocking INTERFACE_LINK_LIBRARIES
+        set(${OUTPUT_VAR} "NOTFOUND" PARENT_SCOPE)
     endif()
 endfunction()
 

@@ -309,22 +309,25 @@ endif()
 
 # Generate CMakeLists.txt
 file(WRITE "${PROJECT_DIR}/CMakeLists.txt"
-"cmake_minimum_required(VERSION 3.20)
+"cmake_minimum_required(VERSION 3.24)
 
-# Project declaration - cpp_library_setup will use this name and detect version from git tags
-project(${ARG_NAME})
-
-# Setup CPM
-if(PROJECT_IS_TOP_LEVEL AND NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
+# Setup CPM cache before project()
+if(NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
     set(CPM_SOURCE_CACHE \"\${CMAKE_SOURCE_DIR}/.cache/cpm\" CACHE PATH \"CPM source cache\")
-    message(STATUS \"Setting cpm cache dir to: \${CPM_SOURCE_CACHE}\")
 endif()
 include(cmake/CPM.cmake)
 
-# Fetch cpp-library via CPM
-CPMAddPackage(\"gh:stlab/cpp-library@4.0.3\")
+# Fetch cpp-library before project()
+CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")
 include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
+# Enable dependency tracking before project()
+cpp_library_enable_dependency_tracking()
+
+# Now declare project
+project(${ARG_NAME})
+
+# Setup library
 cpp_library_setup(
     DESCRIPTION \"${ARG_DESCRIPTION}\"
     NAMESPACE ${ARG_NAMESPACE}
