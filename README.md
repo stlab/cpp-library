@@ -111,8 +111,8 @@ if(PROJECT_IS_TOP_LEVEL AND NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_
 endif()
 include(cmake/CPM.cmake)
 
-# Fetch cpp-library via CPM
-CPMAddPackage("gh:stlab/cpp-library@4.0.3")
+# Fetch cpp-library via CPM (update to latest version)
+CPMAddPackage("gh:stlab/cpp-library@4.0.3")  # Check for latest version
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 cpp_library_setup(
@@ -358,9 +358,9 @@ To enable automatic documentation deployment to GitHub Pages:
 
 1. Go to your repository **Settings** → **Pages**
 2. Under **Source**, select **GitHub Actions**
-3. Push a commit to trigger the CI workflow
+3. Publish a release to trigger documentation build
 
-Your documentation will be automatically built and deployed to `https://your-org.github.io/your-library/` on every push to the main branch.
+Your documentation will be automatically built and deployed to `https://your-org.github.io/your-library/` when you publish a GitHub release.
 
 ## API Reference
 
@@ -409,21 +409,6 @@ This produces:
 - **Package name**: `stlab-enum-ops` (used in `find_package(stlab-enum-ops)`)
 - **Target alias**: `stlab::enum-ops` (used in `target_link_libraries()`)
 - **Repository name**: `stlab/stlab-enum-ops` (must match package name)
-
-**Alternative Patterns:**
-
-You can also use `project(namespace-component)` - the namespace prefix will be detected and stripped from the target alias:
-
-```cmake
-project(stlab-enum-ops)  # Includes namespace prefix
-
-cpp_library_setup(
-    NAMESPACE stlab
-    # ...
-)
-```
-
-Produces the same result as above.
 
 **Special case** — single-component namespace (e.g., `project(stlab)` with `NAMESPACE stlab`):
 
@@ -616,6 +601,49 @@ See these projects using cpp-library:
 - [stlab/stlab-copy-on-write](https://github.com/stlab/stlab-copy-on-write) - Copy-on-write wrapper
 
 Note: Repository names include the namespace prefix for CPM compatibility and collision prevention.
+
+## Troubleshooting
+
+### Version Detection Fails
+
+**Problem**: Error message: "Cannot determine version for dependency..."
+
+**Solution**: Add explicit version mapping before `cpp_library_setup()`:
+```cmake
+cpp_library_map_dependency("stlab::enum-ops" "stlab-enum-ops 1.0.0")
+```
+
+The error message shows the exact line to add.
+
+### Non-Namespaced Target Error
+
+**Problem**: "Cannot automatically handle non-namespaced dependency: opencv_core"
+
+**Solution**: Non-namespaced targets must be explicitly mapped:
+```cmake
+cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
+```
+
+### Component Merging Not Working
+
+**Problem**: Multiple Qt/Boost components generate separate `find_dependency()` calls
+
+**Solution**: Ensure all components have **identical** package name, version, and additional arguments:
+```cmake
+# ✓ Correct - will merge
+cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
+cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.5.0 COMPONENTS Widgets")
+
+# ✗ Wrong - won't merge (different versions)
+cpp_library_map_dependency("Qt6::Core" "Qt6 6.5.0 COMPONENTS Core")
+cpp_library_map_dependency("Qt6::Widgets" "Qt6 6.4.0 COMPONENTS Widgets")
+```
+
+### CPM Cannot Find Package
+
+**Problem**: `CPMAddPackage("gh:stlab/enum-ops@1.0.0")` fails with `CPM_USE_LOCAL_PACKAGES`
+
+**Solution**: Repository name must match package name. If package name is `stlab-enum-ops`, repository must be `stlab/stlab-enum-ops`, not `stlab/enum-ops`.
 
 ## Development
 

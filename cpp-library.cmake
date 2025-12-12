@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: BSL-1.0
 #
-# cpp-library.cmake - Modern C++ Header-Only Library Template
+# cpp-library.cmake - Modern C++ Library Template
 # 
-# This file provides common CMake infrastructure for stlab header-only libraries.
+# This file provides common CMake infrastructure for C++ libraries (header-only and compiled).
 # Usage: include(cmake/cpp-library.cmake) then call cpp_library_setup(...)
 
 # Determine the directory where this file is located

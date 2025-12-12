@@ -12,6 +12,11 @@
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+# System packages that don't require version constraints in find_dependency()
+# These are commonly available system libraries where version requirements are typically not specified.
+# To extend this list in your project, use cpp_library_map_dependency() to explicitly map additional packages.
+set(_CPP_LIBRARY_SYSTEM_PACKAGES "Threads" "OpenMP" "ZLIB" "CURL" "OpenSSL")
+
 # Registers a custom dependency mapping for find_dependency() generation
 # - Precondition: TARGET is a namespaced target (e.g., "Qt6::Core", "stlab::enum-ops") or non-namespaced (e.g., "opencv_core")
 # - Postcondition: FIND_DEPENDENCY_CALL stored for TARGET, used in package config generation
@@ -86,10 +91,7 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
                 endif()
                 
                 # Check if this is a system package that doesn't require versions
-                # These packages are commonly available and don't need version constraints
-                set(SYSTEM_PACKAGES "Threads" "OpenMP" "ZLIB" "CURL" "OpenSSL")
-                
-                if(FIND_PACKAGE_NAME IN_LIST SYSTEM_PACKAGES)
+                if(FIND_PACKAGE_NAME IN_LIST _CPP_LIBRARY_SYSTEM_PACKAGES)
                     # System package - no version required
                     set(FIND_DEP_CALL "${FIND_PACKAGE_NAME}")
                 else()
