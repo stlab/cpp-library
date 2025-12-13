@@ -77,27 +77,33 @@ function(_cpp_library_track_find_package package_name)
             set(FIND_DEP_CALL "${BASE_CALL}")
             list(JOIN MERGED_COMPONENTS " " MERGED_COMPONENTS_STR)
             string(APPEND FIND_DEP_CALL " COMPONENTS ${MERGED_COMPONENTS_STR}")
-            
-            # Add OPTIONAL_COMPONENTS if present in either old or new
-            set(OPT_COMPONENTS ${FP_OPTIONAL_COMPONENTS})
-            if(EXISTING_CALL MATCHES "OPTIONAL_COMPONENTS +([^ ]+( +[^ ]+)*)")
-                string(REGEX REPLACE " +" ";" EXISTING_OPT "${CMAKE_MATCH_1}")
-                foreach(comp IN LISTS EXISTING_OPT)
-                    if(NOT comp IN_LIST OPT_COMPONENTS)
-                        list(APPEND OPT_COMPONENTS "${comp}")
-                    endif()
-                endforeach()
-            endif()
-            if(OPT_COMPONENTS)
-                list(JOIN OPT_COMPONENTS " " OPT_COMPONENTS_STR)
-                string(APPEND FIND_DEP_CALL " OPTIONAL_COMPONENTS ${OPT_COMPONENTS_STR}")
-            endif()
-            
-            # Preserve CONFIG flag if present in either
-            if(EXISTING_CALL MATCHES "CONFIG" OR FP_CONFIG OR FP_NO_MODULE)
-                if(NOT FIND_DEP_CALL MATCHES "CONFIG")
-                    string(APPEND FIND_DEP_CALL " CONFIG")
+        endif()
+        
+        # Preserve OPTIONAL_COMPONENTS if present in either old or new
+        # This must be done outside the MERGED_COMPONENTS block to handle cases
+        # where there are no regular COMPONENTS but OPTIONAL_COMPONENTS exist
+        set(OPT_COMPONENTS ${FP_OPTIONAL_COMPONENTS})
+        if(EXISTING_CALL MATCHES "OPTIONAL_COMPONENTS +([^ ]+( +[^ ]+)*)")
+            string(REGEX REPLACE " +" ";" EXISTING_OPT "${CMAKE_MATCH_1}")
+            foreach(comp IN LISTS EXISTING_OPT)
+                if(NOT comp IN_LIST OPT_COMPONENTS)
+                    list(APPEND OPT_COMPONENTS "${comp}")
                 endif()
+            endforeach()
+        endif()
+        if(OPT_COMPONENTS)
+            # Remove existing OPTIONAL_COMPONENTS to avoid duplication
+            string(REGEX REPLACE " OPTIONAL_COMPONENTS.*$" "" FIND_DEP_CALL "${FIND_DEP_CALL}")
+            list(JOIN OPT_COMPONENTS " " OPT_COMPONENTS_STR)
+            string(APPEND FIND_DEP_CALL " OPTIONAL_COMPONENTS ${OPT_COMPONENTS_STR}")
+        endif()
+        
+        # Preserve CONFIG flag if present in either old or new call
+        # This must be done outside the MERGED_COMPONENTS block to handle cases
+        # where neither call has COMPONENTS but one has CONFIG
+        if(EXISTING_CALL MATCHES "CONFIG" OR FP_CONFIG OR FP_NO_MODULE)
+            if(NOT FIND_DEP_CALL MATCHES "CONFIG")
+                string(APPEND FIND_DEP_CALL " CONFIG")
             endif()
         endif()
     endif()
@@ -173,6 +179,40 @@ if("${DEDUP_CALL}" STREQUAL "${EXPECTED3}")
     message(STATUS "✓ PASS: Duplicate component not added")
 else()
     message(FATAL_ERROR "✗ FAIL: Expected '${EXPECTED3}' but got '${DEDUP_CALL}'")
+endif()
+
+# Test: CONFIG flag preserved when neither call has COMPONENTS
+message(STATUS "")
+message(STATUS "Test: CONFIG preserved when neither call has COMPONENTS")
+
+# Clear state
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_MyPackage")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "")
+
+# First call: find_package(MyPackage 1.0 CONFIG)
+_cpp_library_track_find_package("MyPackage" "1.0" "CONFIG")
+
+get_property(CONFIG_FIRST GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_MyPackage")
+message(STATUS "After first call:  ${CONFIG_FIRST}")
+
+# Verify CONFIG was stored
+set(EXPECTED_CONFIG1 "MyPackage 1.0 CONFIG")
+if(NOT "${CONFIG_FIRST}" STREQUAL "${EXPECTED_CONFIG1}")
+    message(FATAL_ERROR "✗ FAIL: Expected '${EXPECTED_CONFIG1}' but got '${CONFIG_FIRST}'")
+endif()
+
+# Second call: find_package(MyPackage 1.0) - no CONFIG flag
+_cpp_library_track_find_package("MyPackage" "1.0")
+
+get_property(CONFIG_MERGED GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_MyPackage")
+message(STATUS "After second call: ${CONFIG_MERGED}")
+
+# Verify CONFIG was preserved (this was the bug - it would be lost)
+set(EXPECTED_CONFIG2 "MyPackage 1.0 CONFIG")
+if("${CONFIG_MERGED}" STREQUAL "${EXPECTED_CONFIG2}")
+    message(STATUS "✓ PASS: CONFIG flag preserved without components")
+else()
+    message(FATAL_ERROR "✗ FAIL: Expected '${EXPECTED_CONFIG2}' but got '${CONFIG_MERGED}'")
 endif()
 
 message(STATUS "")

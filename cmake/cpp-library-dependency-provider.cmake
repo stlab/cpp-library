@@ -126,30 +126,36 @@ function(_cpp_library_track_find_package package_name)
             list(JOIN MERGED_COMPONENTS " " MERGED_COMPONENTS_STR)
             string(APPEND FIND_DEP_CALL " COMPONENTS ${MERGED_COMPONENTS_STR}")
             
-            # Add OPTIONAL_COMPONENTS if present in either old or new
-            set(OPT_COMPONENTS ${FP_OPTIONAL_COMPONENTS})
-            if(EXISTING_CALL MATCHES "OPTIONAL_COMPONENTS +([^ ]+( +[^ ]+)*)")
-                string(REGEX REPLACE " +" ";" EXISTING_OPT "${CMAKE_MATCH_1}")
-                foreach(comp IN LISTS EXISTING_OPT)
-                    if(NOT comp IN_LIST OPT_COMPONENTS)
-                        list(APPEND OPT_COMPONENTS "${comp}")
-                    endif()
-                endforeach()
-            endif()
-            if(OPT_COMPONENTS)
-                list(JOIN OPT_COMPONENTS " " OPT_COMPONENTS_STR)
-                string(APPEND FIND_DEP_CALL " OPTIONAL_COMPONENTS ${OPT_COMPONENTS_STR}")
-            endif()
-            
-            # Preserve CONFIG flag if present in either
-            if(EXISTING_CALL MATCHES "CONFIG" OR FP_CONFIG OR FP_NO_MODULE)
-                if(NOT FIND_DEP_CALL MATCHES "CONFIG")
-                    string(APPEND FIND_DEP_CALL " CONFIG")
-                endif()
-            endif()
+            message(DEBUG "cpp-library: Merged find_package(${package_name}) components: ${MERGED_COMPONENTS_STR}")
         endif()
         
-        message(DEBUG "cpp-library: Merged find_package(${package_name}) components: ${MERGED_COMPONENTS_STR}")
+        # Preserve OPTIONAL_COMPONENTS if present in either old or new
+        # This must be done outside the MERGED_COMPONENTS block to handle cases
+        # where there are no regular COMPONENTS but OPTIONAL_COMPONENTS exist
+        set(OPT_COMPONENTS ${FP_OPTIONAL_COMPONENTS})
+        if(EXISTING_CALL MATCHES "OPTIONAL_COMPONENTS +([^ ]+( +[^ ]+)*)")
+            string(REGEX REPLACE " +" ";" EXISTING_OPT "${CMAKE_MATCH_1}")
+            foreach(comp IN LISTS EXISTING_OPT)
+                if(NOT comp IN_LIST OPT_COMPONENTS)
+                    list(APPEND OPT_COMPONENTS "${comp}")
+                endif()
+            endforeach()
+        endif()
+        if(OPT_COMPONENTS)
+            # Remove existing OPTIONAL_COMPONENTS to avoid duplication
+            string(REGEX REPLACE " OPTIONAL_COMPONENTS.*$" "" FIND_DEP_CALL "${FIND_DEP_CALL}")
+            list(JOIN OPT_COMPONENTS " " OPT_COMPONENTS_STR)
+            string(APPEND FIND_DEP_CALL " OPTIONAL_COMPONENTS ${OPT_COMPONENTS_STR}")
+        endif()
+        
+        # Preserve CONFIG flag if present in either old or new call
+        # This must be done outside the MERGED_COMPONENTS block to handle cases
+        # where neither call has COMPONENTS but one has CONFIG
+        if(EXISTING_CALL MATCHES "CONFIG" OR FP_CONFIG OR FP_NO_MODULE)
+            if(NOT FIND_DEP_CALL MATCHES "CONFIG")
+                string(APPEND FIND_DEP_CALL " CONFIG")
+            endif()
+        endif()
     endif()
     
     # Store the dependency information globally

@@ -119,3 +119,15 @@ mock_target_links(test28_target "Qt6::Core" "Qt6::Widgets")
 _cpp_library_generate_dependencies(RESULT test28_target "mylib")
 verify_output("${RESULT}" "find_dependency(Qt6 6.5.0 COMPONENTS Core Widgets)" "Test 28")
 
+# Test 29: CONFIG flag preserved when neither call has COMPONENTS (bug fix verification)
+run_test("CONFIG preserved without components - first call has CONFIG")
+# Simulate what the provider would track after merging two calls:
+# First: find_package(MyPkg 1.0 CONFIG), Second: find_package(MyPkg 1.0)
+# The fix ensures CONFIG is preserved even without COMPONENTS
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_MyPkg" "MyPkg 1.0.0 CONFIG")
+set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "MyPkg")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+mock_target_links(test29_target "MyPkg::MyPkg")
+_cpp_library_generate_dependencies(RESULT test29_target "mylib")
+verify_output("${RESULT}" "find_dependency(MyPkg 1.0.0 CONFIG)" "Test 29")
+
