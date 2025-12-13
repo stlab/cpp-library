@@ -39,6 +39,7 @@ endif()
 # Define all functions BEFORE installing the provider
 # The dependency provider implementation
 # This function is called before every find_package() and FetchContent_MakeAvailable()
+# It tracks dependency information; CMake automatically falls back to default behavior after return
 function(_cpp_library_dependency_provider method)
     if(method STREQUAL "FIND_PACKAGE")
         _cpp_library_track_find_package(${ARGN})
@@ -46,9 +47,8 @@ function(_cpp_library_dependency_provider method)
         _cpp_library_track_fetchcontent(${ARGN})
     endif()
     
-    # CRITICAL: Delegate to the default implementation
-    # This actually performs the find_package or FetchContent operation
-    cmake_language(CALL ${method} ${ARGN})
+    # Return without satisfying the dependency - CMake automatically falls back to default behavior
+    # (find_package() or FetchContent_MakeAvailable() will proceed normally)
 endfunction()
 
 # Track a find_package() call
