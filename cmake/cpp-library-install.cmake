@@ -140,12 +140,18 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                     # Provider is installed but dependency wasn't tracked
                     message(FATAL_ERROR 
                         "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.\n"
-                        "This may happen if:\n"
-                        "  - The dependency was added after cpp_library_setup()\n"
-                        "  - The dependency was added in a subdirectory\n"
                         "\n"
-                        "Make sure all CPMAddPackage() and find_package() calls happen AFTER project()\n"
-                        "and BEFORE cpp_library_setup().\n"
+                        "The dependency provider is installed, but this dependency was not captured.\n"
+                        "Common causes:\n"
+                        "  - find_package() or CPMAddPackage() was called AFTER cpp_library_setup()\n"
+                        "  - Dependency was added in a subdirectory with separate scope\n"
+                        "\n"
+                        "Solution: Ensure all dependencies are declared AFTER project() and BEFORE cpp_library_setup().\n"
+                        "\n"
+                        "Correct order:\n"
+                        "    project(my-library)\n"
+                        "    find_package(SomePackage)  # or CPMAddPackage(...)\n"
+                        "    cpp_library_setup(...)     # Must come after all dependencies\n"
                     )
                 endif()
             endif()
@@ -186,9 +192,9 @@ function(_cpp_library_add_dependency FIND_DEP_ARGS)
         set(REMAINING_ARGS "")
     endif()
     
-    # Extract version (first token that looks like a version number)
+    # Extract version (first token that looks like a semantic version number: major.minor[.patch]...)
     set(VERSION "")
-    if(REMAINING_ARGS MATCHES "^([0-9][0-9.]*)")
+    if(REMAINING_ARGS MATCHES "^([0-9]+\\.[0-9]+(?:\\.[0-9]+)*)")
         set(VERSION "${CMAKE_MATCH_1}")
         # Remove version from args - use substring to avoid regex issues with dots
         string(LENGTH "${VERSION}" VERSION_LEN)

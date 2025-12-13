@@ -170,7 +170,8 @@ function(cpp_library_setup)
     
     # Calculate clean name (without namespace prefix) for target alias
     # If PROJECT_NAME starts with NAMESPACE-, strip it; otherwise use PROJECT_NAME as-is
-    string(REGEX REPLACE "^${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    string(REGEX ESCAPE "${ARG_NAMESPACE}" ESCAPED_NAMESPACE)
+    string(REGEX REPLACE "^${ESCAPED_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
     # Always prefix package name with namespace for collision prevention
     # Special case: if namespace equals clean name, don't duplicate (e.g., stlab::stlab → stlab)

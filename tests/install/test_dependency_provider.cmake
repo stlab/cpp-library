@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: BSL-1.0
 #
-# Unit tests for dependency provider tracking
-# These tests verify that the dependency provider correctly tracks dependencies
-
+# Unit tests for dependency provider tracking and its interaction with dependency mapping
+# These tests verify that the dependency provider correctly tracks dependencies and that
+# tracked dependencies interact properly with custom mappings and system packages.
+#
 # Note: We can't actually test the provider installation itself in these unit tests
 # since that requires being called during project(). Instead, we test the tracking
 # functions directly and simulate tracked dependencies.
