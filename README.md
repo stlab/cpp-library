@@ -108,6 +108,7 @@ endif()
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library before project()
+# Check https://github.com/stlab/cpp-library/releases for the latest version
 CPMAddPackage("gh:stlab/cpp-library@5.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
@@ -212,6 +213,7 @@ cpp-library automatically generates `find_dependency()` calls in the installed C
 cmake_minimum_required(VERSION 3.24)
 include(cmake/CPM.cmake)
 
+# Check https://github.com/stlab/cpp-library/releases for the latest version
 CPMAddPackage("gh:stlab/cpp-library@5.0.0")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
