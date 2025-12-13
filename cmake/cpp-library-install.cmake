@@ -194,7 +194,7 @@ function(_cpp_library_add_dependency FIND_DEP_ARGS)
     
     # Extract version (first token that looks like a semantic version number: major.minor[.patch]...)
     set(VERSION "")
-    if(REMAINING_ARGS MATCHES "^([0-9]+\\.[0-9]+(?:\\.[0-9]+)*)")
+    if(REMAINING_ARGS MATCHES "^([0-9]+\\.[0-9]+(\\.[0-9]+)*)")
         set(VERSION "${CMAKE_MATCH_1}")
         # Remove version from args - use substring to avoid regex issues with dots
         string(LENGTH "${VERSION}" VERSION_LEN)
