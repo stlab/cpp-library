@@ -102,8 +102,9 @@ Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 cmake_minimum_required(VERSION 3.24)
 
 # Setup CPM cache before project()
-if(NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
+if(PROJECT_IS_TOP_LEVEL AND NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
     set(CPM_SOURCE_CACHE "${CMAKE_SOURCE_DIR}/.cache/cpm" CACHE PATH "CPM source cache")
+    message(STATUS "Setting cpm cache dir to: ${CPM_SOURCE_CACHE}")
 endif()
 include(cmake/CPM.cmake)
 

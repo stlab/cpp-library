@@ -8,9 +8,10 @@
 # - Static libraries
 # - Shared libraries (when BUILD_SHARED_LIBS is ON)
 # - CMake package config generation for find_package() support
-
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
+#
+# Note: GNUInstallDirs and CMakePackageConfigHelpers are included inside
+# _cpp_library_setup_install() to avoid requiring project() to be called
+# when this module is loaded.
 
 # System packages that don't require version constraints in find_dependency()
 # These are commonly available system libraries where version requirements are typically not specified.
@@ -336,6 +337,10 @@ function(_cpp_library_setup_install)
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    
+    # Include required CMake modules (deferred from top-level to avoid requiring project() before include)
+    include(GNUInstallDirs)
+    include(CMakePackageConfigHelpers)
     
     # Validate required arguments
     if(NOT ARG_NAME)

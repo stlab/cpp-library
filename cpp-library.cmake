@@ -35,12 +35,12 @@ function(cpp_library_enable_dependency_tracking)
 endfunction()
 
 # Include all the component modules
-# Note: CTest is NOT included here because it requires project() to be called first.
-# It will be included in cpp_library_setup() which is called after project().
+# Note: Some modules (CTest, cpp-library-install) require project() to be called first
+# because they need language/architecture information. These are included in
+# cpp_library_setup() which is called after project().
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")  
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
-include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
 # Creates test or example executables and registers them with CTest.
@@ -165,8 +165,10 @@ function(cpp_library_setup)
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
     
-    # Include CTest for testing support (must be after project())
+    # Include modules that require project() to be called first
+    # (CTest and GNUInstallDirs need language/architecture information)
     include(CTest)
+    include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
     
     # Calculate clean name (without namespace prefix) for target alias
     # If PROJECT_NAME starts with NAMESPACE-, strip it; otherwise use PROJECT_NAME as-is
