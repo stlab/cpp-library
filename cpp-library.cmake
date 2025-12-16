@@ -165,9 +165,19 @@ function(cpp_library_setup)
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
     
-    # Include modules that require project() to be called first
-    # (CTest and GNUInstallDirs need language/architecture information)
-    include(CTest)
+    # Enable testing at directory scope (must not be inside function scope for CTest to work)  
+    # This must happen after project(), which has already been called before cpp_library_setup()
+    # We use cmake_language(DEFER DIRECTORY) to execute enable_testing() at directory scope
+    # after this function returns. Since project() was called before cpp_library_setup(),
+    # the deferred enable_testing() will have access to all project information.
+    if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
+        # Defer enable_testing() to execute at directory scope after function returns
+        # This is required because add_test() needs enable_testing() to be at directory scope
+        cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} CALL enable_testing)
+    endif()
+    
+    # Include installation module that requires project() to be called first
+    # (GNUInstallDirs needs language/architecture information)
     include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
     
     # Calculate clean name (without namespace prefix) for target alias
