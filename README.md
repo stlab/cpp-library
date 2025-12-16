@@ -101,11 +101,6 @@ Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 ```cmake
 cmake_minimum_required(VERSION 3.24)
 
-# Setup CPM cache before project()
-if(PROJECT_IS_TOP_LEVEL AND NOT CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
-    set(CPM_SOURCE_CACHE "${CMAKE_SOURCE_DIR}/.cache/cpm" CACHE PATH "CPM source cache")
-    message(STATUS "Setting cpm cache dir to: ${CPM_SOURCE_CACHE}")
-endif()
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library before project()
@@ -425,6 +420,8 @@ cpp-library generates a `CMakePresets.json` file with the following configuratio
 - **`docs`**: Documentation generation with Doxygen
 - **`clang-tidy`**: Static analysis build
 - **`init`**: Template regeneration (regenerates CMakePresets.json, CI workflows, etc.)
+
+All presets automatically configure `CPM_SOURCE_CACHE` to `${sourceDir}/.cache/cpm` for faster dependency resolution. You can override this by setting the `CPM_SOURCE_CACHE` environment variable.
 
 ### Version Management
 

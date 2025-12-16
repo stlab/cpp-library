@@ -11,7 +11,8 @@
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_TESTING": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_EXTENSIONS": "OFF"
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
       }
     },
     {
@@ -24,7 +25,8 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_TESTING": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_EXTENSIONS": "OFF"
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
       }
     },
     {
@@ -38,7 +40,8 @@
         "BUILD_TESTING": "OFF",
         "BUILD_DOCS": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_EXTENSIONS": "OFF"
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
       }
     },
     {
@@ -52,7 +55,8 @@
         "BUILD_TESTING": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_CXX_EXTENSIONS": "OFF",
-        "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy",
+        "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
       }
     },
     {
@@ -66,7 +70,8 @@
         "BUILD_TESTING": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_CXX_EXTENSIONS": "OFF",
-        "CPP_LIBRARY_FORCE_INIT": "ON"
+        "CPP_LIBRARY_FORCE_INIT": "ON",
+        "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
       }
     }
   ],
