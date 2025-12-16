@@ -125,17 +125,13 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                 # Not tracked and not a system package - check if provider is installed
                 get_property(PROVIDER_INSTALLED GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED)
                 if(NOT PROVIDER_INSTALLED)
+                    _cpp_library_example_usage(EXAMPLE)
                     message(FATAL_ERROR 
                         "cpp-library: Dependency provider not installed.\n"
                         "You must call cpp_library_enable_dependency_tracking() before project().\n"
                         "\n"
                         "Example:\n"
-                        "    cmake_minimum_required(VERSION 3.24)\n"
-                        "    include(cmake/CPM.cmake)\n"
-                        "    CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")\n"
-                        "    include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)\n"
-                        "    cpp_library_enable_dependency_tracking()\n"
-                        "    project(my-library)\n"
+                        "${EXAMPLE}\n"
                     )
                 else()
                     # Provider is installed but dependency wasn't tracked

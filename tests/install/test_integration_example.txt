@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.24)
 include(cmake/CPM.cmake)
 
 # Step 2: Fetch cpp-library before project()
-CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Step 3: Enable dependency tracking BEFORE project()

@@ -28,7 +28,7 @@ The easiest way to create a new library project using cpp-library is with the `s
 
 **Interactive mode:**
 
-```bash
+```bash 
 cmake -P <(curl -sSL https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake)
 ```
 
@@ -210,7 +210,7 @@ cmake_minimum_required(VERSION 3.24)
 include(cmake/CPM.cmake)
 
 # Check https://github.com/stlab/cpp-library/releases for the latest version
-CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 cpp_library_enable_dependency_tracking()  # Before project()
@@ -247,7 +247,7 @@ To update to the latest version of cpp-library in your project:
 Change the version tag in your `CPMAddPackage` call:
 
 ```cmake
-CPMAddPackage("gh:stlab/cpp-library@4.1.0")  # Update version here
+CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")  # Update version here
 ```
 
 #### Step 2: Regenerate template files

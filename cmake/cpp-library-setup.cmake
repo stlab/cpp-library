@@ -32,6 +32,27 @@ function(_cpp_library_get_git_version OUTPUT_VAR)
     endif()
 endfunction()
 
+# Returns standardized example usage string with current cpp-library version
+# This ensures consistent error messages across the library
+function(_cpp_library_example_usage OUTPUT_VAR)
+    # Get the current cpp-library version
+    _cpp_library_get_git_version(LIB_VERSION)
+    
+    # If version detection failed, use X.Y.Z placeholder
+    if(LIB_VERSION STREQUAL "0.0.0")
+        set(LIB_VERSION "X.Y.Z")
+    endif()
+    
+    set(${OUTPUT_VAR} 
+"cmake_minimum_required(VERSION 3.24)
+include(cmake/CPM.cmake)
+CPMAddPackage(\"gh:stlab/cpp-library@${LIB_VERSION}\")
+include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+cpp_library_enable_dependency_tracking()
+project(my-library)" 
+        PARENT_SCOPE)
+endfunction()
+
 # Creates library target (INTERFACE or compiled) with headers and proper configuration.
 # - Precondition: NAME, NAMESPACE, PACKAGE_NAME, CLEAN_NAME, and REQUIRES_CPP_VERSION specified
 # - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME, install configured if TOP_LEVEL

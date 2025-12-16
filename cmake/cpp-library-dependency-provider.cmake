@@ -10,7 +10,7 @@
 # Usage:
 #   cmake_minimum_required(VERSION 3.24)
 #   include(cmake/CPM.cmake)
-#   CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+#   CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 #   
 #   # Enable dependency tracking
 #   list(APPEND CMAKE_PROJECT_TOP_LEVEL_INCLUDES 

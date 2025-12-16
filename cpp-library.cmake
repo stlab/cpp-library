@@ -15,7 +15,7 @@ get_filename_component(CPP_LIBRARY_ROOT "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 # Usage:
 #   cmake_minimum_required(VERSION 3.24)
 #   include(cmake/CPM.cmake)
-#   CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+#   CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 #   include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 #   
 #   cpp_library_enable_dependency_tracking()  # Must be before project()

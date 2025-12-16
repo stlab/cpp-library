@@ -9,6 +9,26 @@
 
 cmake_minimum_required(VERSION 3.20)
 
+# Detect cpp-library version from git tags
+execute_process(
+    COMMAND git describe --tags --abbrev=0
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE CPP_LIBRARY_GIT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+# Clean version (remove 'v' prefix if present)
+if(CPP_LIBRARY_GIT_VERSION)
+    string(REGEX REPLACE "^v" "" CPP_LIBRARY_VERSION "${CPP_LIBRARY_GIT_VERSION}")
+else()
+    # Fallback to X.Y.Z placeholder if no git tag found
+    set(CPP_LIBRARY_VERSION "X.Y.Z")
+    message(WARNING "No git tag found for cpp-library version. Using placeholder 'X.Y.Z'. Check https://github.com/stlab/cpp-library/releases for the latest version.")
+endif()
+
+message(STATUS "cpp-library version: ${CPP_LIBRARY_VERSION}")
+
 # Parse command line arguments
 set(CMD_LINE_ARGS "")
 if(CMAKE_ARGV3)
@@ -317,7 +337,8 @@ file(WRITE "${PROJECT_DIR}/CMakeLists.txt"
 include(cmake/CPM.cmake)
 
 # Fetch cpp-library before project()
-CPMAddPackage(\"gh:stlab/cpp-library@5.0.0\")
+# Check https://github.com/stlab/cpp-library/releases for the latest version
+CPMAddPackage(\"gh:stlab/cpp-library@${CPP_LIBRARY_VERSION}\")
 include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Enable dependency tracking before project()
