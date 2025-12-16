@@ -73,6 +73,37 @@ If you need to use CMake 3.20-3.23, use an older version of cpp-library that sup
 
 ## Handling Special Cases
 
+### QUIET Dependencies (Conditional/Optional Packages)
+
+When you use `find_package()` with the QUIET flag, cpp-library automatically filters out dependencies that weren't found. This prevents phantom dependencies in your Config file:
+
+```cmake
+# This will only be included in the Config if Qt5 is actually found
+find_package(Qt5 QUIET COMPONENTS Core)
+
+if(Qt5_FOUND)
+    target_link_libraries(my-library INTERFACE Qt5::Core)
+endif()
+```
+
+**Best Practice for Conditional Dependencies:**
+
+```cmake
+# Option 1: Use if() to conditionally search (recommended)
+if(MYLIB_FEATURE_X)
+    find_package(Qt5 COMPONENTS Core)  # Only searched if feature enabled
+    target_link_libraries(my-library INTERFACE Qt5::Core)
+endif()
+
+# Option 2: Use QUIET and check _FOUND (automatic filtering)
+find_package(Qt5 QUIET COMPONENTS Core)
+if(Qt5_FOUND)
+    target_link_libraries(my-library INTERFACE Qt5::Core)
+endif()
+```
+
+Both approaches work correctly with cpp-library's dependency tracking.
+
 ### Non-namespaced Targets
 
 Non-namespaced targets require explicit mapping (both with and without provider):

@@ -31,8 +31,9 @@ if(CMAKE_VERSION VERSION_LESS "3.24")
 endif()
 
 # Check if provider is already installed (avoid double-installation)
+# Skip this check in test mode to allow function definitions to be loaded
 get_property(_CPP_LIBRARY_PROVIDER_INSTALLED GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED)
-if(_CPP_LIBRARY_PROVIDER_INSTALLED)
+if(_CPP_LIBRARY_PROVIDER_INSTALLED AND NOT CPP_LIBRARY_TEST_MODE)
     return()
 endif()
 
@@ -40,6 +41,11 @@ endif()
 # The dependency provider implementation
 # This function is called before every find_package() and FetchContent_MakeAvailable()
 # It tracks dependency information; CMake automatically falls back to default behavior after return
+#
+# QUIET Dependency Handling:
+# When find_package() is called with QUIET, we track it tentatively, then use cmake_language(DEFER)
+# to verify after find_package() completes whether the package was found. If not found, we remove
+# the tracking to prevent phantom dependencies in the generated Config.cmake.
 function(_cpp_library_dependency_provider method)
     if(method STREQUAL "FIND_PACKAGE")
         _cpp_library_track_find_package(${ARGN})
@@ -53,6 +59,7 @@ endfunction()
 
 # Track a find_package() call
 # Records: package name, version, components, and full call syntax
+# For QUIET packages, defers verification until after find_package() completes
 function(_cpp_library_track_find_package package_name)
     # Parse find_package arguments
     set(options QUIET REQUIRED NO_MODULE CONFIG)
@@ -171,6 +178,46 @@ function(_cpp_library_track_find_package package_name)
     endif()
     
     message(DEBUG "cpp-library: Tracked find_package(${package_name}) → find_dependency(${FIND_DEP_CALL})")
+    
+    # For QUIET packages, defer a check to remove the tracking if the package wasn't found
+    # This prevents phantom dependencies from QUIET find_package() calls that fail
+    if(FP_QUIET)
+        cmake_language(DEFER CALL _cpp_library_verify_quiet_dependency "${package_name}")
+    endif()
+endfunction()
+
+# Verify that a QUIET find_package() call actually found the package
+# Called via cmake_language(DEFER) after find_package() completes
+# Removes the tracking if the package wasn't found (prevents phantom dependencies)
+function(_cpp_library_verify_quiet_dependency package_name)
+    # Check if the package was found using various possible _FOUND variable names
+    # CMake allows packages to set <PackageName>_FOUND or <PACKAGENAME>_FOUND
+    set(FOUND FALSE)
+    
+    if(DEFINED ${package_name}_FOUND AND ${package_name}_FOUND)
+        set(FOUND TRUE)
+    else()
+        # Try uppercase version
+        string(TOUPPER "${package_name}" package_upper)
+        if(DEFINED ${package_upper}_FOUND AND ${package_upper}_FOUND)
+            set(FOUND TRUE)
+        endif()
+    endif()
+    
+    # If not found, remove from tracking
+    if(NOT FOUND)
+        # Remove from the tracked dependency
+        set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${package_name}" "")
+        
+        # Remove from the list of all tracked dependencies
+        get_property(ALL_DEPS GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS)
+        list(REMOVE_ITEM ALL_DEPS "${package_name}")
+        set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "${ALL_DEPS}")
+        
+        message(DEBUG "cpp-library: Removed QUIET dependency ${package_name} (not found)")
+    else()
+        message(DEBUG "cpp-library: Verified QUIET dependency ${package_name} (found)")
+    endif()
 endfunction()
 
 # Track a FetchContent_MakeAvailable() call
@@ -231,13 +278,16 @@ function(_cpp_library_get_all_tracked_deps OUTPUT_VAR)
 endfunction()
 
 # Now install the dependency provider (after all functions are defined)
-set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+# Only install if not already marked as installed (allows tests to skip installation)
+if(NOT _CPP_LIBRARY_PROVIDER_INSTALLED)
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
 
-cmake_language(SET_DEPENDENCY_PROVIDER _cpp_library_dependency_provider
-    SUPPORTED_METHODS 
-        FIND_PACKAGE
-        FETCHCONTENT_MAKEAVAILABLE_SERIAL
-)
+    cmake_language(SET_DEPENDENCY_PROVIDER _cpp_library_dependency_provider
+        SUPPORTED_METHODS 
+            FIND_PACKAGE
+            FETCHCONTENT_MAKEAVAILABLE_SERIAL
+    )
 
-message(STATUS "cpp-library: Dependency tracking enabled")
+    message(STATUS "cpp-library: Dependency tracking enabled")
+endif()
 

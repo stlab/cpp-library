@@ -131,3 +131,48 @@ mock_target_links(test29_target "MyPkg::MyPkg")
 _cpp_library_generate_dependencies(RESULT test29_target "mylib")
 verify_output("${RESULT}" "find_dependency(MyPkg 1.0.0 CONFIG)" "Test 29")
 
+# Test 30: QUIET dependency that was not found should be removed
+run_test("QUIET dependency not found - should be removed")
+# Simulate provider tracking a QUIET find_package() that failed
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_Qt5" "Qt5 5.15 COMPONENTS Core")
+set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "Qt5")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+# Simulate that Qt5 was NOT found
+set(Qt5_FOUND FALSE)
+# Call the verification function that would normally be deferred
+_cpp_library_verify_quiet_dependency("Qt5")
+# Now try to generate dependencies - Qt5 should NOT appear
+mock_target_links(test30_target "Threads::Threads")
+_cpp_library_generate_dependencies(RESULT test30_target "mylib")
+verify_output("${RESULT}" "find_dependency(Threads)" "Test 30")
+
+# Test 31: QUIET dependency that was found should be kept
+run_test("QUIET dependency found - should be kept")
+# Simulate provider tracking a QUIET find_package() that succeeded
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_OpenSSL" "OpenSSL 1.1.1")
+set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "OpenSSL")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+# Simulate that OpenSSL WAS found
+set(OpenSSL_FOUND TRUE)
+# Call the verification function
+_cpp_library_verify_quiet_dependency("OpenSSL")
+# Now generate dependencies - OpenSSL SHOULD appear
+mock_target_links(test31_target "OpenSSL::SSL")
+_cpp_library_generate_dependencies(RESULT test31_target "mylib")
+verify_output("${RESULT}" "find_dependency(OpenSSL 1.1.1)" "Test 31")
+
+# Test 32: QUIET dependency with uppercase _FOUND variable
+run_test("QUIET dependency with uppercase _FOUND")
+# Simulate provider tracking a QUIET find_package()
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_ZLIB" "ZLIB")
+set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "ZLIB")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+# Some packages set UPPERCASE_FOUND instead of PackageName_FOUND
+set(ZLIB_FOUND TRUE)
+# Call the verification function
+_cpp_library_verify_quiet_dependency("ZLIB")
+# ZLIB should be kept
+mock_target_links(test32_target "ZLIB::ZLIB")
+_cpp_library_generate_dependencies(RESULT test32_target "mylib")
+verify_output("${RESULT}" "find_dependency(ZLIB)" "Test 32")
+

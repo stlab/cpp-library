@@ -6,8 +6,14 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-# Include the module we're testing
+# Include the modules we're testing
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/cpp-library-install.cmake)
+
+# Include dependency provider functions in test mode
+# This loads the function definitions without installing the provider
+set(CPP_LIBRARY_TEST_MODE TRUE)
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
+include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/cpp-library-dependency-provider.cmake)
 
 # Test counter
 set(TEST_COUNT 0)
