@@ -110,7 +110,7 @@ include(cmake/CPM.cmake)
 
 # Fetch cpp-library before project()
 # Check https://github.com/stlab/cpp-library/releases for the latest version
-CPMAddPackage("gh:stlab/cpp-library@5.0.0")
+CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Enable dependency tracking before project()
