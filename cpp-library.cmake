@@ -167,13 +167,12 @@ function(cpp_library_setup)
     
     # Enable testing at directory scope (must not be inside function scope for CTest to work)  
     # This must happen after project(), which has already been called before cpp_library_setup()
-    # We use cmake_language(DEFER DIRECTORY) to execute enable_testing() at directory scope
-    # after this function returns. Since project() was called before cpp_library_setup(),
-    # the deferred enable_testing() will have access to all project information.
+    # We use cmake_language(EVAL CODE) to execute enable_testing() in the parent directory scope
+    # immediately, before any add_test() calls in _cpp_library_setup_executables().
     if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
-        # Defer enable_testing() to execute at directory scope after function returns
-        # This is required because add_test() needs enable_testing() to be at directory scope
-        cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} CALL enable_testing)
+        # Execute enable_testing() immediately at directory scope (parent of this function)
+        # This must happen before add_test() is called in _cpp_library_setup_executables()
+        cmake_language(EVAL CODE "enable_testing()")
     endif()
     
     # Include installation module that requires project() to be called first
