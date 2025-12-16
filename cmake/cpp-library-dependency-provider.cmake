@@ -11,10 +11,10 @@
 #   cmake_minimum_required(VERSION 3.24)
 #   include(cmake/CPM.cmake)
 #   CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
+#   include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 #   
-#   # Enable dependency tracking
-#   list(APPEND CMAKE_PROJECT_TOP_LEVEL_INCLUDES 
-#       "${cpp-library_SOURCE_DIR}/cmake/cpp-library-dependency-provider.cmake")
+#   # Enable dependency tracking BEFORE project()
+#   cpp_library_enable_dependency_tracking()
 #   
 #   project(my-library)  # Provider is installed here
 #   
