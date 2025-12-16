@@ -105,6 +105,8 @@ function(_cpp_library_track_find_package package_name)
             if(TEMP_MATCH MATCHES "^(.+) +OPTIONAL_COMPONENTS")
                 set(TEMP_MATCH "${CMAKE_MATCH_1}")
             endif()
+            # Strip keywords (CONFIG, NO_MODULE, REQUIRED) that aren't component names
+            string(REGEX REPLACE " +(REQUIRED|CONFIG|NO_MODULE).*$" "" TEMP_MATCH "${TEMP_MATCH}")
             string(REGEX REPLACE " +" ";" EXISTING_COMPONENTS "${TEMP_MATCH}")
         endif()
         

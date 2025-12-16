@@ -57,6 +57,8 @@ function(_cpp_library_track_find_package package_name)
             if(TEMP_MATCH MATCHES "^(.+) +OPTIONAL_COMPONENTS")
                 set(TEMP_MATCH "${CMAKE_MATCH_1}")
             endif()
+            # Strip keywords (CONFIG, NO_MODULE, REQUIRED) that aren't component names
+            string(REGEX REPLACE " +(REQUIRED|CONFIG|NO_MODULE).*$" "" TEMP_MATCH "${TEMP_MATCH}")
             string(REGEX REPLACE " +" ";" EXISTING_COMPONENTS "${TEMP_MATCH}")
         endif()
         
@@ -213,6 +215,41 @@ if("${CONFIG_MERGED}" STREQUAL "${EXPECTED_CONFIG2}")
     message(STATUS "✓ PASS: CONFIG flag preserved without components")
 else()
     message(FATAL_ERROR "✗ FAIL: Expected '${EXPECTED_CONFIG2}' but got '${CONFIG_MERGED}'")
+endif()
+
+# Test: CONFIG keyword in component list bug fix
+message(STATUS "")
+message(STATUS "Test: CONFIG not treated as component when merging")
+
+# Clear state
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_Qt6")
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "")
+
+# First call: find_package(Qt6 6.5.0 COMPONENTS Core CONFIG)
+_cpp_library_track_find_package("Qt6" "6.5.0" "COMPONENTS" "Core" "CONFIG")
+
+get_property(FIRST_CONFIG GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_Qt6")
+message(STATUS "After first call:  ${FIRST_CONFIG}")
+
+# Verify initial state
+set(EXPECTED_FIRST "Qt6 6.5.0 COMPONENTS Core CONFIG")
+if(NOT "${FIRST_CONFIG}" STREQUAL "${EXPECTED_FIRST}")
+    message(FATAL_ERROR "✗ FAIL: Expected '${EXPECTED_FIRST}' but got '${FIRST_CONFIG}'")
+endif()
+
+# Second call: find_package(Qt6 6.5.0 COMPONENTS Widgets CONFIG)
+# This should merge components but NOT treat CONFIG as a component
+_cpp_library_track_find_package("Qt6" "6.5.0" "COMPONENTS" "Widgets" "CONFIG")
+
+get_property(MERGED_CONFIG GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_Qt6")
+message(STATUS "After second call: ${MERGED_CONFIG}")
+
+# Verify CONFIG is at the end, not in the component list
+set(EXPECTED_MERGED "Qt6 6.5.0 COMPONENTS Core Widgets CONFIG")
+if("${MERGED_CONFIG}" STREQUAL "${EXPECTED_MERGED}")
+    message(STATUS "✓ PASS: CONFIG keyword not treated as component")
+else()
+    message(FATAL_ERROR "✗ FAIL: Expected '${EXPECTED_MERGED}' but got '${MERGED_CONFIG}'")
 endif()
 
 message(STATUS "")
