@@ -424,7 +424,6 @@ cpp-library generates a `CMakePresets.json` file with the following configuratio
 - **`test`**: Debug build with testing enabled
 - **`docs`**: Documentation generation with Doxygen
 - **`clang-tidy`**: Static analysis build
-- **`install`**: Local installation test (installs to `build/install/prefix`)
 - **`init`**: Template regeneration (regenerates CMakePresets.json, CI workflows, etc.)
 
 ### Version Management
