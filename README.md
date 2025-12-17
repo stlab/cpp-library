@@ -194,28 +194,13 @@ Installation is optional and typically not required when using CPM. If you need 
 
 ```bash
 # Build and install to default system location
-cmake --preset=default
-cmake --build --preset=default
-cmake --install build/default
-
-# Install to custom prefix
-cmake --install build/default --prefix /opt/mylib
-```
-
-**Testing your installation:**
-
-Use the `install` preset to verify that installed packages can be found correctly:
-
-```bash
-# Build with CPM_USE_LOCAL_PACKAGES to test finding installed dependencies
 cmake --preset=install
 cmake --build --preset=install
+cmake --install build/install
 
-# Install and test
-cmake --install build/install --prefix /tmp/test-install
-CMAKE_PREFIX_PATH=/tmp/test-install cmake --preset=install
+# Install to custom prefix
+cmake --install build/install --prefix /opt/mylib
 ```
-
 The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which makes CPM call `find_package()` first before fetching. This verifies your generated Config.cmake works correctly.
 
 For information about using installed packages with `find_package()`, see the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake) about [controlling how dependencies are found](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
