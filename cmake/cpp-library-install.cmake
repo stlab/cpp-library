@@ -56,8 +56,14 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     
     # Process each linked library
     foreach(LIB IN LISTS LINK_LIBS)
-        # Skip generator expressions (typically BUILD_INTERFACE dependencies)
-        if(LIB MATCHES "^\\$<")
+        # Handle BUILD_INTERFACE generator expressions
+        # When re-exporting dependencies from external packages, they must be wrapped in BUILD_INTERFACE
+        # to avoid CMake export errors, but we still want to track them for find_dependency()
+        if(LIB MATCHES "^\\$<BUILD_INTERFACE:([^>]+)>$")
+            set(LIB "${CMAKE_MATCH_1}")
+            message(DEBUG "cpp-library: Extracted ${LIB} from BUILD_INTERFACE generator expression")
+        elseif(LIB MATCHES "^\\$<")
+            # Skip other generator expressions (INSTALL_INTERFACE, etc.)
             continue()
         endif()
         

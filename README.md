@@ -190,7 +190,7 @@ The library will be automatically fetched and built as part of your project.
 
 #### Installation (optional)
 
-Installation is optional and typically not required when using CPM. If you need to install your library (e.g., for system-wide deployment or use with a package manager) use:
+Installation is optional and typically not required when using CPM. If you need to install your library (e.g., for system-wide deployment or use with a package manager):
 
 ```bash
 # Build and install to default system location
@@ -202,7 +202,47 @@ cmake --install build/default
 cmake --install build/default --prefix /opt/mylib
 ```
 
+**Testing your installation:**
+
+Use the `install` preset to verify that installed packages can be found correctly:
+
+```bash
+# Build with CPM_USE_LOCAL_PACKAGES to test finding installed dependencies
+cmake --preset=install
+cmake --build --preset=install
+
+# Install and test
+cmake --install build/install --prefix /tmp/test-install
+CMAKE_PREFIX_PATH=/tmp/test-install cmake --preset=install
+```
+
+The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which makes CPM call `find_package()` first before fetching. This verifies your generated Config.cmake works correctly.
+
 For information about using installed packages with `find_package()`, see the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake) about [controlling how dependencies are found](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
+
+**Re-exporting dependencies from external packages:**
+
+When your library re-exports dependencies (via `INTERFACE` linkage) that come from CPMAddPackage, you must wrap them in `BUILD_INTERFACE` to avoid CMake export errors:
+
+```cmake
+# Correct: Wrap CPM-fetched dependencies in BUILD_INTERFACE
+CPMAddPackage("gh:other-org/some-package@1.0.0")
+target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:other::package>)
+```
+
+**Why this is needed:** CPMAddPackage creates regular (non-IMPORTED) targets in your build tree. When CMake exports your library, it sees these dependencies but cannot include them in your export set (they belong to a different package). The `BUILD_INTERFACE` wrapper tells CMake:
+- Use this dependency during build
+- Don't include it in the export
+- Let consumers find it themselves via `find_dependency()` in the generated Config.cmake
+
+cpp-library automatically extracts dependencies from `BUILD_INTERFACE` expressions and generates the appropriate `find_dependency()` calls in your package configuration.
+
+**When BUILD_INTERFACE is NOT needed:**
+- Dependencies from `find_package()` (already IMPORTED targets)
+- System libraries like `Threads::Threads`
+- Internal (PRIVATE) dependencies (not applicable to INTERFACE libraries)
+
+This is a standard CMake pattern for re-exporting external package dependencies, not specific to cpp-library.
 
 #### Dependency Handling in Installed Packages
 
@@ -469,6 +509,8 @@ cpp-library generates a `CMakePresets.json` file with the following configuratio
 - **`init`**: Template regeneration (regenerates CMakePresets.json, CI workflows, etc.)
 
 All presets automatically configure `CPM_SOURCE_CACHE` to `${sourceDir}/.cache/cpm` for faster dependency resolution. You can override this by setting the `CPM_SOURCE_CACHE` environment variable.
+
+**Best Practice:** Set `CPM_SOURCE_CACHE` in presets or via environment variable/command line, not in CMakeLists.txt. Setting it in CMakeLists.txt with `FORCE` can override parent project settings when used as a subdirectory, and prevents users from configuring it themselves.
 
 ### Version Management
 
