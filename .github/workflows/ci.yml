@@ -47,6 +47,7 @@ jobs:
           include(../cmake/CPM.cmake)
           
           # Fetch cpp-library before project()
+          # Check https://github.com/stlab/cpp-library/releases for the latest version
           CPMAddPackage(NAME cpp-library SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
           include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
           

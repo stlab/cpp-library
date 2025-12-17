@@ -114,6 +114,9 @@ cpp_library_enable_dependency_tracking()
 # Now declare project
 project(your-library)
 
+# Enable testing infrastructure (required for TESTS and EXAMPLES)
+include(CTest)
+
 # Setup library
 cpp_library_setup(
     DESCRIPTION "Your library description"
@@ -209,22 +212,28 @@ cpp-library automatically generates `find_dependency()` calls in the installed C
 cmake_minimum_required(VERSION 3.24)
 include(cmake/CPM.cmake)
 
+# Fetch cpp-library before project()
 # Check https://github.com/stlab/cpp-library/releases for the latest version
 CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
-cpp_library_enable_dependency_tracking()  # Before project()
+# Enable dependency tracking before project()
+cpp_library_enable_dependency_tracking()
+
+# Declare project
 project(my-library)
 
-# Add dependencies
-CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
-find_package(Boost 1.79 COMPONENTS filesystem)
-
+# Setup library target
 cpp_library_setup(
     DESCRIPTION "My library"
     NAMESPACE mylib
     HEADERS mylib.hpp
 )
+
+# Add dependencies and link them
+# Dependencies are automatically tracked and included in Config.cmake
+CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
+find_package(Boost 1.79 COMPONENTS filesystem)
 
 target_link_libraries(my-library INTERFACE
     stlab::enum-ops
@@ -236,6 +245,42 @@ target_link_libraries(my-library INTERFACE
 
 ```cmake
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
+```
+
+**Complete example with dependencies and tests:**
+
+```cmake
+cmake_minimum_required(VERSION 3.24)
+include(cmake/CPM.cmake)
+
+# Fetch cpp-library before project()
+# Check https://github.com/stlab/cpp-library/releases for the latest version
+CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
+include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+
+cpp_library_enable_dependency_tracking()
+project(my-library)
+
+# Enable testing (required if you have TESTS or EXAMPLES)
+include(CTest)
+
+# Setup library
+cpp_library_setup(
+    DESCRIPTION "My library with tests"
+    NAMESPACE mylib
+    HEADERS mylib.hpp
+    TESTS my_tests.cpp
+    EXAMPLES my_example.cpp
+)
+
+# Add dependencies and link them
+CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
+find_package(Boost 1.79 COMPONENTS filesystem)
+
+target_link_libraries(my-library INTERFACE
+    stlab::enum-ops
+    Boost::filesystem
+)
 ```
 
 ### Updating cpp-library
@@ -324,6 +369,8 @@ cpp_library_setup(
 **Notes:**
 
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
+- **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
+- **Clang-tidy** (`CMAKE_CXX_CLANG_TIDY`) analyzes whatever gets built—it doesn't change what gets built. 
 - Version is automatically detected from git tags, or can be overridden with `-DCPP_LIBRARY_VERSION=x.y.z` (see [Version Management](#version-management)).
 - Examples using doctest should include `test` in the filename to be visible in the [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter) extension for VS Code test explorer.
 
@@ -483,7 +530,7 @@ cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
 
 **Problem**: Error that a dependency was not tracked
 
-**Solution**: Ensure `cpp_library_enable_dependency_tracking()` is called before `project()`, and all dependencies are added after `project()` but before `cpp_library_setup()`.
+**Solution**: Ensure `cpp_library_enable_dependency_tracking()` is called before `project()`. Dependencies can be added anywhere after `project()` and will be automatically captured.
 
 ### CPM Repository Name Mismatch
 

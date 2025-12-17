@@ -140,15 +140,18 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                         "\n"
                         "The dependency provider is installed, but this dependency was not captured.\n"
                         "Common causes:\n"
-                        "  - find_package() or CPMAddPackage() was called AFTER cpp_library_setup()\n"
-                        "  - Dependency was added in a subdirectory with separate scope\n"
+                        "  - find_package() or CPMAddPackage() was called in a subdirectory\n"
+                        "  - Dependency was added before project() (must be after)\n"
+                        "  - cpp_library_enable_dependency_tracking() was not called before project()\n"
                         "\n"
-                        "Solution: Ensure all dependencies are declared AFTER project() and BEFORE cpp_library_setup().\n"
+                        "Solution: Ensure dependency tracking is enabled and dependencies are declared after project().\n"
                         "\n"
                         "Correct order:\n"
+                        "    cpp_library_enable_dependency_tracking()\n"
                         "    project(my-library)\n"
+                        "    cpp_library_setup(...)\n"
                         "    find_package(SomePackage)  # or CPMAddPackage(...)\n"
-                        "    cpp_library_setup(...)     # Must come after all dependencies\n"
+                        "    target_link_libraries(...)\n"
                     )
                 endif()
             endif()
@@ -317,6 +320,40 @@ function(_cpp_library_get_merged_dependencies OUTPUT_VAR)
     set(${OUTPUT_VAR} "${RESULT_STR}" PARENT_SCOPE)
 endfunction()
 
+# Deferred function to generate Config.cmake after all target_link_libraries() calls
+# This runs at the end of CMakeLists.txt processing via cmake_language(DEFER)
+function(_cpp_library_deferred_generate_config)
+    # Include required modules
+    include(CMakePackageConfigHelpers)
+    
+    # Retrieve stored arguments from global properties
+    get_property(ARG_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME)
+    get_property(ARG_PACKAGE_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME)
+    get_property(ARG_VERSION GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_VERSION)
+    get_property(ARG_NAMESPACE GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE)
+    get_property(CPP_LIBRARY_ROOT GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_ROOT)
+    get_property(BINARY_DIR GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR)
+    
+    # Now generate find_dependency() calls with complete link information
+    _cpp_library_generate_dependencies(PACKAGE_DEPENDENCIES ${ARG_NAME} ${ARG_NAMESPACE})
+    
+    # Generate package version file
+    write_basic_package_version_file(
+        "${BINARY_DIR}/${ARG_PACKAGE_NAME}ConfigVersion.cmake"
+        VERSION ${ARG_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+    
+    # Generate package config file from template
+    configure_file(
+        "${CPP_LIBRARY_ROOT}/templates/Config.cmake.in"
+        "${BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"
+        @ONLY
+    )
+    
+    message(STATUS "cpp-library: Generated ${ARG_PACKAGE_NAME}Config.cmake with dependencies")
+endfunction()
+
 # Configures CMake install rules for library target and package config files.
 # - Precondition: NAME, PACKAGE_NAME, VERSION, and NAMESPACE specified; target NAME exists
 # - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
@@ -374,24 +411,18 @@ function(_cpp_library_setup_install)
         )
     endif()
     
-    # Generate find_dependency() calls for package dependencies
-    _cpp_library_generate_dependencies(PACKAGE_DEPENDENCIES ${ARG_NAME} ${ARG_NAMESPACE})
+    # Defer Config.cmake generation until end of CMakeLists.txt processing
+    # This ensures all target_link_libraries() calls have been made first
+    # Store arguments in global properties for the deferred function
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME "${ARG_NAME}")
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME "${ARG_PACKAGE_NAME}")
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_VERSION "${ARG_VERSION}")
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE "${ARG_NAMESPACE}")
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_ROOT "${CPP_LIBRARY_ROOT}")
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     
-    # Generate package version file
-    # Uses SameMajorVersion compatibility (e.g., 2.1.0 is compatible with 2.0.0)
-    write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}ConfigVersion.cmake"
-        VERSION ${ARG_VERSION}
-        COMPATIBILITY SameMajorVersion
-    )
-    
-    # Generate package config file from template
-    # PACKAGE_DEPENDENCIES will be substituted via @PACKAGE_DEPENDENCIES@
-    configure_file(
-        "${CPP_LIBRARY_ROOT}/templates/Config.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"
-        @ONLY
-    )
+    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+        CALL _cpp_library_deferred_generate_config)
     
     # Install export targets with namespace
     # This allows downstream projects to use find_package(package-name)

@@ -44,7 +44,7 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
 # Creates test or example executables and registers them with CTest.
-# - Precondition: doctest target available via CPM, source files exist in TYPE directory
+# - Precondition: doctest target available via CPM, source files exist in TYPE directory, enable_testing() called
 # - Postcondition: executables created and added as tests (unless in clang-tidy mode)
 # - Executables with "_fail" suffix are added as negative compilation tests
 function(_cpp_library_setup_executables)
@@ -62,11 +62,8 @@ function(_cpp_library_setup_executables)
     # Extract the clean library name for linking (strip namespace prefix if present)
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
-    # Download doctest dependency via CPM
-    if(NOT TARGET doctest::doctest)
-        # https://github.com/doctest/doctest
-        CPMAddPackage("gh:doctest/doctest@2.4.12")
-    endif()
+    # Note: doctest dependency is downloaded by  before deferring
+    # This function assumes doctest::doctest target already exists
     
     # Determine source directory based on type
     if(ARG_TYPE STREQUAL "examples")
@@ -165,15 +162,14 @@ function(cpp_library_setup)
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
     
-    # Enable testing at directory scope (must not be inside function scope for CTest to work)  
-    # This must happen after project(), which has already been called before cpp_library_setup()
-    # We use cmake_language(EVAL CODE) to execute enable_testing() in the parent directory scope
-    # immediately, before any add_test() calls in _cpp_library_setup_executables().
-    if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
-        # Execute enable_testing() immediately at directory scope (parent of this function)
-        # This must happen before add_test() is called in _cpp_library_setup_executables()
-        cmake_language(EVAL CODE "enable_testing()")
-    endif()
+    # IMPORTANT: If TESTS or EXAMPLES are specified, include(CTest) MUST be called
+    # at directory scope before cpp_library_setup(). This enables the testing infrastructure
+    # required for add_test() and defines the BUILD_TESTING option.
+    #
+    # Required structure:
+    #   project(my-library)
+    #   include(CTest)
+    #   cpp_library_setup(...)
     
     # Include installation module that requires project() to be called first
     # (GNUInstallDirs needs language/architecture information)
@@ -256,7 +252,16 @@ function(cpp_library_setup)
         _cpp_library_copy_templates("${PACKAGE_NAME}")
     endif()
     
+    # Download doctest if we'll need it for tests or examples
+    # This must happen during normal configuration (not deferred) because CPMAddPackage uses add_subdirectory
+    if(BUILD_TESTING AND (ARG_TESTS OR ARG_EXAMPLES))
+        if(NOT TARGET doctest::doctest)
+            CPMAddPackage("gh:doctest/doctest@2.4.12")
+        endif()
+    endif()
+    
     # Setup testing (if tests are specified)
+    # enable_testing() has already been called above via include(), so we can add tests immediately
     if(BUILD_TESTING AND ARG_TESTS)
         _cpp_library_setup_executables(
             NAME "${ARG_NAME}"
@@ -279,6 +284,7 @@ function(cpp_library_setup)
 
     
     # Build examples if specified (only when BUILD_TESTING is enabled)
+    # enable_testing() has already been called above, so we can add examples immediately
     if(BUILD_TESTING AND ARG_EXAMPLES)
         _cpp_library_setup_executables(
             NAME "${ARG_NAME}"
