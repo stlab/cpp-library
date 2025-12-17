@@ -89,11 +89,11 @@ The most significant addition in this release is comprehensive installation supp
 
 ## Bug Fixes
 
-- **Fixed CONFIG flag preservation**: CONFIG flag is now preserved when merging find_package calls without components (#40f1197).
-- **Fixed component merging**: CONFIG, NO_MODULE, and REQUIRED keywords no longer treated as components (#c13e524).
+- **Fixed CONFIG flag preservation**: CONFIG flag is now preserved when merging find_package calls without components.
+- **Fixed component merging**: CONFIG, NO_MODULE, and REQUIRED keywords no longer treated as components.
 - **Fixed namespace prefix escaping**: Corrected regex handling when escaping namespace prefixes for clean name calculation.
 - **Fixed version extraction**: Improved version extraction logic to enforce semantic versioning format.
-- **Fixed QUIET dependency handling**: Phantom dependencies from failed QUIET find_package calls are no longer included in config files (#d85c6cd).
+- **Fixed QUIET dependency handling**: Phantom dependencies from failed QUIET find_package calls are no longer included in config files.
 - **Fixed enable_testing() timing**: Changed to use EVAL CODE instead of DEFER DIRECTORY for immediate execution at parent directory scope.
 - **Fixed quoting issues**: Resolved various quoting issues in Windows bash environments.
 - **Fixed CI test project**: Corrected usage order demonstration in CI test project.
@@ -151,14 +151,14 @@ If you're upgrading from v4.0.5 or earlier, you'll need to make the following ch
 
 ## Contributors
 
-- Sean Parent (@sean-parent) - Primary contributor
+- Sean Parent - Primary contributor
 - Copilot SWE Agent - Automated contributions
 
 ## Statistics
 
 - **69 commits** since v4.0.5
 - **23 files changed**
-- **3,030 insertions**, 315 deletions
+- **3,030 insertions, 315 deletions**
 - Date range: 2025-11-11 to 2025-12-16
 
 ## What's Next
