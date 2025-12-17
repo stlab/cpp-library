@@ -73,6 +73,21 @@
         "CPP_LIBRARY_FORCE_INIT": "ON",
         "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
       }
+    },
+    {
+      "name": "install",
+      "displayName": "Install Configuration",
+      "description": "Release build for installation with CPM_USE_LOCAL_PACKAGES enabled for testing installed packages",
+      "binaryDir": "${sourceDir}/build/install",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "OFF",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CPM_USE_LOCAL_PACKAGES": "ON",
+        "CPM_SOURCE_CACHE": "${sourceDir}/.cache/cpm"
+      }
     }
   ],
   "buildPresets": [
@@ -80,7 +95,8 @@
     { "name": "test", "displayName": "Build Tests", "configurePreset": "test" },
     { "name": "docs", "displayName": "Build Docs", "configurePreset": "docs", "targets": "docs" },
     { "name": "clang-tidy", "displayName": "Build with Clang-Tidy", "configurePreset": "clang-tidy" },
-    { "name": "init", "displayName": "Initialize Templates", "configurePreset": "init" }
+    { "name": "init", "displayName": "Initialize Templates", "configurePreset": "init" },
+    { "name": "install", "displayName": "Build for Installation", "configurePreset": "install" }
   ],
   "testPresets": [
     { "name": "test", "displayName": "Run All Tests", "configurePreset": "test", "output": { "outputOnFailure": true } },

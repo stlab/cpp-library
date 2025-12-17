@@ -56,8 +56,23 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     
     # Process each linked library
     foreach(LIB IN LISTS LINK_LIBS)
-        # Skip generator expressions (typically BUILD_INTERFACE dependencies)
-        if(LIB MATCHES "^\\$<")
+        # Handle BUILD_INTERFACE generator expressions
+        # When re-exporting dependencies from external packages, they must be wrapped in BUILD_INTERFACE
+        # to avoid CMake export errors, but we still want to track them for find_dependency()
+        if(LIB MATCHES "^\\$<BUILD_INTERFACE:([^>]+)>$")
+            set(EXTRACTED_TARGET "${CMAKE_MATCH_1}")
+            # Only process if it's a namespaced target (external dependency)
+            # Non-namespaced targets in BUILD_INTERFACE are local build targets
+            if(EXTRACTED_TARGET MATCHES "::")
+                set(LIB "${EXTRACTED_TARGET}")
+                message(DEBUG "cpp-library: Extracted ${LIB} from BUILD_INTERFACE generator expression")
+            else()
+                # Skip non-namespaced BUILD_INTERFACE targets (local build targets)
+                message(DEBUG "cpp-library: Skipping non-namespaced BUILD_INTERFACE target: ${EXTRACTED_TARGET}")
+                continue()
+            endif()
+        elseif(LIB MATCHES "^\\$<")
+            # Skip other generator expressions (INSTALL_INTERFACE, etc.)
             continue()
         endif()
         
