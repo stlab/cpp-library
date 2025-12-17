@@ -62,7 +62,7 @@ function(_cpp_library_setup_executables)
     # Extract the clean library name for linking (strip namespace prefix if present)
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
-    # Note: doctest dependency is downloaded by  before deferring
+    # Note: doctest dependency is downloaded by cpp_library_setup before deferring
     # This function assumes doctest::doctest target already exists
     
     # Determine source directory based on type
@@ -94,27 +94,19 @@ function(_cpp_library_setup_executables)
                 )
                 set_tests_properties(compile_${executable_base} PROPERTIES WILL_FAIL TRUE)
             else()
-                # Regular executable - conditionally build based on preset
+                # Regular executable - build and link normally
                 add_executable(${executable_base} "${source_dir}/${executable}")
                 target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
                 
-                # Only fully build (compile and link) in test preset
-                # In clang-tidy preset, compile with clang-tidy but don't link
-                if(CMAKE_CXX_CLANG_TIDY)
-                    # In clang-tidy mode, exclude from all builds but still compile
-                    set_target_properties(${executable_base} PROPERTIES EXCLUDE_FROM_ALL TRUE)
-                    # Don't add as a test in clang-tidy mode since we're not linking
-                else()
-                    # In test mode, build normally and add as test
-                    add_test(NAME ${executable_base} COMMAND ${executable_base})
-                    
-                    # Set test properties for better IDE integration (only for tests)
-                    if(ARG_TYPE STREQUAL "tests")
-                        set_tests_properties(${executable_base} PROPERTIES
-                            LABELS "doctest"
-                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        )
-                    endif()
+                # Register as CTest test
+                add_test(NAME ${executable_base} COMMAND ${executable_base})
+                
+                # Set test properties for better IDE integration (only for tests)
+                if(ARG_TYPE STREQUAL "tests")
+                    set_tests_properties(${executable_base} PROPERTIES
+                        LABELS "doctest"
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    )
                 endif()
             endif()
         else()
@@ -161,6 +153,18 @@ function(cpp_library_setup)
         message(FATAL_ERROR "cpp_library_setup: PROJECT_NAME must be defined. Call project() before cpp_library_setup()")
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
+    
+    # Workaround for known clang-tidy issue on MSVC: clang-tidy doesn't properly recognize
+    # the /EHsc exception handling flag from compile_commands.json (CMake issue #22979)
+    # Automatically add --extra-arg=/EHsc when using clang-tidy with MSVC
+    if(MSVC AND CMAKE_CXX_CLANG_TIDY)
+        string(FIND "${CMAKE_CXX_CLANG_TIDY}" "/EHsc" EHSC_FOUND)
+        if(EHSC_FOUND EQUAL -1)
+            set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY};--extra-arg=/EHsc" 
+                CACHE STRING "clang-tidy command" FORCE)
+            message(STATUS "cpp-library: Added /EHsc to clang-tidy for MSVC compatibility")
+        endif()
+    endif()
     
     # IMPORTANT: If TESTS or EXAMPLES are specified, include(CTest) MUST be called
     # at directory scope before cpp_library_setup(). This enables the testing infrastructure

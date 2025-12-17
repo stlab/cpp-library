@@ -538,6 +538,12 @@ cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
 
 **Solution**: Repository name must match package name. For package `stlab-enum-ops`, use repository `stlab/stlab-enum-ops`, not `stlab/enum-ops`.
 
+### Clang-Tidy on Windows/MSVC
+
+**Problem**: Clang-tidy reports "exceptions are disabled" when analyzing code on Windows with MSVC
+
+**Solution**: This is a known clang-tidy issue ([CMake #22979](https://gitlab.kitware.com/cmake/cmake/-/issues/22979)) where clang-tidy doesn't properly recognize MSVC's `/EHsc` exception handling flag. cpp-library automatically detects this scenario and adds `--extra-arg=/EHsc` to `CMAKE_CXX_CLANG_TIDY` when both MSVC and clang-tidy are enabled. This workaround is applied transparently and only on MSVC platforms.
+
 ## Development
 
 ### Running Tests
