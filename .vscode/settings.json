@@ -1,0 +1,10 @@
+{
+    "cSpell.words": [
+        "clangd",
+        "ctest",
+        "doctest",
+        "MSVC",
+        "mylib"
+    ],
+    "cmake.ignoreCMakeListsMissing": true
+}

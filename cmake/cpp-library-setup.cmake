@@ -2,8 +2,16 @@
 #
 # cpp-library-setup.cmake - Core library setup functionality
 
-# Function to get version from git tags
+# Returns version string from CPP_LIBRARY_VERSION cache variable (if set), git tag (with 'v' prefix removed), or 
+#    "0.0.0" fallback
 function(_cpp_library_get_git_version OUTPUT_VAR)
+    # If CPP_LIBRARY_VERSION is set (e.g., by vcpkg or other package manager via -DCPP_LIBRARY_VERSION=x.y.z),
+    # use it instead of trying to query git (which may not be available in source archives)
+    if(DEFINED CPP_LIBRARY_VERSION AND NOT CPP_LIBRARY_VERSION STREQUAL "")
+        set(${OUTPUT_VAR} "${CPP_LIBRARY_VERSION}" PARENT_SCOPE)
+        return()
+    endif()
+    
     # Try to get version from git tags
     execute_process(
         COMMAND git describe --tags --abbrev=0
@@ -24,12 +32,38 @@ function(_cpp_library_get_git_version OUTPUT_VAR)
     endif()
 endfunction()
 
+# Returns standardized example usage string with current cpp-library version
+# This ensures consistent error messages across the library
+function(_cpp_library_example_usage OUTPUT_VAR)
+    # Get the current cpp-library version
+    _cpp_library_get_git_version(LIB_VERSION)
+    
+    # If version detection failed, use X.Y.Z placeholder
+    if(LIB_VERSION STREQUAL "0.0.0")
+        set(LIB_VERSION "X.Y.Z")
+    endif()
+    
+    set(${OUTPUT_VAR} 
+"cmake_minimum_required(VERSION 3.24)
+include(cmake/CPM.cmake)
+CPMAddPackage(\"gh:stlab/cpp-library@${LIB_VERSION}\")
+include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+cpp_library_enable_dependency_tracking()
+project(my-library)" 
+        PARENT_SCOPE)
+endfunction()
+
+# Creates library target (INTERFACE or compiled) with headers and proper configuration.
+# - Precondition: NAME, NAMESPACE, PACKAGE_NAME, CLEAN_NAME, and REQUIRES_CPP_VERSION specified
+# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME, install configured if TOP_LEVEL
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
         VERSION
         DESCRIPTION
         NAMESPACE
+        PACKAGE_NAME
+        CLEAN_NAME
         REQUIRES_CPP_VERSION
         TOP_LEVEL
     )
@@ -49,15 +83,13 @@ function(_cpp_library_setup_core)
     # Note: Project declaration is now handled in the main cpp_library_setup function
     # No need to check ARG_TOP_LEVEL here for project declaration
 
-    # Extract the library name without namespace prefix for target naming
-    string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
-
     if(ARG_SOURCES)
-        # Create a regular library if sources are present
-        add_library(${ARG_NAME} STATIC ${ARG_SOURCES})
-        add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
+        # Create a library with sources (respects BUILD_SHARED_LIBS variable)
+        add_library(${ARG_NAME} ${ARG_SOURCES})
+        add_library(${ARG_NAMESPACE}::${ARG_CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
         )
         target_compile_features(${ARG_NAME} PUBLIC cxx_std_${ARG_REQUIRES_CPP_VERSION})
         if(ARG_HEADERS)
@@ -71,9 +103,10 @@ function(_cpp_library_setup_core)
     else()
         # Header-only INTERFACE target
         add_library(${ARG_NAME} INTERFACE)
-        add_library(${ARG_NAMESPACE}::${CLEAN_NAME} ALIAS ${ARG_NAME})
+        add_library(${ARG_NAMESPACE}::${ARG_CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
         )
         target_compile_features(${ARG_NAME} INTERFACE cxx_std_${ARG_REQUIRES_CPP_VERSION})
         if(ARG_HEADERS)
@@ -85,11 +118,25 @@ function(_cpp_library_setup_core)
             )
         endif()
     endif()
+    
+    # Setup installation when building as top-level project
+    if(ARG_TOP_LEVEL)
+        _cpp_library_setup_install(
+            NAME "${ARG_NAME}"
+            PACKAGE_NAME "${ARG_PACKAGE_NAME}"
+            VERSION "${ARG_VERSION}"
+            NAMESPACE "${ARG_NAMESPACE}"
+            HEADERS "${ARG_HEADERS}"
+        )
+    endif()
 
 endfunction()
 
-# Function to copy static template files
-function(_cpp_library_copy_templates)
+# Copies template files (.clang-format, .gitignore, etc.) to project root if not present.
+# - Precondition: PACKAGE_NAME must be passed as first parameter
+# - Postcondition: missing template files copied to project, CI workflow configured with PACKAGE_NAME substitution
+# - With FORCE_INIT: overwrites existing files
+function(_cpp_library_copy_templates PACKAGE_NAME)
     set(options FORCE_INIT)
     cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
 
@@ -101,27 +148,22 @@ function(_cpp_library_copy_templates)
         ".vscode/extensions.json"
         "docs/index.html"
         "CMakePresets.json"
-        ".github/workflows/ci.yml"
     )
 
     foreach(template_file IN LISTS TEMPLATE_FILES)
         set(source_file "${CPP_LIBRARY_ROOT}/templates/${template_file}")
         set(dest_file "${CMAKE_CURRENT_SOURCE_DIR}/${template_file}")
 
-        # Check if template file exists
-        if(EXISTS "${source_file}")
-            # Copy if file doesn't exist or FORCE_INIT is enabled
-            if(NOT EXISTS "${dest_file}" OR ARG_FORCE_INIT)
-                # Create directory if needed
-                get_filename_component(dest_dir "${dest_file}" DIRECTORY)
-                file(MAKE_DIRECTORY "${dest_dir}")
-
-                # Copy the file
-                file(COPY "${source_file}" DESTINATION "${dest_dir}")
-                message(STATUS "Copied template file: ${template_file}")
-            endif()
-        else()
+        if(EXISTS "${source_file}" AND (NOT EXISTS "${dest_file}" OR ARG_FORCE_INIT))
+            get_filename_component(dest_dir "${dest_file}" DIRECTORY)
+            file(MAKE_DIRECTORY "${dest_dir}")
+            file(COPY "${source_file}" DESTINATION "${dest_dir}")
+            message(STATUS "Copied template file: ${template_file}")
+        elseif(NOT EXISTS "${source_file}")
             message(WARNING "Template file not found: ${source_file}")
         endif()
     endforeach()
+    
+    # Setup CI workflow with PACKAGE_NAME substitution
+    _cpp_library_setup_ci("${PACKAGE_NAME}" ${ARG_FORCE_INIT})
 endfunction()

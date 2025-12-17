@@ -1,22 +1,52 @@
 # SPDX-License-Identifier: BSL-1.0
 #
-# cpp-library.cmake - Modern C++ Header-Only Library Template
+# cpp-library.cmake - Modern C++ Library Template
 # 
-# This file provides common CMake infrastructure for stlab header-only libraries.
+# This file provides common CMake infrastructure for C++ libraries (header-only and compiled).
 # Usage: include(cmake/cpp-library.cmake) then call cpp_library_setup(...)
 
 # Determine the directory where this file is located
 get_filename_component(CPP_LIBRARY_ROOT "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 
-# Include CTest for testing support
-include(CTest)
+# Enable dependency tracking for accurate find_dependency() generation
+# This function should be called BEFORE project() to install the dependency provider.
+# Requires CMake 3.24+.
+#
+# Usage:
+#   cmake_minimum_required(VERSION 3.24)
+#   include(cmake/CPM.cmake)
+#   CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
+#   include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+#   
+#   cpp_library_enable_dependency_tracking()  # Must be before project()
+#   
+#   project(my-library)
+#   # Now all find_package/CPM calls are tracked
+function(cpp_library_enable_dependency_tracking)
+    # Add the dependency provider to CMAKE_PROJECT_TOP_LEVEL_INCLUDES
+    # This will be processed during the next project() call
+    list(APPEND CMAKE_PROJECT_TOP_LEVEL_INCLUDES 
+        "${CPP_LIBRARY_ROOT}/cmake/cpp-library-dependency-provider.cmake")
+    
+    # Propagate to parent scope so project() sees it
+    set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES "${CMAKE_PROJECT_TOP_LEVEL_INCLUDES}" PARENT_SCOPE)
+    
+    message(STATUS "cpp-library: Dependency tracking will be enabled during project() call")
+endfunction()
 
 # Include all the component modules
+# Note: Some modules (CTest, cpp-library-install) require project() to be called first
+# because they need language/architecture information. These are included in
+# cpp_library_setup() which is called after project().
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")  
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
+include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
 
-# Shared function to handle examples and tests consistently
+# Creates test or example executables and registers them with CTest.
+# - Precondition: doctest target available via CPM, source files exist in TYPE directory, enable_testing() called
+# - Postcondition: executables created and added as tests (unless in clang-tidy mode)
+# - Executables with "_fail" suffix are added as negative compilation tests
 function(_cpp_library_setup_executables)
     set(oneValueArgs
         NAME
@@ -29,14 +59,11 @@ function(_cpp_library_setup_executables)
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     
-    # Extract the clean library name for linking
+    # Extract the clean library name for linking (strip namespace prefix if present)
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
     
-    # Download doctest dependency via CPM
-    if(NOT TARGET doctest::doctest)
-        # https://github.com/doctest/doctest
-        CPMAddPackage("gh:doctest/doctest@2.4.12")
-    endif()
+    # Note: doctest dependency is downloaded by cpp_library_setup before deferring
+    # This function assumes doctest::doctest target already exists
     
     # Determine source directory based on type
     if(ARG_TYPE STREQUAL "examples")
@@ -67,27 +94,19 @@ function(_cpp_library_setup_executables)
                 )
                 set_tests_properties(compile_${executable_base} PROPERTIES WILL_FAIL TRUE)
             else()
-                # Regular executable - conditionally build based on preset
+                # Regular executable - build and link normally
                 add_executable(${executable_base} "${source_dir}/${executable}")
                 target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
                 
-                # Only fully build (compile and link) in test preset
-                # In clang-tidy preset, compile with clang-tidy but don't link
-                if(CMAKE_CXX_CLANG_TIDY)
-                    # In clang-tidy mode, exclude from all builds but still compile
-                    set_target_properties(${executable_base} PROPERTIES EXCLUDE_FROM_ALL TRUE)
-                    # Don't add as a test in clang-tidy mode since we're not linking
-                else()
-                    # In test mode, build normally and add as test
-                    add_test(NAME ${executable_base} COMMAND ${executable_base})
-                    
-                    # Set test properties for better IDE integration (only for tests)
-                    if(ARG_TYPE STREQUAL "tests")
-                        set_tests_properties(${executable_base} PROPERTIES
-                            LABELS "doctest"
-                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        )
-                    endif()
+                # Register as CTest test
+                add_test(NAME ${executable_base} COMMAND ${executable_base})
+                
+                # Set test properties for better IDE integration (only for tests)
+                if(ARG_TYPE STREQUAL "tests")
+                    set_tests_properties(${executable_base} PROPERTIES
+                        LABELS "doctest"
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    )
                 endif()
             endif()
         else()
@@ -97,7 +116,10 @@ function(_cpp_library_setup_executables)
     
 endfunction()
 
-# Main entry point function - users call this to set up their library
+# Sets up a C++ header-only or compiled library with testing, docs, and install support.
+# - Precondition: PROJECT_NAME defined via project(), at least one HEADERS specified
+# - Postcondition: library target created, version set from git tags, optional tests/docs/examples configured
+# - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, docs, and installation
 function(cpp_library_setup)
     # Parse arguments
     set(oneValueArgs
@@ -131,6 +153,44 @@ function(cpp_library_setup)
         message(FATAL_ERROR "cpp_library_setup: PROJECT_NAME must be defined. Call project() before cpp_library_setup()")
     endif()
     set(ARG_NAME "${PROJECT_NAME}")
+    
+    # Workaround for known clang-tidy issue on MSVC: clang-tidy doesn't properly recognize
+    # the /EHsc exception handling flag from compile_commands.json (CMake issue #22979)
+    # Automatically add --extra-arg=/EHsc when using clang-tidy with MSVC
+    if(MSVC AND CMAKE_CXX_CLANG_TIDY)
+        string(FIND "${CMAKE_CXX_CLANG_TIDY}" "/EHsc" EHSC_FOUND)
+        if(EHSC_FOUND EQUAL -1)
+            set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY};--extra-arg=/EHsc" 
+                CACHE STRING "clang-tidy command" FORCE)
+            message(STATUS "cpp-library: Added /EHsc to clang-tidy for MSVC compatibility")
+        endif()
+    endif()
+    
+    # IMPORTANT: If TESTS or EXAMPLES are specified, include(CTest) MUST be called
+    # at directory scope before cpp_library_setup(). This enables the testing infrastructure
+    # required for add_test() and defines the BUILD_TESTING option.
+    #
+    # Required structure:
+    #   project(my-library)
+    #   include(CTest)
+    #   cpp_library_setup(...)
+    
+    # Include installation module that requires project() to be called first
+    # (GNUInstallDirs needs language/architecture information)
+    include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
+    
+    # Calculate clean name (without namespace prefix) for target alias
+    # If PROJECT_NAME starts with NAMESPACE-, strip it; otherwise use PROJECT_NAME as-is
+    string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    # If no replacement happened, CLEAN_NAME equals ARG_NAME (which is what we want)
+    
+    # Always prefix package name with namespace for collision prevention
+    # Special case: if namespace equals clean name, don't duplicate (e.g., stlab::stlab → stlab)
+    if(ARG_NAMESPACE STREQUAL CLEAN_NAME)
+        set(PACKAGE_NAME "${ARG_NAMESPACE}")
+    else()
+        set(PACKAGE_NAME "${ARG_NAMESPACE}-${CLEAN_NAME}")
+    endif()
     
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
@@ -176,6 +236,8 @@ function(cpp_library_setup)
         VERSION "${ARG_VERSION}" 
         DESCRIPTION "${ARG_DESCRIPTION}"
         NAMESPACE "${ARG_NAMESPACE}"
+        PACKAGE_NAME "${PACKAGE_NAME}"
+        CLEAN_NAME "${CLEAN_NAME}"
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
@@ -186,25 +248,24 @@ function(cpp_library_setup)
     if(NOT PROJECT_IS_TOP_LEVEL)
         return()  # Early return for lightweight consumer mode
     endif()
-    
-    # Create symlink to compile_commands.json for clangd (only when BUILD_TESTING is enabled)
-    if(CMAKE_EXPORT_COMPILE_COMMANDS AND BUILD_TESTING)
-        add_custom_target(clangd_compile_commands ALL
-            COMMAND ${CMAKE_COMMAND} -E create_symlink 
-                ${CMAKE_BINARY_DIR}/compile_commands.json
-                ${CMAKE_SOURCE_DIR}/compile_commands.json
-            COMMENT "Creating symlink to compile_commands.json for clangd"
-        )
-    endif()
-    
+
     # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
     if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
-        _cpp_library_copy_templates(FORCE_INIT)
+        _cpp_library_copy_templates("${PACKAGE_NAME}" FORCE_INIT)
     else()
-        _cpp_library_copy_templates()
+        _cpp_library_copy_templates("${PACKAGE_NAME}")
+    endif()
+    
+    # Download doctest if we'll need it for tests or examples
+    # This must happen during normal configuration (not deferred) because CPMAddPackage uses add_subdirectory
+    if(BUILD_TESTING AND (ARG_TESTS OR ARG_EXAMPLES))
+        if(NOT TARGET doctest::doctest)
+            CPMAddPackage("gh:doctest/doctest@2.4.12")
+        endif()
     endif()
     
     # Setup testing (if tests are specified)
+    # enable_testing() has already been called above via include(), so we can add tests immediately
     if(BUILD_TESTING AND ARG_TESTS)
         _cpp_library_setup_executables(
             NAME "${ARG_NAME}"
@@ -227,6 +288,7 @@ function(cpp_library_setup)
 
     
     # Build examples if specified (only when BUILD_TESTING is enabled)
+    # enable_testing() has already been called above, so we can add examples immediately
     if(BUILD_TESTING AND ARG_EXAMPLES)
         _cpp_library_setup_executables(
             NAME "${ARG_NAME}"
