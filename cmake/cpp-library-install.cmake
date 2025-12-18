@@ -472,16 +472,18 @@ function(_cpp_library_setup_install)
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_ROOT "${CPP_LIBRARY_ROOT}")
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     
-    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-        CALL _cpp_library_deferred_generate_config)
-    
     # Defer install validation and file installation setup until after config generation
     # This ensures:
     # 1. The unverified deps file is created first
     # 2. Validation install code is registered before export/config file installation
     # 3. At install time, validation runs before any config files are written
+    # Note: DEFER uses LIFO ordering, so register validation first (runs last)
     cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         CALL _cpp_library_setup_install_validation)
+    
+    # Register config generation second so it runs first (LIFO) and sets properties
+    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+        CALL _cpp_library_deferred_generate_config)
     
 endfunction()
 
