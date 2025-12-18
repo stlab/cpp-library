@@ -475,34 +475,24 @@ function(_cpp_library_setup_install)
     cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
         CALL _cpp_library_deferred_generate_config)
     
-    # Defer install validation setup until after config generation
-    # This ensures the unverified deps file is created first
+    # Defer install validation and file installation setup until after config generation
+    # This ensures:
+    # 1. The unverified deps file is created first
+    # 2. Validation install code is registered before export/config file installation
+    # 3. At install time, validation runs before any config files are written
     cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         CALL _cpp_library_setup_install_validation)
-    
-    # Install export targets with namespace
-    # This allows downstream projects to use find_package(package-name)
-    # and link against namespace::target
-    install(EXPORT ${ARG_NAME}Targets
-        FILE ${ARG_PACKAGE_NAME}Targets.cmake
-        NAMESPACE ${ARG_NAMESPACE}::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_PACKAGE_NAME}
-    )
-    
-    # Install package config and version files
-    install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}ConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_PACKAGE_NAME}
-    )
     
 endfunction()
 
 # Deferred function to setup install validation after config generation
 # This runs after _cpp_library_deferred_generate_config() has created the unverified deps file
+# Registers validation BEFORE export/config file installation to prevent broken configs from being written
 function(_cpp_library_setup_install_validation)
     # Retrieve stored arguments from global properties (set by _cpp_library_setup_install)
+    get_property(NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME)
     get_property(PACKAGE_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME)
+    get_property(NAMESPACE GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE)
     get_property(BINARY_DIR GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR)
     
     # Check if there are unverified dependencies
@@ -522,7 +512,7 @@ function(_cpp_library_setup_install_validation)
             if(_UNVERIFIED_DEPS_LIST)
                 # Parse the unverified dependencies list
                 string(REPLACE \";\" \"\\n  - \" FORMATTED_DEPS \"\${_UNVERIFIED_DEPS_LIST}\")
-                string(REGEX REPLACE \"\\\\|[^\\n]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
+                string(REGEX REPLACE \"\\\\|[a-zA-Z0-9_:.\\\\- ]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
                 
                 message(FATAL_ERROR
                     \"cpp-library: Cannot install ${PACKAGE_NAME} - untracked dependencies detected:\\n\"
@@ -545,4 +535,23 @@ function(_cpp_library_setup_install_validation)
             message(STATUS \"cpp-library: All dependencies properly tracked for ${PACKAGE_NAME}\")
         ")
     endif()
+    
+    # Now register the export and config file installations AFTER validation
+    # This ensures validation runs first at install time, preventing broken configs from being written
+    
+    # Install export targets with namespace
+    # This allows downstream projects to use find_package(package-name)
+    # and link against namespace::target
+    install(EXPORT ${NAME}Targets
+        FILE ${PACKAGE_NAME}Targets.cmake
+        NAMESPACE ${NAMESPACE}::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+    )
+    
+    # Install package config and version files
+    install(FILES
+        "${BINARY_DIR}/${PACKAGE_NAME}Config.cmake"
+        "${BINARY_DIR}/${PACKAGE_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+    )
 endfunction()
