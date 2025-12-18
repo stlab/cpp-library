@@ -130,39 +130,7 @@ cpp_library_setup(
 )
 ```
 
-### Getting Started
-
-Before using cpp-library, you'll need:
-
-- **CMake 3.24+** - [Download here](https://cmake.org/download/)
-- **A C++17+ compiler** - GCC 7+, Clang 5+, MSVC 2017+, or Apple Clang 9+
-
-#### Step 1: Install CPM.cmake
-
-[CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) is required for dependency management. [Add it to your project](https://github.com/cpm-cmake/CPM.cmake?tab=readme-ov-file#adding-cpm):
-
-```bash
-mkdir -p cmake
-wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
-```
-
-Create the standard directory structure:
-
-```bash
-mkdir -p include/your_namespace examples tests
-```
-
-#### Step 2: Create your CMakeLists.txt
-
-Create a `CMakeLists.txt` file following the example shown at the [beginning of the Usage section](#usage).
-
-#### Step 3: Build and test
-
-```bash
-cmake --preset=test
-cmake --build --preset=test
-ctest --preset=test
-```
+**Requirements:** CMake 3.24+, C++17+ compiler (GCC 7+, Clang 5+, MSVC 2017+, or Apple Clang 9+)
 
 ### Consuming Libraries Built with cpp-library
 
@@ -186,7 +154,7 @@ target_link_libraries(my-app PRIVATE stlab::enum-ops)
 
 The library will be automatically fetched and built as part of your project.
 
-**Repository Naming:** Your GitHub repository name must match the package name for CPM compatibility. For a library with package name `stlab-enum-ops`, name your repository `stlab/stlab-enum-ops`. This ensures `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` works correctly with both source builds and `CPM_USE_LOCAL_PACKAGES`.
+**Repository Naming:** Your GitHub repository name must match the package name for CPM compatibility (see [Target Naming](#target-naming) for details).
 
 #### Installation (optional)
 
@@ -201,33 +169,16 @@ cmake --install build/install
 # Install to custom prefix
 cmake --install build/install --prefix /opt/mylib
 ```
-The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which makes CPM call `find_package()` first before fetching. This verifies your generated Config.cmake works correctly.
+The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
 
-For information about using installed packages with `find_package()`, see the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake) about [controlling how dependencies are found](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
-
-**Re-exporting dependencies from external packages:**
-
-When your library re-exports dependencies (via `INTERFACE` linkage) that come from CPMAddPackage, you must wrap them in `BUILD_INTERFACE` to avoid CMake export errors:
+**Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, wrap them in `BUILD_INTERFACE` to avoid export errors (CPM creates non-IMPORTED targets that can't be exported):
 
 ```cmake
-# Correct: Wrap CPM-fetched dependencies in BUILD_INTERFACE
 CPMAddPackage("gh:other-org/some-package@1.0.0")
 target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:other::package>)
 ```
 
-**Why this is needed:** CPMAddPackage creates regular (non-IMPORTED) targets in your build tree. When CMake exports your library, it sees these dependencies but cannot include them in your export set (they belong to a different package). The `BUILD_INTERFACE` wrapper tells CMake:
-- Use this dependency during build
-- Don't include it in the export
-- Let consumers find it themselves via `find_dependency()` in the generated Config.cmake
-
-cpp-library automatically extracts dependencies from `BUILD_INTERFACE` expressions and generates the appropriate `find_dependency()` calls in your package configuration.
-
-**When BUILD_INTERFACE is NOT needed:**
-- Dependencies from `find_package()` (already IMPORTED targets)
-- System libraries like `Threads::Threads`
-- Internal (PRIVATE) dependencies (not applicable to INTERFACE libraries)
-
-This is a standard CMake pattern for re-exporting external package dependencies, not specific to cpp-library.
+cpp-library automatically extracts these and generates appropriate `find_dependency()` calls. Dependencies from `find_package()` and system libraries don't need `BUILD_INTERFACE`.
 
 #### Dependency Handling in Installed Packages
 
@@ -237,26 +188,23 @@ cpp-library automatically generates `find_dependency()` calls in the installed C
 cmake_minimum_required(VERSION 3.24)
 include(cmake/CPM.cmake)
 
-# Fetch cpp-library before project()
-# Check https://github.com/stlab/cpp-library/releases for the latest version
 CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
-# Enable dependency tracking before project()
 cpp_library_enable_dependency_tracking()
-
-# Declare project
 project(my-library)
 
-# Setup library target
+include(CTest)  # Required if you have TESTS or EXAMPLES
+
 cpp_library_setup(
     DESCRIPTION "My library"
     NAMESPACE mylib
     HEADERS mylib.hpp
+    TESTS my_tests.cpp        # Optional
+    EXAMPLES my_example.cpp   # Optional
 )
 
-# Add dependencies and link them
-# Dependencies are automatically tracked and included in Config.cmake
+# Add dependencies - automatically tracked and included in Config.cmake
 CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
 find_package(Boost 1.79 COMPONENTS filesystem)
 
@@ -266,98 +214,37 @@ target_link_libraries(my-library INTERFACE
 )
 ```
 
-**Non-namespaced targets:** For targets like `opencv_core`, add an explicit mapping:
+**Non-namespaced targets:** For targets like `opencv_core` where the package name cannot be inferred, add explicit mapping:
 
 ```cmake
+find_package(OpenCV 4.5.0 REQUIRED)
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
-```
-
-**Complete example with dependencies and tests:**
-
-```cmake
-cmake_minimum_required(VERSION 3.24)
-include(cmake/CPM.cmake)
-
-# Fetch cpp-library before project()
-# Check https://github.com/stlab/cpp-library/releases for the latest version
-CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
-include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
-
-cpp_library_enable_dependency_tracking()
-project(my-library)
-
-# Enable testing (required if you have TESTS or EXAMPLES)
-include(CTest)
-
-# Setup library
-cpp_library_setup(
-    DESCRIPTION "My library with tests"
-    NAMESPACE mylib
-    HEADERS mylib.hpp
-    TESTS my_tests.cpp
-    EXAMPLES my_example.cpp
-)
-
-# Add dependencies and link them
-CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")
-find_package(Boost 1.79 COMPONENTS filesystem)
-
-target_link_libraries(my-library INTERFACE
-    stlab::enum-ops
-    Boost::filesystem
-)
+target_link_libraries(my-library INTERFACE opencv_core)
 ```
 
 ### Updating cpp-library
 
-To update to the latest version of cpp-library in your project:
+To update to a newer version:
 
-#### Step 1: Update the version in CMakeLists.txt
-
-Change the version tag in your `CPMAddPackage` call:
-
-```cmake
-CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")  # Update version here
-```
-
-#### Step 2: Regenerate template files
-
-Use the `init` preset to regenerate `CMakePresets.json` and CI workflows with the latest templates:
-
-```bash
-cmake --preset=init
-cmake --build --preset=init
-```
-
-This ensures your project uses the latest presets and CI configurations from the updated cpp-library version.
+1. Change the version in your `CPMAddPackage` call: `CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")`
+2. Regenerate template files: `cmake --preset=init && cmake --build --preset=init`
 
 ### Setting Up GitHub Repository
 
 #### Repository Naming
 
-**Critical:** Your GitHub repository name must match your package name for CPM compatibility.
-
-When using `project(enum-ops)` with `NAMESPACE stlab`:
-- Package name: `stlab-enum-ops`
-- Repository name: `stlab/stlab-enum-ops`
-
-This naming convention:
-- Prevents package name collisions across organizations
-- Enables `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` to work seamlessly
-- Makes `CPM_USE_LOCAL_PACKAGES` work correctly with `find_package(stlab-enum-ops)`
+**Critical:** Your GitHub repository name must match your package name for CPM compatibility. When using `project(enum-ops)` with `NAMESPACE stlab`, the package name is `stlab-enum-ops`, so your repository must be `stlab/stlab-enum-ops`. This prevents collisions and ensures `CPMAddPackage("gh:stlab/stlab-enum-ops@1.0.0")` works with both source builds and `CPM_USE_LOCAL_PACKAGES`.
 
 #### Version Tagging
 
-cpp-library automatically detects your library version from git tags. To version your library:
+cpp-library automatically detects your library version from git tags following [semantic versioning](https://semver.org/):
 
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Tags should follow [semantic versioning](https://semver.org/) (e.g., `v1.0.0`, `v2.1.3`).
-
-Alternatively, you can override the version using `-DCPP_LIBRARY_VERSION=x.y.z` (useful for package managers). See [Version Management](#version-management) for details.
+See [Version Management](#version-management) for override options.
 
 #### GitHub Pages Deployment
 
@@ -395,9 +282,7 @@ cpp_library_setup(
 
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
 - **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
-- **Clang-tidy** (`CMAKE_CXX_CLANG_TIDY`) analyzes whatever gets built—it doesn't change what gets built. 
-- Version is automatically detected from git tags, or can be overridden with `-DCPP_LIBRARY_VERSION=x.y.z` (see [Version Management](#version-management)).
-- Examples using doctest should include `test` in the filename to be visible in the [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter) extension for VS Code test explorer.
+- Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
 
 ### Target Naming
 
@@ -432,11 +317,11 @@ This produces:
 cpp_library_map_dependency(target find_dependency_call)
 ```
 
-Maps non-namespaced targets to their package. Required only for targets like `opencv_core` where the package name cannot be inferred:
+Maps non-namespaced targets to their package. Required only for targets like `opencv_core` where the package name cannot be inferred. Call this after `find_package()` or `CPMAddPackage()`:
 
 ```cmake
+find_package(OpenCV 4.5.0 REQUIRED)
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
-
 target_link_libraries(my-target INTERFACE opencv_core)
 ```
 
@@ -444,58 +329,25 @@ Namespaced targets like `Qt6::Core` and `Boost::filesystem` are tracked automati
 
 ### Path Conventions
 
-The template uses consistent path conventions for all file specifications:
+All file specifications use filenames only, automatically placed in standard directories:
 
-- **HEADERS**: Filenames only, automatically placed in `include/<namespace>/` directory
-  - Examples: `your_header.hpp`, `enum_ops.hpp` (automatically becomes `include/your_namespace/your_header.hpp`)
-- **SOURCES**: Filenames only, automatically placed in `src/` directory (omit for header-only libraries)
-  - Examples: `your_library.cpp`, `implementation.cpp` (automatically becomes `src/your_library.cpp`)
-- **EXAMPLES**: Source files with `.cpp` extension, located in `examples/` directory
-  - Examples: `example.cpp`, `example_fail.cpp`
-- **TESTS**: Source files with `.cpp` extension, located in `tests/` directory
-  - Examples: `tests.cpp`, `unit_tests.cpp`
+- **HEADERS**: `include/<namespace>/` (e.g., `your_header.hpp` → `include/your_namespace/your_header.hpp`)
+- **SOURCES**: `src/` (e.g., `your_library.cpp` → `src/your_library.cpp`; omit for header-only)
+- **EXAMPLES**: `examples/` (e.g., `example.cpp`, `example_fail.cpp`)
+- **TESTS**: `tests/` (e.g., `tests.cpp`, `unit_tests.cpp`)
 
 ### Library Types
 
-**Header-only libraries**: Specify only `HEADERS`, omit `SOURCES`
-
-```cmake
-cpp_library_setup(
-    DESCRIPTION "Header-only library"
-    NAMESPACE my_lib
-    HEADERS my_header.hpp
-    # No SOURCES needed for header-only
-)
-```
-
-**Non-header-only libraries**: Specify both `HEADERS` and `SOURCES`
-
-```cmake
-cpp_library_setup(
-    DESCRIPTION "Library with implementation"
-    NAMESPACE my_lib
-    HEADERS my_header.hpp
-    SOURCES my_library.cpp implementation.cpp
-)
-```
-
-Libraries with sources build as static libraries by default. Set `BUILD_SHARED_LIBS=ON` to build shared libraries instead.
+- **Header-only**: Specify only `HEADERS`, omit `SOURCES`
+- **Compiled**: Specify both `HEADERS` and `SOURCES` (builds as static by default, set `BUILD_SHARED_LIBS=ON` for shared)
 
 ## Reference
 
 ### CMake Presets
 
-cpp-library generates a `CMakePresets.json` file with the following configurations:
+cpp-library generates a `CMakePresets.json` file with configurations for: `default` (release), `test` (debug), `docs`, `clang-tidy`, `install`, and `init`.
 
-- **`default`**: Release build for production use
-- **`test`**: Debug build with testing enabled
-- **`docs`**: Documentation generation with Doxygen
-- **`clang-tidy`**: Static analysis build
-- **`init`**: Template regeneration (regenerates CMakePresets.json, CI workflows, etc.)
-
-All presets automatically configure `CPM_SOURCE_CACHE` to `${sourceDir}/.cache/cpm` for faster dependency resolution. You can override this by setting the `CPM_SOURCE_CACHE` environment variable.
-
-**Best Practice:** Set `CPM_SOURCE_CACHE` in presets or via environment variable/command line, not in CMakeLists.txt. Setting it in CMakeLists.txt with `FORCE` can override parent project settings when used as a subdirectory, and prevents users from configuring it themselves.
+All presets configure `CPM_SOURCE_CACHE` to `${sourceDir}/.cache/cpm` for faster builds. Override via environment variable if needed (avoid setting in CMakeLists.txt to preserve parent project settings).
 
 ### Version Management
 
@@ -516,22 +368,18 @@ This is particularly useful for vcpkg, Conan, or other package managers that don
 
 ### Testing
 
-- **Test framework**: [doctest](https://github.com/doctest/doctest)
-- **Compile-fail tests**: Automatically detected via `_fail` suffix in filenames
-- **Test discovery**: Scans `tests/` and `examples/` directories
-- **CTest integration**: All tests registered with CTest for IDE integration
+Uses [doctest](https://github.com/doctest/doctest) with CTest integration. Compile-fail tests are automatically detected via `_fail` suffix in filenames.
 
-## Template Files Generated
+### Template Files
 
 cpp-library automatically generates infrastructure files on first configuration and when using the `init` preset:
 
 - **CMakePresets.json**: Build configurations (default, test, docs, clang-tidy, install, init)
 - **.github/workflows/ci.yml**: Multi-platform CI/CD pipeline with testing and documentation deployment
-- **.gitignore**: Standard C++ project ignores
-- **.vscode/extensions.json**: Recommended VS Code extensions
-- **Package config files**: `<Package>Config.cmake` for CMake integration (when building as top-level project)
+- **.gitignore**, **.vscode/extensions.json**: Development environment configuration
+- **Package config files**: `<Package>Config.cmake` for CMake integration
 
-These files are generated automatically. To regenerate with the latest templates, use `cmake --preset=init`.
+Regenerate with `cmake --preset=init` after updating cpp-library versions.
 
 ## Example Projects
 
@@ -540,30 +388,76 @@ See these projects using cpp-library:
 - [stlab/stlab-enum-ops](https://github.com/stlab/stlab-enum-ops) - Type-safe operators for enums
 - [stlab/stlab-copy-on-write](https://github.com/stlab/stlab-copy-on-write) - Copy-on-write wrapper
 
-Note: Repository names include the namespace prefix for CPM compatibility and collision prevention.
-
 ## Troubleshooting
 
 ### Non-Namespaced Target Error
 
 **Problem**: Error about non-namespaced dependency like `opencv_core`
 
-**Solution**: Map the target to its package:
+**Solution**: Map the target to its package after `find_package()`:
 ```cmake
+find_package(OpenCV 4.5.0 REQUIRED)
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
+target_link_libraries(my-library INTERFACE opencv_core)
 ```
 
-### Dependency Not Tracked
+### Untracked Dependencies
 
-**Problem**: Error that a dependency was not tracked
+During configuration, you may see messages like:
 
-**Solution**: Ensure `cpp_library_enable_dependency_tracking()` is called before `project()`. Dependencies can be added anywhere after `project()` and will be automatically captured.
+```
+-- cpp-library: Untracked dependencies (see: https://github.com/stlab/cpp-library#untracked-dependencies)
+-- cpp-library: Dependency stlab::copy-on-write (package: stlab-copy-on-write) was not tracked.
+-- cpp-library: Dependency stlab::enum-ops (package: stlab-enum-ops) was not tracked.
+```
+
+**This is expected behavior** when:
+- Building for development (not installing)
+- Using dependencies added from subdirectories (via `CPMAddPackage` in downstream packages)
+- Testing locally without installation
+
+**What it means:**
+- These dependencies were not captured by the dependency provider (usually because they were added in a subdirectory)
+- cpp-library uses a fallback `find_dependency()` call for these dependencies
+- Your build will work correctly
+- If you attempt to install, validation will fail to prevent broken package configs
+
+**When it matters:**
+- **Installing the package**: Installation will fail with a detailed error, preventing broken configs
+- **Not installing**: Messages are informational only - your local development builds work fine
+
+**Solutions** (if you need to install):
+
+1. **Move dependencies to top-level** (preferred):
+   ```cmake
+   # In your top-level CMakeLists.txt (after project())
+   CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
+   target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:stlab::copy-on-write>)
+   ```
+
+2. **Manually register dependencies**:
+   ```cmake
+   # After adding the dependency
+   CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
+   cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 1.1.0")
+   target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:stlab::copy-on-write>)
+   ```
+
+3. **Use CPM_USE_LOCAL_PACKAGES**: Install dependencies first, then build with local packages:
+   ```bash
+   cmake -DCPM_USE_LOCAL_PACKAGES=ON -B build
+   ```
+
+**Why this happens:**
+The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage()` calls at the project scope. When dependencies are added in subdirectories (common with transitive CPM dependencies), they aren't captured at your project's scope.
+
+**Important:** Ensure `cpp_library_enable_dependency_tracking()` is called before `project()` - this is required for any dependency tracking to work.
 
 ### CPM Repository Name Mismatch
 
 **Problem**: `CPMAddPackage()` fails with `CPM_USE_LOCAL_PACKAGES`
 
-**Solution**: Repository name must match package name. For package `stlab-enum-ops`, use repository `stlab/stlab-enum-ops`, not `stlab/enum-ops`.
+**Solution**: Repository name must match package name. See [Repository Naming](#repository-naming) for details.
 
 ### Clang-Tidy on Windows/MSVC
 
@@ -573,24 +467,13 @@ cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
 
 ## Development
 
-### Running Tests
-
-cpp-library includes unit tests for its dependency mapping and installation logic:
+To run cpp-library's unit tests for dependency mapping and installation:
 
 ```bash
-# Run unit tests
 cmake -P tests/install/CMakeLists.txt
 ```
 
-The test suite covers:
-- Automatic version detection
-- Component merging (Qt, Boost)
-- System packages (Threads, OpenMP, etc.)
-- Custom dependency mappings
-- Internal cpp-library dependencies
-- Edge cases and error handling
-
-See `tests/install/README.md` for more details.
+See `tests/install/README.md` for details.
 
 ## License
 
