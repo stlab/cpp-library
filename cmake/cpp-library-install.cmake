@@ -150,24 +150,48 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                     )
                 else()
                     # Provider is installed but dependency wasn't tracked
-                    message(FATAL_ERROR 
-                        "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.\n"
-                        "\n"
-                        "The dependency provider is installed, but this dependency was not captured.\n"
-                        "Common causes:\n"
-                        "  - find_package() or CPMAddPackage() was called in a subdirectory\n"
-                        "  - Dependency was added before project() (must be after)\n"
-                        "  - cpp_library_enable_dependency_tracking() was not called before project()\n"
-                        "\n"
-                        "Solution: Ensure dependency tracking is enabled and dependencies are declared after project().\n"
-                        "\n"
-                        "Correct order:\n"
-                        "    cpp_library_enable_dependency_tracking()\n"
-                        "    project(my-library)\n"
-                        "    cpp_library_setup(...)\n"
-                        "    find_package(SomePackage)  # or CPMAddPackage(...)\n"
-                        "    target_link_libraries(...)\n"
-                    )
+                    # Check if we're in strict install validation mode
+                    get_property(IN_INSTALL_MODE GLOBAL PROPERTY _CPP_LIBRARY_IN_INSTALL_MODE)
+                    
+                    if(IN_INSTALL_MODE)
+                        # Strict mode during install: error out
+                        message(FATAL_ERROR 
+                            "cpp-library: Cannot install - Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.\n"
+                            "\n"
+                            "The dependency provider is installed, but this dependency was not captured.\n"
+                            "Common causes:\n"
+                            "  - find_package() or CPMAddPackage() was called in a subdirectory\n"
+                            "  - Dependency was added before project() (must be after)\n"
+                            "\n"
+                            "Solution: Ensure dependencies are declared after project() in the top-level CMakeLists.txt.\n"
+                            "\n"
+                            "Correct order:\n"
+                            "    cpp_library_enable_dependency_tracking()\n"
+                            "    project(my-library)\n"
+                            "    cpp_library_setup(...)\n"
+                            "    find_package(SomePackage)  # or CPMAddPackage(...)\n"
+                            "    target_link_libraries(...)\n"
+                        )
+                    else()
+                        # Lenient mode during configure: notify and use fallback
+                        # Print header message before first untracked dependency
+                        get_property(HEADER_PRINTED GLOBAL PROPERTY _CPP_LIBRARY_UNTRACKED_HEADER_PRINTED)
+                        if(NOT HEADER_PRINTED)
+                            message(STATUS "cpp-library: Untracked dependencies (see: https://github.com/stlab/cpp-library#untracked-dependencies)")
+                            set_property(GLOBAL PROPERTY _CPP_LIBRARY_UNTRACKED_HEADER_PRINTED TRUE)
+                        endif()
+                        
+                        # Print concise message about this specific dependency
+                        message(STATUS "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.")
+                        
+                        # Track this as an unverified dependency for install-time validation
+                        set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_UNVERIFIED_DEPS 
+                            "${LIB}|${FIND_PACKAGE_NAME}")
+                        
+                        # Use a reasonable fallback for development builds
+                        set(${OUTPUT_VAR} "${FIND_PACKAGE_NAME}" PARENT_SCOPE)
+                        return()
+                    endif()
                 endif()
             endif()
         endif()
@@ -182,9 +206,10 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
             "    cpp_library_map_dependency(\"${LIB}\" \"<PACKAGE_NAME> <VERSION>\")\n"
             "\n"
             "For example, if ${LIB} comes from OpenCV:\n"
+            "    find_package(OpenCV 4.5.0 REQUIRED)\n"
             "    cpp_library_map_dependency(\"${LIB}\" \"OpenCV 4.5.0\")\n"
             "\n"
-            "Add this mapping BEFORE cpp_library_setup().\n"
+            "Add this mapping after find_package() or CPMAddPackage() in your CMakeLists.txt.\n"
         )
     endif()
 endfunction()
@@ -366,6 +391,17 @@ function(_cpp_library_deferred_generate_config)
         @ONLY
     )
     
+    # Save unverified dependencies to a file for install-time validation
+    get_property(UNVERIFIED_DEPS GLOBAL PROPERTY _CPP_LIBRARY_UNVERIFIED_DEPS)
+    if(UNVERIFIED_DEPS)
+        set(UNVERIFIED_FILE "${BINARY_DIR}/${ARG_PACKAGE_NAME}_unverified_deps.cmake")
+        file(WRITE "${UNVERIFIED_FILE}" "# Unverified dependencies for ${ARG_PACKAGE_NAME}\n")
+        file(APPEND "${UNVERIFIED_FILE}" "set(_UNVERIFIED_DEPS_LIST [[${UNVERIFIED_DEPS}]])\n")
+        set_property(GLOBAL PROPERTY _CPP_LIBRARY_HAS_UNVERIFIED_DEPS TRUE)
+    else()
+        set_property(GLOBAL PROPERTY _CPP_LIBRARY_HAS_UNVERIFIED_DEPS FALSE)
+    endif()
+    
     message(STATUS "cpp-library: Generated ${ARG_PACKAGE_NAME}Config.cmake with dependencies")
 endfunction()
 
@@ -436,23 +472,88 @@ function(_cpp_library_setup_install)
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_ROOT "${CPP_LIBRARY_ROOT}")
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     
+    # Defer install validation and file installation setup until after config generation
+    # This ensures:
+    # 1. The unverified deps file is created first
+    # 2. Validation install code is registered before export/config file installation
+    # 3. At install time, validation runs before any config files are written
+    # Note: DEFER uses LIFO ordering, so register validation first (runs last)
+    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        CALL _cpp_library_setup_install_validation)
+    
+    # Register config generation second so it runs first (LIFO) and sets properties
     cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
         CALL _cpp_library_deferred_generate_config)
+    
+endfunction()
+
+# Deferred function to setup install validation after config generation
+# This runs after _cpp_library_deferred_generate_config() has created the unverified deps file
+# Registers validation BEFORE export/config file installation to prevent broken configs from being written
+function(_cpp_library_setup_install_validation)
+    # Retrieve stored arguments from global properties (set by _cpp_library_setup_install)
+    get_property(NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME)
+    get_property(PACKAGE_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME)
+    get_property(NAMESPACE GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE)
+    get_property(BINARY_DIR GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR)
+    
+    # Check if there are unverified dependencies
+    get_property(HAS_UNVERIFIED GLOBAL PROPERTY _CPP_LIBRARY_HAS_UNVERIFIED_DEPS)
+    
+    if(HAS_UNVERIFIED)
+        set(UNVERIFIED_FILE "${BINARY_DIR}/${PACKAGE_NAME}_unverified_deps.cmake")
+        
+        # Add install-time validation to ensure all dependencies are properly tracked
+        # This runs before config files are installed and will fail if untracked dependencies exist
+        install(CODE "
+            message(STATUS \"cpp-library: Validating tracked dependencies for ${PACKAGE_NAME}...\")
+            
+            # Load the list of unverified dependencies
+            include(\"${UNVERIFIED_FILE}\")
+            
+            if(_UNVERIFIED_DEPS_LIST)
+                # Parse the unverified dependencies list
+                string(REPLACE \";\" \"\\n  - \" FORMATTED_DEPS \"\${_UNVERIFIED_DEPS_LIST}\")
+                string(REGEX REPLACE \"\\\\|[a-zA-Z0-9_:.\\\\- ]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
+                
+                message(FATAL_ERROR
+                    \"cpp-library: Cannot install ${PACKAGE_NAME} - untracked dependencies detected:\\n\"
+                    \"  - \${FORMATTED_DEPS}\\n\"
+                    \"\\n\"
+                    \"These dependencies were not captured by the dependency provider.\\n\"
+                    \"Common causes:\\n\"
+                    \"  - find_package() or CPMAddPackage() was called in a subdirectory\\n\"
+                    \"  - Dependency was added before project() (must be after)\\n\"
+                    \"\\n\"
+                    \"Solution: Ensure dependencies are declared after project() in the top-level CMakeLists.txt.\\n\"
+                    \"Or use cpp_library_map_dependency() to manually register each dependency.\\n\"
+                )
+            endif()
+            
+            message(STATUS \"cpp-library: Dependency validation passed for ${PACKAGE_NAME}\")
+        ")
+    else()
+        install(CODE "
+            message(STATUS \"cpp-library: All dependencies properly tracked for ${PACKAGE_NAME}\")
+        ")
+    endif()
+    
+    # Now register the export and config file installations AFTER validation
+    # This ensures validation runs first at install time, preventing broken configs from being written
     
     # Install export targets with namespace
     # This allows downstream projects to use find_package(package-name)
     # and link against namespace::target
-    install(EXPORT ${ARG_NAME}Targets
-        FILE ${ARG_PACKAGE_NAME}Targets.cmake
-        NAMESPACE ${ARG_NAMESPACE}::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_PACKAGE_NAME}
+    install(EXPORT ${NAME}Targets
+        FILE ${PACKAGE_NAME}Targets.cmake
+        NAMESPACE ${NAMESPACE}::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
     )
     
     # Install package config and version files
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}Config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/${ARG_PACKAGE_NAME}ConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ARG_PACKAGE_NAME}
+        "${BINARY_DIR}/${PACKAGE_NAME}Config.cmake"
+        "${BINARY_DIR}/${PACKAGE_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
     )
-    
 endfunction()
