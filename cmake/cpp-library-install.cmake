@@ -522,7 +522,7 @@ function(_cpp_library_setup_install_validation)
             if(_UNVERIFIED_DEPS_LIST)
                 # Parse the unverified dependencies list
                 string(REPLACE \";\" \"\\n  - \" FORMATTED_DEPS \"\${_UNVERIFIED_DEPS_LIST}\")
-                string(REGEX REPLACE \"\\\\|[^;]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
+                string(REGEX REPLACE \"\\\\|[^\\n]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
                 
                 message(FATAL_ERROR
                     \"cpp-library: Cannot install ${PACKAGE_NAME} - untracked dependencies detected:\\n\"
