@@ -8,6 +8,42 @@
 # Determine the directory where this file is located
 get_filename_component(CPP_LIBRARY_ROOT "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 
+# Public function to update project version from git tags after project() has been called.
+# This is useful for projects that need custom setup and can't use cpp_library_setup()
+# but still want automatic git-based versioning.
+#
+# Usage:
+#   project(my-library)  # No VERSION specified
+#   cpp_library_set_version()
+#   # Now PROJECT_VERSION and related variables are set from git tags
+#
+# The function respects CPP_LIBRARY_VERSION if set (e.g., by package managers),
+# otherwise queries git tags, stripping the 'v' prefix if present.
+function(cpp_library_set_version)
+    # Get version from git tags (respects CPP_LIBRARY_VERSION override)
+    _cpp_library_get_git_version(GIT_VERSION)
+    
+    # Parse version components
+    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${GIT_VERSION}")
+    if(VERSION_MATCH)
+        set(VERSION_MAJOR ${CMAKE_MATCH_1})
+        set(VERSION_MINOR ${CMAKE_MATCH_2})
+        set(VERSION_PATCH ${CMAKE_MATCH_3})
+    else()
+        set(VERSION_MAJOR 0)
+        set(VERSION_MINOR 0)
+        set(VERSION_PATCH 0)
+    endif()
+    
+    # Update project version in parent scope
+    set(PROJECT_VERSION ${GIT_VERSION} PARENT_SCOPE)
+    set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR} PARENT_SCOPE)
+    set(PROJECT_VERSION_MINOR ${VERSION_MINOR} PARENT_SCOPE)
+    set(PROJECT_VERSION_PATCH ${VERSION_PATCH} PARENT_SCOPE)
+    
+    message(STATUS "cpp-library: Set project version to ${GIT_VERSION} from git tags")
+endfunction()
+
 # Enable dependency tracking for accurate find_dependency() generation
 # This function should be called BEFORE project() to install the dependency provider.
 # Requires CMake 3.24+.
@@ -197,23 +233,16 @@ function(cpp_library_setup)
         set(ARG_REQUIRES_CPP_VERSION 17)
     endif()
     
-    # Get version from git tags
-    _cpp_library_get_git_version(GIT_VERSION)
-    set(ARG_VERSION "${GIT_VERSION}")
+    # Get version from git tags and update project version variables
+    cpp_library_set_version()
     
-    # Parse version components
-    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${ARG_VERSION}")
-    if(VERSION_MATCH)
-        set(ARG_VERSION_MAJOR ${CMAKE_MATCH_1})
-        set(ARG_VERSION_MINOR ${CMAKE_MATCH_2})
-        set(ARG_VERSION_PATCH ${CMAKE_MATCH_3})
-    else()
-        set(ARG_VERSION_MAJOR 0)
-        set(ARG_VERSION_MINOR 0)
-        set(ARG_VERSION_PATCH 0)
-    endif()
+    # Retrieve the version that was just set
+    set(ARG_VERSION "${PROJECT_VERSION}")
+    set(ARG_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+    set(ARG_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+    set(ARG_VERSION_PATCH ${PROJECT_VERSION_PATCH})
     
-    # Update project version
+    # Propagate project version to caller's scope (backward compatibility)
     set(PROJECT_VERSION ${ARG_VERSION} PARENT_SCOPE)
     set(PROJECT_VERSION_MAJOR ${ARG_VERSION_MAJOR} PARENT_SCOPE)
     set(PROJECT_VERSION_MINOR ${ARG_VERSION_MINOR} PARENT_SCOPE)
