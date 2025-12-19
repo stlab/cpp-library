@@ -482,7 +482,7 @@ function(_cpp_library_setup_install)
         CALL _cpp_library_setup_install_validation)
     
     # Register config generation second so it runs first (LIFO) and sets properties
-    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         CALL _cpp_library_deferred_generate_config)
     
 endfunction()

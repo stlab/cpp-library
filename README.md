@@ -258,6 +258,56 @@ Your documentation will be automatically built and deployed to `https://your-org
 
 ## API Reference
 
+### `cpp_library_set_version`
+
+```cmake
+cpp_library_set_version()
+```
+
+Updates the project version from git tags after `project()` has been called. This is useful for projects that need custom setup and can't use `cpp_library_setup()` but still want automatic git-based versioning.
+
+**Usage:**
+
+```cmake
+project(my-library)  # No VERSION specified
+cpp_library_set_version()
+# Now PROJECT_VERSION, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, 
+# and PROJECT_VERSION_PATCH are set from git tags
+```
+
+The function:
+- Queries git tags using `git describe --tags --abbrev=0`
+- Strips the 'v' prefix if present (e.g., `v1.2.3` → `1.2.3`)
+- Respects `CPP_LIBRARY_VERSION` cache variable if set (for package managers)
+- Falls back to `0.0.0` if no tag found
+- Updates all `PROJECT_VERSION*` variables in parent scope
+
+**When to use:**
+- You have a custom library setup that doesn't use `cpp_library_setup()`
+- You want to remove hardcoded versions from your `project()` declaration
+- You're migrating to cpp-library incrementally
+
+**Example for stlab/libraries:**
+
+```cmake
+cmake_minimum_required(VERSION 3.24)
+include(cmake/CPM.cmake)
+
+CPMAddPackage("gh:stlab/cpp-library@5.1.1")
+include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
+
+cpp_library_enable_dependency_tracking()
+
+project(stlab LANGUAGES CXX)  # No hardcoded version
+
+# Set version from git tags
+cpp_library_set_version()
+
+# Custom library setup continues...
+add_library(stlab)
+# ... rest of CMakeLists.txt
+```
+
 ### `cpp_library_setup`
 
 ```cmake
