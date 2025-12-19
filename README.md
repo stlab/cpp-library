@@ -287,7 +287,7 @@ The function:
 - You want to remove hardcoded versions from your `project()` declaration
 - You're migrating to cpp-library incrementally
 
-**Example for stlab/libraries:**
+**Example for stlab/stlab:**
 
 ```cmake
 cmake_minimum_required(VERSION 3.24)
