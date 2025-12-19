@@ -242,6 +242,12 @@ function(cpp_library_setup)
     set(ARG_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(ARG_VERSION_PATCH ${PROJECT_VERSION_PATCH})
     
+    # Propagate project version to caller's scope (backward compatibility)
+    set(PROJECT_VERSION ${ARG_VERSION} PARENT_SCOPE)
+    set(PROJECT_VERSION_MAJOR ${ARG_VERSION_MAJOR} PARENT_SCOPE)
+    set(PROJECT_VERSION_MINOR ${ARG_VERSION_MINOR} PARENT_SCOPE)
+    set(PROJECT_VERSION_PATCH ${ARG_VERSION_PATCH} PARENT_SCOPE)
+    
     # Generate full paths for HEADERS and SOURCES based on conventions
     set(GENERATED_HEADERS "")
     foreach(header IN LISTS ARG_HEADERS)
