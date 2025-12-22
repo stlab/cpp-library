@@ -119,8 +119,10 @@ function(_cpp_library_setup_core)
         endif()
     endif()
     
-    # Setup installation when building as top-level project
-    if(ARG_TOP_LEVEL)
+    # Setup installation when building as top-level project OR explicitly requested
+    # This allows package managers (vcpkg, CPM with install intent) to enable installation
+    # even when PROJECT_IS_TOP_LEVEL is FALSE
+    if(ARG_TOP_LEVEL OR ${ARG_NAMESPACE}_INSTALL)
         _cpp_library_setup_install(
             NAME "${ARG_NAME}"
             PACKAGE_NAME "${ARG_PACKAGE_NAME}"
