@@ -171,6 +171,13 @@ cmake --install build/install --prefix /opt/mylib
 ```
 The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
 
+**Controlling installation**: The `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
+
+```bash
+cmake -DSTLAB_INSTALL=OFF -B build  # Disable install for top-level project
+cmake -DSTLAB_INSTALL=ON -B build   # Enable install for non-top-level (e.g., via CPM)
+```
+
 **Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, wrap them in `BUILD_INTERFACE` to avoid export errors (CPM creates non-IMPORTED targets that can't be exported):
 
 ```cmake
@@ -333,6 +340,7 @@ cpp_library_setup(
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
 - **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
+- Installation is controlled by the `${NAMESPACE}_INSTALL` option, which defaults to `PROJECT_IS_TOP_LEVEL`.
 
 ### Target Naming
 

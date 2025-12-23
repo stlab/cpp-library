@@ -119,16 +119,15 @@ function(_cpp_library_setup_core)
         endif()
     endif()
     
-    # Setup installation when building as top-level project
-    if(ARG_TOP_LEVEL)
-        _cpp_library_setup_install(
-            NAME "${ARG_NAME}"
-            PACKAGE_NAME "${ARG_PACKAGE_NAME}"
-            VERSION "${ARG_VERSION}"
-            NAMESPACE "${ARG_NAMESPACE}"
-            HEADERS "${ARG_HEADERS}"
-        )
-    endif()
+    # Setup installation (controlled by ${NAMESPACE}_INSTALL option, defaults to PROJECT_IS_TOP_LEVEL)
+    # The option is defined and checked inside _cpp_library_setup_install()
+    _cpp_library_setup_install(
+        NAME "${ARG_NAME}"
+        PACKAGE_NAME "${ARG_PACKAGE_NAME}"
+        VERSION "${ARG_VERSION}"
+        NAMESPACE "${ARG_NAMESPACE}"
+        HEADERS "${ARG_HEADERS}"
+    )
 
 endfunction()
 
