@@ -49,6 +49,7 @@ if(NOT CPP_LIBRARY_VERSION)
         OUTPUT_VARIABLE CPP_LIBRARY_REMOTE_TAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
+        TIMEOUT 10
     )
     extract_latest_cpp_library_version_from_tags("${CPP_LIBRARY_REMOTE_TAGS}" CPP_LIBRARY_VERSION)
 endif()

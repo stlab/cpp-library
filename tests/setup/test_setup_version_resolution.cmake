@@ -6,7 +6,17 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-set(TEST_ROOT_DIR "/tmp/cpp-library-setup-version-test")
+if(DEFINED ENV{TMPDIR} AND NOT "$ENV{TMPDIR}" STREQUAL "")
+    set(TEST_BASE_DIR "$ENV{TMPDIR}")
+elseif(DEFINED ENV{TEMP} AND NOT "$ENV{TEMP}" STREQUAL "")
+    set(TEST_BASE_DIR "$ENV{TEMP}")
+elseif(DEFINED ENV{TMP} AND NOT "$ENV{TMP}" STREQUAL "")
+    set(TEST_BASE_DIR "$ENV{TMP}")
+else()
+    set(TEST_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
+set(TEST_ROOT_DIR "${TEST_BASE_DIR}/cpp-library-setup-version-test")
 set(TEST_PROJECT_NAME "setup-version-test-lib")
 
 file(REMOVE_RECURSE "${TEST_ROOT_DIR}")
@@ -14,7 +24,17 @@ file(MAKE_DIRECTORY "${TEST_ROOT_DIR}")
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/../../setup.cmake" DESTINATION "${TEST_ROOT_DIR}")
 
 execute_process(
-    COMMAND ${CMAKE_COMMAND} -P setup.cmake -- --name=${TEST_PROJECT_NAME} --namespace=testns --description=test --header-only=yes --examples=no --tests=no
+    COMMAND
+        ${CMAKE_COMMAND}
+        -P
+        setup.cmake
+        --
+        --name=${TEST_PROJECT_NAME}
+        --namespace=testns
+        --description=test
+        --header-only=yes
+        --examples=no
+        --tests=no
     WORKING_DIRECTORY "${TEST_ROOT_DIR}"
     RESULT_VARIABLE SETUP_RESULT
     OUTPUT_VARIABLE SETUP_OUTPUT
@@ -41,3 +61,5 @@ if(NOT GENERATED_CONTENT MATCHES "CPMAddPackage\\(\"gh:stlab/cpp-library@([0-9]+
 endif()
 
 message(STATUS "✓ setup.cmake generated a valid cpp-library version reference")
+
+file(REMOVE_RECURSE "${TEST_ROOT_DIR}")
