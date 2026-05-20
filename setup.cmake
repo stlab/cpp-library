@@ -9,7 +9,29 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-# Detect cpp-library version from git tags
+# Extract latest semantic version from a list of refs/tags/vX.Y.Z entries
+function(extract_latest_cpp_library_version_from_tags TAG_REFS OUTPUT_VAR)
+    # Require a non-version suffix so pre-release refs (e.g. v2.0.0-rc1) are not substring-matched
+    string(REGEX MATCHALL "refs/tags/v[0-9]+\\.[0-9]+\\.[0-9]+([^0-9.\\-]|$)" TAG_REFS_MATCHES "${TAG_REFS}")
+
+    set(SEMVER_TAGS "")
+    foreach(tag_ref IN LISTS TAG_REFS_MATCHES)
+        string(REGEX REPLACE "^refs/tags/v([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" semver "${tag_ref}")
+        list(APPEND SEMVER_TAGS "${semver}")
+    endforeach()
+
+    if(SEMVER_TAGS)
+        list(REMOVE_DUPLICATES SEMVER_TAGS)
+        list(SORT SEMVER_TAGS COMPARE NATURAL ORDER DESCENDING)
+        list(GET SEMVER_TAGS 0 latest_version)
+        set(${OUTPUT_VAR} "${latest_version}" PARENT_SCOPE)
+    else()
+        set(${OUTPUT_VAR} "" PARENT_SCOPE)
+    endif()
+endfunction()
+
+# Detect cpp-library version from local git tags first
+set(CPP_LIBRARY_VERSION "")
 execute_process(
     COMMAND git describe --tags --abbrev=0
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
@@ -17,14 +39,33 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_QUIET
 )
-
-# Clean version (remove 'v' prefix if present)
 if(CPP_LIBRARY_GIT_VERSION)
     string(REGEX REPLACE "^v" "" CPP_LIBRARY_VERSION "${CPP_LIBRARY_GIT_VERSION}")
+endif()
+
+# If setup.cmake is downloaded standalone (no local tags), detect from remote tags
+if(NOT CPP_LIBRARY_VERSION)
+    execute_process(
+        COMMAND git ls-remote --tags --refs https://github.com/stlab/cpp-library.git v[0-9]*
+        OUTPUT_VARIABLE CPP_LIBRARY_REMOTE_TAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        TIMEOUT 10
+    )
+    extract_latest_cpp_library_version_from_tags("${CPP_LIBRARY_REMOTE_TAGS}" CPP_LIBRARY_VERSION)
+endif()
+
+# Last-resort fallback to main branch so initialization still works
+if(NOT CPP_LIBRARY_VERSION)
+    set(CPP_LIBRARY_VERSION "main")
+    message(WARNING "No git tag found for cpp-library version. Falling back to branch 'main'.")
+endif()
+
+# CPM shorthand: @version sets VERSION (GIT_TAG defaults to v${VERSION}); #ref sets GIT_TAG (branch/tag/commit)
+if(CPP_LIBRARY_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+    set(CPP_LIBRARY_CPM_SPEC "gh:stlab/cpp-library@${CPP_LIBRARY_VERSION}")
 else()
-    # Fallback to X.Y.Z placeholder if no git tag found
-    set(CPP_LIBRARY_VERSION "X.Y.Z")
-    message(WARNING "No git tag found for cpp-library version. Using placeholder 'X.Y.Z'. Check https://github.com/stlab/cpp-library/releases for the latest version.")
+    set(CPP_LIBRARY_CPM_SPEC "gh:stlab/cpp-library#${CPP_LIBRARY_VERSION}")
 endif()
 
 message(STATUS "cpp-library version: ${CPP_LIBRARY_VERSION}")
@@ -338,7 +379,7 @@ include(cmake/CPM.cmake)
 
 # Fetch cpp-library before project()
 # Check https://github.com/stlab/cpp-library/releases for the latest version
-CPMAddPackage(\"gh:stlab/cpp-library@${CPP_LIBRARY_VERSION}\")
+CPMAddPackage(\"${CPP_LIBRARY_CPM_SPEC}\")
 include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Enable dependency tracking before project()
