@@ -11,11 +11,12 @@ cmake_minimum_required(VERSION 3.20)
 
 # Extract latest semantic version from a list of refs/tags/vX.Y.Z entries
 function(extract_latest_cpp_library_version_from_tags TAG_REFS OUTPUT_VAR)
-    string(REGEX MATCHALL "refs/tags/v[0-9]+\\.[0-9]+\\.[0-9]+" TAG_REFS_MATCHES "${TAG_REFS}")
+    # Require a non-version suffix so pre-release refs (e.g. v2.0.0-rc1) are not substring-matched
+    string(REGEX MATCHALL "refs/tags/v[0-9]+\\.[0-9]+\\.[0-9]+([^0-9.\\-]|$)" TAG_REFS_MATCHES "${TAG_REFS}")
 
     set(SEMVER_TAGS "")
     foreach(tag_ref IN LISTS TAG_REFS_MATCHES)
-        string(REGEX REPLACE "^refs/tags/v" "" semver "${tag_ref}")
+        string(REGEX REPLACE "^refs/tags/v([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" semver "${tag_ref}")
         list(APPEND SEMVER_TAGS "${semver}")
     endforeach()
 
@@ -58,6 +59,13 @@ endif()
 if(NOT CPP_LIBRARY_VERSION)
     set(CPP_LIBRARY_VERSION "main")
     message(WARNING "No git tag found for cpp-library version. Falling back to branch 'main'.")
+endif()
+
+# CPM shorthand: @version sets VERSION (GIT_TAG defaults to v${VERSION}); #ref sets GIT_TAG (branch/tag/commit)
+if(CPP_LIBRARY_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+    set(CPP_LIBRARY_CPM_SPEC "gh:stlab/cpp-library@${CPP_LIBRARY_VERSION}")
+else()
+    set(CPP_LIBRARY_CPM_SPEC "gh:stlab/cpp-library#${CPP_LIBRARY_VERSION}")
 endif()
 
 message(STATUS "cpp-library version: ${CPP_LIBRARY_VERSION}")
@@ -371,7 +379,7 @@ include(cmake/CPM.cmake)
 
 # Fetch cpp-library before project()
 # Check https://github.com/stlab/cpp-library/releases for the latest version
-CPMAddPackage(\"gh:stlab/cpp-library@${CPP_LIBRARY_VERSION}\")
+CPMAddPackage(\"${CPP_LIBRARY_CPM_SPEC}\")
 include(\${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 # Enable dependency tracking before project()
