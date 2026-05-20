@@ -92,9 +92,16 @@ cmake --build --preset=init
 
 ## Manual Setup
 
-If you prefer to set up your project manually, or need to integrate cpp-library into an existing project, follow these steps.
+If you prefer to set up your project manually or need to integrate the cpp-library into an existing project, follow these steps.
 
 ### Usage
+
+Install [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake):
+
+```bash
+mkdir -p cmake
+curl -L -o cmake/CPM.cmake "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake"
+```
 
 Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 
@@ -129,8 +136,6 @@ cpp_library_setup(
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
 )
 ```
-
-**Requirements:** CMake 3.24+, C++17+ compiler (GCC 7+, Clang 5+, MSVC 2017+, or Apple Clang 9+)
 
 ### Consuming Libraries Built with cpp-library
 
@@ -524,6 +529,20 @@ The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage
 **Solution**: This is a known clang-tidy issue ([CMake #22979](https://gitlab.kitware.com/cmake/cmake/-/issues/22979)) where clang-tidy doesn't properly recognize MSVC's `/EHsc` exception handling flag. cpp-library automatically detects this scenario and adds `--extra-arg=/EHsc` to `CMAKE_CXX_CLANG_TIDY` when both MSVC and clang-tidy are enabled. This workaround is applied transparently and only on MSVC platforms.
 
 ## Development
+
+To use a local copy of cpp-library:
+
+```
+CPMAddPackage(
+    NAME cpp-library
+     SOURCE_DIR "${CMAKE_SOURCE_DIR}/../cpp-library"
+)
+```
+
+To use cpp-library from a specific commit:
+```
+CPMAddPackage("gh:stlab/cpp-library#65dbed9fff9a0331355bd51dc1e8156262390154")
+```
 
 To run cpp-library's unit tests for dependency mapping and installation:
 

@@ -289,7 +289,8 @@ function(cpp_library_setup)
     # This must happen during normal configuration (not deferred) because CPMAddPackage uses add_subdirectory
     if(BUILD_TESTING AND (ARG_TESTS OR ARG_EXAMPLES))
         if(NOT TARGET doctest::doctest)
-            CPMAddPackage("gh:doctest/doctest@2.4.12")
+            # [DEPENDENCY] https://github.com/doctest/doctest/releases
+            CPMAddPackage("gh:doctest/doctest@2.5.2")
         endif()
     endif()
     

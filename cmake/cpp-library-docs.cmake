@@ -26,7 +26,8 @@ function(_cpp_library_setup_docs)
     # Download doxygen-awesome-css theme via CPM
     # https://github.com/jothepro/doxygen-awesome-css
     CPMAddPackage(
-        URI gh:jothepro/doxygen-awesome-css@2.4.1
+        # [DEPENDENCY] https://github.com/jothepro/doxygen-awesome-css/releases
+        URI gh:jothepro/doxygen-awesome-css@2.4.2
         DOWNLOAD_ONLY YES
     )
 
