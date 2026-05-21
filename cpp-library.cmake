@@ -155,7 +155,8 @@ endfunction()
 # Sets up a C++ header-only or compiled library with testing, docs, and install support.
 # - Precondition: PROJECT_NAME defined via project(), at least one HEADERS specified
 # - Postcondition: library target created, version set from git tags, optional tests/docs/examples configured
-# - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, docs, and installation
+# - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, and docs
+# - Installation is controlled by ${NAMESPACE}_INSTALL (defaults to PROJECT_IS_TOP_LEVEL)
 function(cpp_library_setup)
     # Parse arguments
     set(oneValueArgs
@@ -270,7 +271,6 @@ function(cpp_library_setup)
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
-        TOP_LEVEL "${PROJECT_IS_TOP_LEVEL}"
     )
     
     # Only setup development infrastructure when building as top-level project
@@ -289,7 +289,8 @@ function(cpp_library_setup)
     # This must happen during normal configuration (not deferred) because CPMAddPackage uses add_subdirectory
     if(BUILD_TESTING AND (ARG_TESTS OR ARG_EXAMPLES))
         if(NOT TARGET doctest::doctest)
-            CPMAddPackage("gh:doctest/doctest@2.4.12")
+            # [DEPENDENCY] https://github.com/doctest/doctest/releases
+            CPMAddPackage("gh:doctest/doctest@2.5.2")
         endif()
     endif()
     

@@ -55,7 +55,7 @@ endfunction()
 
 # Creates library target (INTERFACE or compiled) with headers and proper configuration.
 # - Precondition: NAME, NAMESPACE, PACKAGE_NAME, CLEAN_NAME, and REQUIRES_CPP_VERSION specified
-# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME, install configured if TOP_LEVEL
+# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME; install rules when ${NAMESPACE}_INSTALL is ON
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
@@ -65,7 +65,6 @@ function(_cpp_library_setup_core)
         PACKAGE_NAME
         CLEAN_NAME
         REQUIRES_CPP_VERSION
-        TOP_LEVEL
     )
     set(multiValueArgs
         HEADERS
@@ -79,9 +78,6 @@ function(_cpp_library_setup_core)
         _cpp_library_get_git_version(GIT_VERSION)
         set(ARG_VERSION "${GIT_VERSION}")
     endif()
-
-    # Note: Project declaration is now handled in the main cpp_library_setup function
-    # No need to check ARG_TOP_LEVEL here for project declaration
 
     if(ARG_SOURCES)
         # Create a library with sources (respects BUILD_SHARED_LIBS variable)
@@ -119,16 +115,15 @@ function(_cpp_library_setup_core)
         endif()
     endif()
     
-    # Setup installation when building as top-level project
-    if(ARG_TOP_LEVEL)
-        _cpp_library_setup_install(
-            NAME "${ARG_NAME}"
-            PACKAGE_NAME "${ARG_PACKAGE_NAME}"
-            VERSION "${ARG_VERSION}"
-            NAMESPACE "${ARG_NAMESPACE}"
-            HEADERS "${ARG_HEADERS}"
-        )
-    endif()
+    # Setup installation (controlled by ${NAMESPACE}_INSTALL option, defaults to PROJECT_IS_TOP_LEVEL)
+    # The option is defined and checked inside _cpp_library_setup_install()
+    _cpp_library_setup_install(
+        NAME "${ARG_NAME}"
+        PACKAGE_NAME "${ARG_PACKAGE_NAME}"
+        VERSION "${ARG_VERSION}"
+        NAMESPACE "${ARG_NAMESPACE}"
+        HEADERS "${ARG_HEADERS}"
+    )
 
 endfunction()
 

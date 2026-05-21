@@ -409,6 +409,7 @@ endfunction()
 # - Precondition: NAME, PACKAGE_NAME, VERSION, and NAMESPACE specified; target NAME exists
 # - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
 # - Supports header-only (INTERFACE) and compiled libraries, uses SameMajorVersion compatibility
+# - Installation can be controlled via ${NAMESPACE}_INSTALL option (defaults to PROJECT_IS_TOP_LEVEL)
 function(_cpp_library_setup_install)
     set(oneValueArgs
         NAME            # Target name (e.g., "stlab-enum-ops")
@@ -421,10 +422,6 @@ function(_cpp_library_setup_install)
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    
-    # Include required CMake modules (deferred from top-level to avoid requiring project() before include)
-    include(GNUInstallDirs)
-    include(CMakePackageConfigHelpers)
     
     # Validate required arguments
     if(NOT ARG_NAME)
@@ -439,6 +436,22 @@ function(_cpp_library_setup_install)
     if(NOT ARG_NAMESPACE)
         message(FATAL_ERROR "_cpp_library_setup_install: NAMESPACE is required")
     endif()
+    
+    # Define installation option with PROJECT_IS_TOP_LEVEL as default
+    # This allows explicit control: -D${NAMESPACE}_INSTALL=ON/OFF
+    # Upper-case the namespace for the option name
+    string(TOUPPER "${ARG_NAMESPACE}" NAMESPACE_UPPER)
+    option(${NAMESPACE_UPPER}_INSTALL "Enable installation of ${ARG_PACKAGE_NAME}" ${PROJECT_IS_TOP_LEVEL})
+    
+    # Check if installation is enabled
+    if(NOT ${NAMESPACE_UPPER}_INSTALL)
+        message(STATUS "cpp-library: Installation disabled for ${ARG_PACKAGE_NAME} (${NAMESPACE_UPPER}_INSTALL=OFF)")
+        return()
+    endif()
+    
+    # Include required CMake modules (deferred from top-level to avoid requiring project() before include)
+    include(GNUInstallDirs)
+    include(CMakePackageConfigHelpers)
     
     # Install the library target
     # For header-only libraries (INTERFACE), this installs the target metadata

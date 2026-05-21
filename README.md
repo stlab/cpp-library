@@ -92,9 +92,16 @@ cmake --build --preset=init
 
 ## Manual Setup
 
-If you prefer to set up your project manually, or need to integrate cpp-library into an existing project, follow these steps.
+If you prefer to set up your project manually or need to integrate the cpp-library into an existing project, follow these steps.
 
 ### Usage
+
+Install [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake):
+
+```bash
+mkdir -p cmake
+curl -L -o cmake/CPM.cmake "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake"
+```
 
 Use `CPMAddPackage` to fetch cpp-library directly in your `CMakeLists.txt`:
 
@@ -129,8 +136,6 @@ cpp_library_setup(
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
 )
 ```
-
-**Requirements:** CMake 3.24+, C++17+ compiler (GCC 7+, Clang 5+, MSVC 2017+, or Apple Clang 9+)
 
 ### Consuming Libraries Built with cpp-library
 
@@ -170,6 +175,13 @@ cmake --install build/install
 cmake --install build/install --prefix /opt/mylib
 ```
 The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
+
+**Controlling installation**: The `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
+
+```bash
+cmake -DSTLAB_INSTALL=OFF -B build  # Disable install for top-level project
+cmake -DSTLAB_INSTALL=ON -B build   # Enable install for non-top-level (e.g., via CPM)
+```
 
 **Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, wrap them in `BUILD_INTERFACE` to avoid export errors (CPM creates non-IMPORTED targets that can't be exported):
 
@@ -333,6 +345,7 @@ cpp_library_setup(
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
 - **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
+- Installation is controlled by the `${NAMESPACE}_INSTALL` option, which defaults to `PROJECT_IS_TOP_LEVEL`.
 
 ### Target Naming
 
@@ -516,6 +529,20 @@ The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage
 **Solution**: This is a known clang-tidy issue ([CMake #22979](https://gitlab.kitware.com/cmake/cmake/-/issues/22979)) where clang-tidy doesn't properly recognize MSVC's `/EHsc` exception handling flag. cpp-library automatically detects this scenario and adds `--extra-arg=/EHsc` to `CMAKE_CXX_CLANG_TIDY` when both MSVC and clang-tidy are enabled. This workaround is applied transparently and only on MSVC platforms.
 
 ## Development
+
+To use a local copy of cpp-library:
+
+```
+CPMAddPackage(
+    NAME cpp-library
+     SOURCE_DIR "${CMAKE_SOURCE_DIR}/../cpp-library"
+)
+```
+
+To use cpp-library from a specific commit:
+```
+CPMAddPackage("gh:stlab/cpp-library#65dbed9fff9a0331355bd51dc1e8156262390154")
+```
 
 To run cpp-library's unit tests for dependency mapping and installation:
 

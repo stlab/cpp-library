@@ -9,6 +9,22 @@
 # - Postcondition: .github/workflows/ci.yml created from template if not present
 # - With force_init: overwrites existing workflow file
 function(_cpp_library_setup_ci PACKAGE_NAME force_init)
+    # GitHub Actions refs (versions and source links) - update here to bump CI deps
+    # [DEPENDENCY] https://github.com/actions/checkout/releases
+    set(CI_ACTION_CHECKOUT "actions/checkout@v6")
+    # [DEPENDENCY] https://github.com/ilammy/msvc-dev-cmd/releases
+    # @1.13.0
+    set(CI_ACTION_MSVC_DEV_CMD "ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756")
+    # [DEPENDENCY] https://github.com/ssciwr/doxygen-install/releases
+    # @2.0.1
+    set(CI_ACTION_DOXYGEN_INSTALL "ssciwr/doxygen-install@329d88f5a303066a5bd006db7516b1925b86350e")
+    # [DEPENDENCY] https://github.com/actions/configure-pages/releases
+    set(CI_ACTION_CONFIGURE_PAGES "actions/configure-pages@v6")
+    # [DEPENDENCY] https://github.com/actions/upload-pages-artifact/releases
+    set(CI_ACTION_UPLOAD_PAGES_ARTIFACT "actions/upload-pages-artifact@v5")
+    # [DEPENDENCY] https://github.com/actions/deploy-pages/releases
+    set(CI_ACTION_DEPLOY_PAGES "actions/deploy-pages@v5")
+
     set(ci_template "${CPP_LIBRARY_ROOT}/templates/.github/workflows/ci.yml.in")
     set(ci_dest "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml")
     
