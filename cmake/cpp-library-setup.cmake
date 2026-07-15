@@ -141,6 +141,7 @@ function(_cpp_library_copy_templates PACKAGE_NAME)
         ".gitignore"
         ".gitattributes"
         ".vscode/extensions.json"
+        ".vscode/tasks.json"
         "docs/index.html"
         "CMakePresets.json"
     )
