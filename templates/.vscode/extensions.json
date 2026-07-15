@@ -2,6 +2,7 @@
     "recommendations": [
         "matepek.vscode-catch2-test-adapter",
         "llvm-vs-code-extensions.vscode-clangd",
-        "ms-vscode.live-server"
+        "ms-vscode.live-server",
+        "ms-vscode.cmake-tools"
     ]
 }

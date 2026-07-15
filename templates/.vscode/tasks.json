@@ -1,0 +1,143 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Configure & Build: Default Configuration",
+      "type": "shell",
+      "command": "cmake --preset default && cmake --build --preset default",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-default} ${input:setBuildPreset-default}"
+        }
+      },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Default configuration for building the library"
+    },
+    {
+      "label": "Configure & Build: Test Configuration",
+      "type": "shell",
+      "command": "cmake --preset test && cmake --build --preset test",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-test} ${input:setBuildPreset-test}"
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Configuration for building and running tests"
+    },
+    {
+      "label": "Configure & Build: Documentation Configuration",
+      "type": "shell",
+      "command": "cmake --preset docs && cmake --build --preset docs",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-docs} ${input:setBuildPreset-docs}"
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Configuration for building documentation"
+    },
+    {
+      "label": "Configure & Build: Clang-Tidy Configuration",
+      "type": "shell",
+      "command": "cmake --preset clang-tidy && cmake --build --preset clang-tidy",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-clang-tidy} ${input:setBuildPreset-clang-tidy}"
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Configuration for running clang-tidy static analysis"
+    },
+    {
+      "label": "Configure & Build: Initialize Templates",
+      "type": "shell",
+      "command": "cmake --preset init && cmake --build --preset init",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-init} ${input:setBuildPreset-init}"
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Force regeneration of template files (CMakePresets.json, CI, etc.)"
+    },
+    {
+      "label": "Configure & Build: Install Configuration",
+      "type": "shell",
+      "command": "cmake --preset install && cmake --build --preset install",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-install} ${input:setBuildPreset-install}"
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Release build for installation with CPM_USE_LOCAL_PACKAGES enabled for testing installed packages"
+    },
+    {
+      "label": "Build & Test: Run All Tests",
+      "type": "shell",
+      "command": "cmake --preset test && cmake --build --preset test && ctest --preset test",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-test} ${input:setBuildPreset-test} ${input:setTestPreset-test}"
+        }
+      },
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Configuration for building and running tests"
+    },
+    {
+      "label": "Build & Test: Run Tests with Clang-Tidy",
+      "type": "shell",
+      "command": "cmake --preset clang-tidy && cmake --build --preset clang-tidy && ctest --preset clang-tidy",
+      "options": {
+        "env": {
+          "CMAKE_TOOLS_SYNC": "${input:setConfigurePreset-clang-tidy} ${input:setBuildPreset-clang-tidy} ${input:setTestPreset-clang-tidy}"
+        }
+      },
+      "group": "test",
+      "problemMatcher": ["$gcc", "$msCompile"],
+      "detail": "Configuration for running clang-tidy static analysis"
+    },
+    {
+      "label": "Clean Build Directory (Active Config)",
+      "type": "shell",
+      "command": "cmake -E rm -rf \"${command:cmake.buildDirectory}\"",
+      "detail": "Deletes the build directory for the CMake Tools extension's currently active configure preset. Requires the CMake Tools extension with an active preset selected."
+    },
+    {
+      "label": "Clean Build Directory (All Presets)",
+      "type": "shell",
+      "command": "cmake -E rm -rf \"${workspaceFolder}/build\"",
+      "detail": "Deletes the entire build/ directory, covering every preset's binary directory."
+    },
+    {
+      "label": "Clean CPM Cache",
+      "type": "shell",
+      "command": "cmake -E rm -rf \"${workspaceFolder}/.cache/cpm\"",
+      "detail": "Deletes the CPM dependency source cache (CPM_SOURCE_CACHE)."
+    }
+  ],
+  "inputs": [
+    { "id": "setConfigurePreset-default", "type": "command", "command": "cmake.setConfigurePreset", "args": "default" },
+    { "id": "setConfigurePreset-test", "type": "command", "command": "cmake.setConfigurePreset", "args": "test" },
+    { "id": "setConfigurePreset-docs", "type": "command", "command": "cmake.setConfigurePreset", "args": "docs" },
+    { "id": "setConfigurePreset-clang-tidy", "type": "command", "command": "cmake.setConfigurePreset", "args": "clang-tidy" },
+    { "id": "setConfigurePreset-init", "type": "command", "command": "cmake.setConfigurePreset", "args": "init" },
+    { "id": "setConfigurePreset-install", "type": "command", "command": "cmake.setConfigurePreset", "args": "install" },
+    { "id": "setBuildPreset-default", "type": "command", "command": "cmake.setBuildPreset", "args": "default" },
+    { "id": "setBuildPreset-test", "type": "command", "command": "cmake.setBuildPreset", "args": "test" },
+    { "id": "setBuildPreset-docs", "type": "command", "command": "cmake.setBuildPreset", "args": "docs" },
+    { "id": "setBuildPreset-clang-tidy", "type": "command", "command": "cmake.setBuildPreset", "args": "clang-tidy" },
+    { "id": "setBuildPreset-init", "type": "command", "command": "cmake.setBuildPreset", "args": "init" },
+    { "id": "setBuildPreset-install", "type": "command", "command": "cmake.setBuildPreset", "args": "install" },
+    { "id": "setTestPreset-test", "type": "command", "command": "cmake.setTestPreset", "args": "test" },
+    { "id": "setTestPreset-clang-tidy", "type": "command", "command": "cmake.setTestPreset", "args": "clang-tidy" }
+  ]
+}
