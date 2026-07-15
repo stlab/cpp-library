@@ -12,7 +12,15 @@
       },
       "group": { "kind": "build", "isDefault": true },
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Default configuration for building the library"
+      "detail": "Default configuration for building the library Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Configure & Build: Test Configuration",
@@ -25,7 +33,15 @@
       },
       "group": "build",
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Configuration for building and running tests"
+      "detail": "Configuration for building and running tests Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Configure & Build: Documentation Configuration",
@@ -38,7 +54,15 @@
       },
       "group": "build",
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Configuration for building documentation"
+      "detail": "Configuration for building documentation Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Configure & Build: Clang-Tidy Configuration",
@@ -51,7 +75,15 @@
       },
       "group": "build",
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Configuration for running clang-tidy static analysis"
+      "detail": "Configuration for running clang-tidy static analysis Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Configure & Build: Initialize Templates",
@@ -64,7 +96,15 @@
       },
       "group": "build",
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Force regeneration of template files (CMakePresets.json, CI, etc.)"
+      "detail": "Force regeneration of template files (CMakePresets.json, CI, etc.) Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Configure & Build: Install Configuration",
@@ -77,7 +117,15 @@
       },
       "group": "build",
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Release build for installation with CPM_USE_LOCAL_PACKAGES enabled for testing installed packages"
+      "detail": "Release build for installation with CPM_USE_LOCAL_PACKAGES enabled for testing installed packages Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Build & Test: Run All Tests",
@@ -90,7 +138,15 @@
       },
       "group": { "kind": "test", "isDefault": true },
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Configuration for building and running tests"
+      "detail": "Configuration for building and running tests Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Build & Test: Run Tests with Clang-Tidy",
@@ -103,7 +159,15 @@
       },
       "group": "test",
       "problemMatcher": ["$gcc", "$msCompile"],
-      "detail": "Configuration for running clang-tidy static analysis"
+      "detail": "Configuration for running clang-tidy static analysis Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      }
     },
     {
       "label": "Clean Build Directory (Active Config)",
