@@ -11,7 +11,7 @@
 function(_cpp_library_setup_ci PACKAGE_NAME force_init)
     # GitHub Actions refs (versions and source links) - update here to bump CI deps
     # [DEPENDENCY] https://github.com/actions/checkout/releases
-    set(CI_ACTION_CHECKOUT "actions/checkout@v6")
+    set(CI_ACTION_CHECKOUT "actions/checkout@v7")
     # [DEPENDENCY] https://github.com/ilammy/msvc-dev-cmd/releases
     # @1.13.0
     set(CI_ACTION_MSVC_DEV_CMD "ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756")
@@ -27,7 +27,7 @@ function(_cpp_library_setup_ci PACKAGE_NAME force_init)
 
     set(ci_template "${CPP_LIBRARY_ROOT}/templates/.github/workflows/ci.yml.in")
     set(ci_dest "${CMAKE_CURRENT_SOURCE_DIR}/.github/workflows/ci.yml")
-    
+
     if(EXISTS "${ci_template}" AND (NOT EXISTS "${ci_dest}" OR force_init))
         get_filename_component(ci_dir "${ci_dest}" DIRECTORY)
         file(MAKE_DIRECTORY "${ci_dir}")

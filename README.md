@@ -28,11 +28,11 @@ The easiest way to create a new library project using cpp-library is with the `s
 
 **Interactive mode:**
 
-```bash 
+```bash
 cmake -P <(curl -sSL https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake)
 ```
 
-Or download and run:  
+Or download and run:
 
 ```bash
 curl -O https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake
@@ -174,6 +174,7 @@ cmake --install build/install
 # Install to custom prefix
 cmake --install build/install --prefix /opt/mylib
 ```
+
 The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
 
 **Controlling installation**: The `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
@@ -283,11 +284,12 @@ Updates the project version from git tags after `project()` has been called. Thi
 ```cmake
 project(my-library)  # No VERSION specified
 cpp_library_set_version()
-# Now PROJECT_VERSION, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, 
+# Now PROJECT_VERSION, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR,
 # and PROJECT_VERSION_PATCH are set from git tags
 ```
 
 The function:
+
 - Queries git tags using `git describe --tags --abbrev=0`
 - Strips the 'v' prefix if present (e.g., `v1.2.3` → `1.2.3`)
 - Respects `CPP_LIBRARY_VERSION` cache variable if set (for package managers)
@@ -295,6 +297,7 @@ The function:
 - Updates all `PROJECT_VERSION*` variables in parent scope
 
 **When to use:**
+
 - You have a custom library setup that doesn't use `cpp_library_setup()`
 - You want to remove hardcoded versions from your `project()` declaration
 - You're migrating to cpp-library incrementally
@@ -458,6 +461,7 @@ See these projects using cpp-library:
 **Problem**: Error about non-namespaced dependency like `opencv_core`
 
 **Solution**: Map the target to its package after `find_package()`:
+
 ```cmake
 find_package(OpenCV 4.5.0 REQUIRED)
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
@@ -475,23 +479,27 @@ During configuration, you may see messages like:
 ```
 
 **This is expected behavior** when:
+
 - Building for development (not installing)
 - Using dependencies added from subdirectories (via `CPMAddPackage` in downstream packages)
 - Testing locally without installation
 
 **What it means:**
+
 - These dependencies were not captured by the dependency provider (usually because they were added in a subdirectory)
 - cpp-library uses a fallback `find_dependency()` call for these dependencies
 - Your build will work correctly
 - If you attempt to install, validation will fail to prevent broken package configs
 
 **When it matters:**
+
 - **Installing the package**: Installation will fail with a detailed error, preventing broken configs
 - **Not installing**: Messages are informational only - your local development builds work fine
 
 **Solutions** (if you need to install):
 
 1. **Move dependencies to top-level** (preferred):
+
    ```cmake
    # In your top-level CMakeLists.txt (after project())
    CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
@@ -499,6 +507,7 @@ During configuration, you may see messages like:
    ```
 
 2. **Manually register dependencies**:
+
    ```cmake
    # After adding the dependency
    CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
@@ -530,16 +539,19 @@ The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage
 
 ## Development
 
+To update cpp-library dependencies search for `[DEPENDENCY]`.
+
 To use a local copy of cpp-library:
 
 ```
 CPMAddPackage(
     NAME cpp-library
-     SOURCE_DIR "${CMAKE_SOURCE_DIR}/../cpp-library"
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/../cpp-library"
 )
 ```
 
 To use cpp-library from a specific commit:
+
 ```
 CPMAddPackage("gh:stlab/cpp-library#65dbed9fff9a0331355bd51dc1e8156262390154")
 ```
