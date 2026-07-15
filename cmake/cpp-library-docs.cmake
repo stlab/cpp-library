@@ -18,10 +18,6 @@ function(_cpp_library_setup_docs)
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     find_package(Doxygen REQUIRED)
-    if(NOT DOXYGEN_FOUND)
-        message(WARNING "Doxygen not found. Documentation will not be built.")
-        return()
-    endif()
 
     # Download doxygen-awesome-css theme via CPM
     # https://github.com/jothepro/doxygen-awesome-css
