@@ -418,9 +418,11 @@ git init -q
 git commit -q --allow-empty -m "init"
 ```
 
+**Note on Steps 4, 6, 7, 8 below:** each of these steps tests only the `git worktree ... && (tokensave ... || true)` (or `|| ver>nul`) portion of the task's command string — a *prefix* that stops right before the trailing `&& code --new-window "..."` segment, not the task's full command. This is intentional, not an oversight: in both the bash and Windows forms, the parenthesized tokensave subshell always resolves to exit 0 via its trailing `|| true` / `|| ver>nul` fallback, regardless of whether tokensave succeeds, is absent, or errors. That means the `&&` immediately before `code --new-window` is guaranteed to be reached in every case these steps exercise — so testing up through that point, combined with the separate `code --version` liveness check in Step 9, together cover the task's real behavior without needing to launch a GUI window during automated verification.
+
 - [ ] **Step 4: Test "worktree: create" (bash form, tokensave present)**
 
-Run the exact command string from the task, substituting `myfeature` for `${input:worktreeName}`:
+Run the git+tokensave portion of the task's command string (omitting the trailing `&& code --new-window ...` — see the note above and Step 9 for why), substituting `myfeature` for `${input:worktreeName}`:
 
 ```bash
 cd "$CMDTEST"
@@ -444,7 +446,7 @@ Expected: `EXIT: 0`, and `git worktree list` no longer shows `.claude/worktrees/
 
 - [ ] **Step 6: Test "worktree: create" / "worktree: remove" (bash form, tokensave simulated absent)**
 
-Same as Steps 4–5, but with `tokensave` replaced by a nonexistent command name in the copied string:
+Same as Steps 4–5 — again using only the git+tokensave prefix, omitting the trailing `&& code --new-window ...` (see the note before Step 4) — but with `tokensave` replaced by a nonexistent command name in the copied string:
 
 ```bash
 cd "$CMDTEST"
@@ -461,6 +463,8 @@ Expected: both `EXIT: 0` lines, worktree appears after create and is gone after 
 
 - [ ] **Step 7: Test the Windows/cmd.exe form (tokensave present)**
 
+As with Steps 4 and 6, this exercises only the git+tokensave prefix of the `windows.command` string, omitting the trailing `&& code --new-window ...` (see the note before Step 4).
+
 ```bash
 cd "$CMDTEST"
 cmd.exe /d /c "git worktree add \".claude/worktrees/myfeature3\" -b \"worktree-myfeature3\" && (where tokensave >nul 2>&1 && (tokensave init \".claude/worktrees/myfeature3\" && tokensave branch add \"worktree-myfeature3\" --path \".claude/worktrees/myfeature3\") || ver>nul)"
@@ -474,6 +478,8 @@ git worktree list
 Expected: both exit 0; worktree present after create, gone after remove.
 
 - [ ] **Step 8: Test the Windows/cmd.exe form (tokensave simulated absent)**
+
+Same prefix-only scope as Step 7 (see the note before Step 4) — the trailing `&& code --new-window ...` is not exercised here either.
 
 ```bash
 cd "$CMDTEST"
