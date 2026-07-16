@@ -30,7 +30,7 @@
 
 Replace the entire file with exactly this content:
 
-```json
+```jsonc
 {
   "version": "2.0.0",
   "inputs": [
@@ -72,7 +72,8 @@ Replace the entire file with exactly this content:
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
-      }
+      },
+      "detail": "Prompts for a name, creates a git worktree at .claude/worktrees/<name> on branch worktree-<name>, best-effort syncs it with tokensave if installed, and opens it in a new window."
     },
     {
       "label": "worktree: remove",
@@ -94,7 +95,8 @@ Replace the entire file with exactly this content:
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
-      }
+      },
+      "detail": "Prompts for a name, removes the git worktree at .claude/worktrees/<name>, and best-effort garbage-collects tokensave's branch tracking if installed."
     },
     // ============ CMake Preset Tasks ============
     {
