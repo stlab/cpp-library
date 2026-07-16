@@ -539,7 +539,9 @@ The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage
 
 ## Development
 
-To update cpp-library dependencies search for `[DEPENDENCY]`.
+To update cpp-library dependencies search for `[DEPENDENCY]`. Embed the marker in an HTML
+comment (e.g. `<!-- [DEPENDENCY] -->`) rather than as visible text, so it doesn't render in
+rendered docs.
 
 To use a local copy of cpp-library:
 
