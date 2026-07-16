@@ -1,8 +1,12 @@
 {
     "cSpell.words": [
+        "ARGN",
         "clangd",
         "ctest",
         "doctest",
+        "DOXYFILE",
+        "endfunction",
+        "jothepro",
         "MSVC",
         "mylib"
     ],
