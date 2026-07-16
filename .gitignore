@@ -1,3 +1,5 @@
 .DS_Store
 .superpowers/
 .worktrees/
+.claude/worktrees/
+.tokensave
