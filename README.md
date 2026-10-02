@@ -334,6 +334,7 @@ cpp_library_setup(
 
     # Source specification for non-header-only libraries
     SOURCES source_list            # List of source filenames (e.g., "your_library.cpp", omit for header-only libraries)
+    [LIBRARY_TYPE STATIC|SHARED]    # Explicit compiled target type (requires SOURCES)
 
     # Optional features
     [EXAMPLES example_list]        # Example source files to build (e.g., "example.cpp example_fail.cpp")
@@ -405,7 +406,11 @@ All file specifications use filenames only, automatically placed in standard dir
 ### Library Types
 
 - **Header-only**: Specify only `HEADERS`, omit `SOURCES`
-- **Compiled**: Specify both `HEADERS` and `SOURCES` (builds as static by default, set `BUILD_SHARED_LIBS=ON` for shared)
+- **Compiled**: Specify both `HEADERS` and `SOURCES`. When `LIBRARY_TYPE` is omitted,
+  the target respects `BUILD_SHARED_LIBS` (static by default; shared when `ON`).
+  Use `LIBRARY_TYPE STATIC` or `LIBRARY_TYPE SHARED` to select the target type
+  explicitly without changing the parent project's `BUILD_SHARED_LIBS`.
+  Other types and explicit types without `SOURCES` are diagnosed.
 
 ## Reference
 

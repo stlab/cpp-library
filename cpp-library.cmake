@@ -163,6 +163,7 @@ function(cpp_library_setup)
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION # C++ version (default: 17)
+        LIBRARY_TYPE # Explicit compiled library type (STATIC or SHARED)
     )
     set(multiValueArgs
         HEADERS # List of header filenames (e.g., "your_header.hpp")
@@ -271,6 +272,7 @@ function(cpp_library_setup)
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
+        LIBRARY_TYPE "${ARG_LIBRARY_TYPE}"
     )
 
     # Only setup development infrastructure when building as top-level project
