@@ -9,6 +9,8 @@ cpp_library_setup(
     DESCRIPTION "Leaf package fixture"
     NAMESPACE stlab
     HEADERS leaf.hpp
+    SOURCES leaf.cpp
+    LIBRARY_TYPE STATIC
     ${install_args})
 if(INVALID_PACKAGE STREQUAL "leaf")
     add_library(UnknownLeaf::dep INTERFACE IMPORTED)

@@ -200,14 +200,20 @@ packages' custom options. Each custom option defaults to that project's `PROJECT
 Omitting `INSTALL_OPTION` preserves the shared namespace-level option and its existing behavior.
 Specifying `INSTALL_OPTION` without a value is an error.
 
-**Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, wrap them in `BUILD_INTERFACE` to avoid export errors (CPM creates non-IMPORTED targets that can't be exported):
+**Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, use separate build and install interfaces. CPM creates non-IMPORTED targets that may not be included in your install export:
 
 ```cmake
 CPMAddPackage("gh:other-org/some-package@1.0.0")
-target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:other::package>)
+target_link_libraries(my-library INTERFACE
+    $<BUILD_INTERFACE:other::package>
+    $<INSTALL_INTERFACE:$<1:other::package>>)
 ```
 
-cpp-library automatically extracts these and generates appropriate `find_dependency()` calls. Dependencies from `find_package()` and system libraries don't need `BUILD_INTERFACE`.
+cpp-library extracts the build-interface dependency to generate the appropriate `find_dependency()` call.
+The install interface preserves transitive linkage; its nested `$<1:...>` expression defers
+target resolution to the downstream consumer, allowing the dependency to be installed separately.
+Using only `BUILD_INTERFACE` loads the dependency's package but drops its linkage from the
+installed target. Dependencies from `find_package()` and system libraries don't need these wrappers.
 
 #### Dependency Handling in Installed Packages
 
@@ -527,7 +533,9 @@ During configuration, you may see messages like:
    ```cmake
    # In your top-level CMakeLists.txt (after project())
    CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
-   target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:stlab::copy-on-write>)
+   target_link_libraries(my-library INTERFACE
+       $<BUILD_INTERFACE:stlab::copy-on-write>
+       $<INSTALL_INTERFACE:$<1:stlab::copy-on-write>>)
    ```
 
 2. **Manually register dependencies**:
@@ -536,7 +544,9 @@ During configuration, you may see messages like:
    # After adding the dependency
    CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
    cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 1.1.0")
-   target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:stlab::copy-on-write>)
+   target_link_libraries(my-library INTERFACE
+       $<BUILD_INTERFACE:stlab::copy-on-write>
+       $<INSTALL_INTERFACE:$<1:stlab::copy-on-write>>)
    ```
 
 3. **Use CPM_USE_LOCAL_PACKAGES**: Install dependencies first, then build with local packages:
@@ -595,6 +605,8 @@ cmake -P tests/setup/test_setup_version_resolution.cmake
 
 The nested-install regression configures, builds, installs, and runs a downstream consumer,
 checks independent and legacy installation controls, and verifies package-local dependency validation.
+The consumer links only the parent target and calls its API, which requires a compiled static
+leaf library, so missing installed transitive linkage causes a link failure.
 
 See `tests/install/README.md` for details.
 

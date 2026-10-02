@@ -20,7 +20,10 @@ cpp_library_setup(
     HEADERS parent.hpp
     ${install_args})
 add_subdirectory(leaf)
-target_link_libraries(parent INTERFACE $<BUILD_INTERFACE:stlab::leaf>)
+# Resolve the installed target downstream, even when leaf is not exported in this build.
+target_link_libraries(parent INTERFACE
+    $<BUILD_INTERFACE:stlab::leaf>
+    $<INSTALL_INTERFACE:$<1:stlab::leaf>>)
 cpp_library_map_dependency("stlab::leaf" "stlab-leaf 1.0.0")
 if(INVALID_PACKAGE STREQUAL "parent")
     add_library(UnknownParent::dep INTERFACE IMPORTED)
