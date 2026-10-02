@@ -55,7 +55,8 @@ endfunction()
 
 # Creates library target (INTERFACE or compiled) with headers and proper configuration.
 # - Precondition: NAME, NAMESPACE, PACKAGE_NAME, CLEAN_NAME, and REQUIRES_CPP_VERSION specified
-# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME; install rules when ${NAMESPACE}_INSTALL is ON
+# - Postcondition: library target created with alias NAMESPACE::CLEAN_NAME; install rules when
+#   INSTALL_OPTION (or uppercase ${NAMESPACE}_INSTALL) is ON
 function(_cpp_library_setup_core)
     set(oneValueArgs
         NAME
@@ -66,6 +67,7 @@ function(_cpp_library_setup_core)
         CLEAN_NAME
         REQUIRES_CPP_VERSION
         LIBRARY_TYPE
+        INSTALL_OPTION
     )
     set(multiValueArgs
         HEADERS
@@ -73,6 +75,13 @@ function(_cpp_library_setup_core)
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+        message(FATAL_ERROR "_cpp_library_setup_core: INSTALL_OPTION requires a value")
+    endif()
+    set(install_args)
+    if(DEFINED ARG_INSTALL_OPTION)
+        list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
+    endif()
 
     # Get version from git tags if not provided
     if(NOT ARG_VERSION)
@@ -128,7 +137,7 @@ function(_cpp_library_setup_core)
         endif()
     endif()
     
-    # Setup installation (controlled by ${NAMESPACE}_INSTALL option, defaults to PROJECT_IS_TOP_LEVEL)
+    # Setup installation (defaults to PROJECT_IS_TOP_LEVEL)
     # The option is defined and checked inside _cpp_library_setup_install()
     _cpp_library_setup_install(
         NAME "${ARG_NAME}"
@@ -136,6 +145,7 @@ function(_cpp_library_setup_core)
         VERSION "${ARG_VERSION}"
         NAMESPACE "${ARG_NAMESPACE}"
         HEADERS "${ARG_HEADERS}"
+        ${install_args}
     )
 
 endfunction()

@@ -177,12 +177,28 @@ cmake --install build/install --prefix /opt/mylib
 
 The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
 
-**Controlling installation**: The `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
+**Controlling installation**: The uppercase `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
 
 ```bash
 cmake -DSTLAB_INSTALL=OFF -B build  # Disable install for top-level project
 cmake -DSTLAB_INSTALL=ON -B build   # Enable install for non-top-level (e.g., via CPM)
 ```
+
+For independent packages sharing a namespace, specify an option name with `INSTALL_OPTION`:
+
+```cmake
+cpp_library_setup(
+    DESCRIPTION "Execution primitives"
+    NAMESPACE stlab
+    HEADERS execution.hpp
+    INSTALL_OPTION STLAB_EXECUTION_INSTALL
+)
+```
+
+This package then uses `STLAB_EXECUTION_INSTALL`, independently of `STLAB_INSTALL` or other
+packages' custom options. Each custom option defaults to that project's `PROJECT_IS_TOP_LEVEL`.
+Omitting `INSTALL_OPTION` preserves the shared namespace-level option and its existing behavior.
+Specifying `INSTALL_OPTION` without a value is an error.
 
 **Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, wrap them in `BUILD_INTERFACE` to avoid export errors (CPM creates non-IMPORTED targets that can't be exported):
 
@@ -341,6 +357,7 @@ cpp_library_setup(
     [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
+    [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
 )
 ```
 
@@ -349,7 +366,8 @@ cpp_library_setup(
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
 - **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
-- Installation is controlled by the `${NAMESPACE}_INSTALL` option, which defaults to `PROJECT_IS_TOP_LEVEL`.
+- Installation is controlled by `INSTALL_OPTION`, or the uppercase `${NAMESPACE}_INSTALL` option
+  when omitted. Options default to `PROJECT_IS_TOP_LEVEL`.
 
 ### Target Naming
 
@@ -564,11 +582,19 @@ To use cpp-library from a specific commit:
 CPMAddPackage("gh:stlab/cpp-library#65dbed9fff9a0331355bd51dc1e8156262390154")
 ```
 
-To run cpp-library's unit tests for dependency mapping and installation:
+To run cpp-library's script regressions (C++ fixtures require Ninja and a configured compiler;
+on Windows, use a Visual Studio developer environment):
 
 ```bash
 cmake -P tests/install/CMakeLists.txt
+cmake -P tests/install/test_provider_merge.cmake
+cmake -P tests/install/test_nested_install.cmake
+cmake -P tests/setup/test_target_type.cmake
+cmake -P tests/setup/test_setup_version_resolution.cmake
 ```
+
+The nested-install regression configures, builds, installs, and runs a downstream consumer,
+checks independent and legacy installation controls, and verifies package-local dependency validation.
 
 See `tests/install/README.md` for details.
 
