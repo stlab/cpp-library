@@ -175,6 +175,10 @@ function(cpp_library_setup)
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    if("LIBRARY_TYPE" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+        message(FATAL_ERROR "cpp_library_setup: LIBRARY_TYPE requires a value")
+    endif()
+
     # Validate required arguments
     if(NOT ARG_DESCRIPTION)
         message(FATAL_ERROR "cpp_library_setup: DESCRIPTION is required")

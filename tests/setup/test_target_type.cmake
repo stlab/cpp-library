@@ -54,6 +54,8 @@ run_case(invalid_type OFF "" "cpp_library_setup: LIBRARY_TYPE must be STATIC or 
     -DREQUESTED_TYPE=MODULE)
 run_case(invalid_false_type OFF "" "cpp_library_setup: LIBRARY_TYPE must be STATIC or SHARED"
     -DREQUESTED_TYPE=OFF)
+run_case(missing_library_type OFF STATIC_LIBRARY "cpp_library_setup: LIBRARY_TYPE requires a value"
+    -DMISSING_LIBRARY_TYPE=ON)
 run_case(static_without_sources ON "" "cpp_library_setup: LIBRARY_TYPE requires SOURCES"
     -DREQUESTED_TYPE=STATIC -DOMIT_SOURCES=ON)
 run_case(shared_without_sources OFF "" "cpp_library_setup: LIBRARY_TYPE requires SOURCES"

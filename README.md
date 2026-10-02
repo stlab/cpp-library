@@ -410,7 +410,8 @@ All file specifications use filenames only, automatically placed in standard dir
   the target respects `BUILD_SHARED_LIBS` (static by default; shared when `ON`).
   Use `LIBRARY_TYPE STATIC` or `LIBRARY_TYPE SHARED` to select the target type
   explicitly without changing the parent project's `BUILD_SHARED_LIBS`.
-  Other types and explicit types without `SOURCES` are diagnosed.
+  A `LIBRARY_TYPE` keyword without a value, other types, and explicit types
+  without `SOURCES` are diagnosed.
 
 ## Reference
 
