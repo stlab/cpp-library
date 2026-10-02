@@ -23,6 +23,12 @@ jobs:
       - name: Run provider merging tests
         run: cmake -P tests/install/test_provider_merge.cmake
 
+      - name: Run nested installation round-trip tests
+        run: cmake -P tests/install/test_nested_install.cmake
+
+      - name: Run target type tests
+        run: cmake -P tests/setup/test_target_type.cmake
+
       - name: Run setup.cmake version resolution test
         run: cmake -P tests/setup/test_setup_version_resolution.cmake
 

@@ -156,13 +156,16 @@ endfunction()
 # - Precondition: PROJECT_NAME defined via project(), at least one HEADERS specified
 # - Postcondition: library target created, version set from git tags, optional tests/docs/examples configured
 # - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, and docs
-# - Installation is controlled by ${NAMESPACE}_INSTALL (defaults to PROJECT_IS_TOP_LEVEL)
+# - Installation is controlled by INSTALL_OPTION or uppercase ${NAMESPACE}_INSTALL
+#   (defaults to PROJECT_IS_TOP_LEVEL)
 function(cpp_library_setup)
     # Parse arguments
     set(oneValueArgs
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION # C++ version (default: 17)
+        LIBRARY_TYPE # Explicit compiled library type (STATIC or SHARED)
+        INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
         HEADERS # List of header filenames (e.g., "your_header.hpp")
@@ -173,6 +176,17 @@ function(cpp_library_setup)
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if("LIBRARY_TYPE" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+        message(FATAL_ERROR "cpp_library_setup: LIBRARY_TYPE requires a value")
+    endif()
+    if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+        message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
+    endif()
+    set(install_args)
+    if(DEFINED ARG_INSTALL_OPTION)
+        list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
+    endif()
 
     # Validate required arguments
     if(NOT ARG_DESCRIPTION)
@@ -271,6 +285,8 @@ function(cpp_library_setup)
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
+        LIBRARY_TYPE "${ARG_LIBRARY_TYPE}"
+        ${install_args}
     )
 
     # Only setup development infrastructure when building as top-level project

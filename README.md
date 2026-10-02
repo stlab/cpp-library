@@ -177,21 +177,43 @@ cmake --install build/install --prefix /opt/mylib
 
 The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
 
-**Controlling installation**: The `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
+**Controlling installation**: The uppercase `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
 
 ```bash
 cmake -DSTLAB_INSTALL=OFF -B build  # Disable install for top-level project
 cmake -DSTLAB_INSTALL=ON -B build   # Enable install for non-top-level (e.g., via CPM)
 ```
 
-**Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, wrap them in `BUILD_INTERFACE` to avoid export errors (CPM creates non-IMPORTED targets that can't be exported):
+For independent packages sharing a namespace, specify an option name with `INSTALL_OPTION`:
+
+```cmake
+cpp_library_setup(
+    DESCRIPTION "Execution primitives"
+    NAMESPACE stlab
+    HEADERS execution.hpp
+    INSTALL_OPTION STLAB_EXECUTION_INSTALL
+)
+```
+
+This package then uses `STLAB_EXECUTION_INSTALL`, independently of `STLAB_INSTALL` or other
+packages' custom options. Each custom option defaults to that project's `PROJECT_IS_TOP_LEVEL`.
+Omitting `INSTALL_OPTION` preserves the shared namespace-level option and its existing behavior.
+Specifying `INSTALL_OPTION` without a value is an error.
+
+**Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, use separate build and install interfaces. CPM creates non-IMPORTED targets that may not be included in your install export:
 
 ```cmake
 CPMAddPackage("gh:other-org/some-package@1.0.0")
-target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:other::package>)
+target_link_libraries(my-library INTERFACE
+    $<BUILD_INTERFACE:other::package>
+    $<INSTALL_INTERFACE:$<1:other::package>>)
 ```
 
-cpp-library automatically extracts these and generates appropriate `find_dependency()` calls. Dependencies from `find_package()` and system libraries don't need `BUILD_INTERFACE`.
+cpp-library extracts the build-interface dependency to generate the appropriate `find_dependency()` call.
+The install interface preserves transitive linkage; its nested `$<1:...>` expression defers
+target resolution to the downstream consumer, allowing the dependency to be installed separately.
+Using only `BUILD_INTERFACE` loads the dependency's package but drops its linkage from the
+installed target. Dependencies from `find_package()` and system libraries don't need these wrappers.
 
 #### Dependency Handling in Installed Packages
 
@@ -334,12 +356,14 @@ cpp_library_setup(
 
     # Source specification for non-header-only libraries
     SOURCES source_list            # List of source filenames (e.g., "your_library.cpp", omit for header-only libraries)
+    [LIBRARY_TYPE STATIC|SHARED]    # Explicit compiled target type (requires SOURCES)
 
     # Optional features
     [EXAMPLES example_list]        # Example source files to build (e.g., "example.cpp example_fail.cpp")
     [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
+    [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
 )
 ```
 
@@ -348,7 +372,8 @@ cpp_library_setup(
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
 - **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
-- Installation is controlled by the `${NAMESPACE}_INSTALL` option, which defaults to `PROJECT_IS_TOP_LEVEL`.
+- Installation is controlled by `INSTALL_OPTION`, or the uppercase `${NAMESPACE}_INSTALL` option
+  when omitted. Options default to `PROJECT_IS_TOP_LEVEL`.
 
 ### Target Naming
 
@@ -405,7 +430,12 @@ All file specifications use filenames only, automatically placed in standard dir
 ### Library Types
 
 - **Header-only**: Specify only `HEADERS`, omit `SOURCES`
-- **Compiled**: Specify both `HEADERS` and `SOURCES` (builds as static by default, set `BUILD_SHARED_LIBS=ON` for shared)
+- **Compiled**: Specify both `HEADERS` and `SOURCES`. When `LIBRARY_TYPE` is omitted,
+  the target respects `BUILD_SHARED_LIBS` (static by default; shared when `ON`).
+  Use `LIBRARY_TYPE STATIC` or `LIBRARY_TYPE SHARED` to select the target type
+  explicitly without changing the parent project's `BUILD_SHARED_LIBS`.
+  A `LIBRARY_TYPE` keyword without a value, other types, and explicit types
+  without `SOURCES` are diagnosed.
 
 ## Reference
 
@@ -503,7 +533,9 @@ During configuration, you may see messages like:
    ```cmake
    # In your top-level CMakeLists.txt (after project())
    CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
-   target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:stlab::copy-on-write>)
+   target_link_libraries(my-library INTERFACE
+       $<BUILD_INTERFACE:stlab::copy-on-write>
+       $<INSTALL_INTERFACE:$<1:stlab::copy-on-write>>)
    ```
 
 2. **Manually register dependencies**:
@@ -512,7 +544,9 @@ During configuration, you may see messages like:
    # After adding the dependency
    CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
    cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 1.1.0")
-   target_link_libraries(my-library INTERFACE $<BUILD_INTERFACE:stlab::copy-on-write>)
+   target_link_libraries(my-library INTERFACE
+       $<BUILD_INTERFACE:stlab::copy-on-write>
+       $<INSTALL_INTERFACE:$<1:stlab::copy-on-write>>)
    ```
 
 3. **Use CPM_USE_LOCAL_PACKAGES**: Install dependencies first, then build with local packages:
@@ -558,11 +592,21 @@ To use cpp-library from a specific commit:
 CPMAddPackage("gh:stlab/cpp-library#65dbed9fff9a0331355bd51dc1e8156262390154")
 ```
 
-To run cpp-library's unit tests for dependency mapping and installation:
+To run cpp-library's script regressions (C++ fixtures require Ninja and a configured compiler;
+on Windows, use a Visual Studio developer environment):
 
 ```bash
 cmake -P tests/install/CMakeLists.txt
+cmake -P tests/install/test_provider_merge.cmake
+cmake -P tests/install/test_nested_install.cmake
+cmake -P tests/setup/test_target_type.cmake
+cmake -P tests/setup/test_setup_version_resolution.cmake
 ```
+
+The nested-install regression configures, builds, installs, and runs a downstream consumer,
+checks independent and legacy installation controls, and verifies package-local dependency validation.
+The consumer links only the parent target and calls its API, which requires a compiled static
+leaf library, so missing installed transitive linkage causes a link failure.
 
 See `tests/install/README.md` for details.
 

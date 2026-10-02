@@ -39,6 +39,7 @@ endfunction()
 # Generates find_dependency() calls for target's INTERFACE link libraries
 # - Precondition: TARGET_NAME specifies existing target with INTERFACE_LINK_LIBRARIES, dependency provider installed
 # - Postcondition: OUTPUT_VAR contains newline-separated find_dependency() calls for public dependencies
+# - Optional fourth argument receives only this target's unverified dependencies
 # - Uses dependency tracking data from cpp_library_dependency_provider to generate accurate calls
 # - Automatically includes version constraints from tracked find_package() calls
 # - Common system packages (Threads, OpenMP, etc.) are handled automatically
@@ -47,6 +48,10 @@ endfunction()
 # - cpp-library dependencies: namespace::namespace → find_dependency(namespace VERSION), namespace::component → find_dependency(namespace-component VERSION)
 # - External dependencies: name::name → find_dependency(name VERSION), name::component → find_dependency(name VERSION)
 function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
+    set(UNVERIFIED_DEPS "")
+    if(ARGC GREATER 3)
+        set(${ARGV3} "" PARENT_SCOPE)
+    endif()
     get_target_property(LINK_LIBS ${TARGET_NAME} INTERFACE_LINK_LIBRARIES)
     
     if(NOT LINK_LIBS)
@@ -87,7 +92,10 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
             message(DEBUG "cpp-library: Using custom mapping for ${LIB}: ${CUSTOM_MAPPING}")
         else()
             # Use tracked dependency data from provider
-            _cpp_library_resolve_dependency("${LIB}" "${NAMESPACE}" FIND_DEP_CALL)
+            _cpp_library_resolve_dependency("${LIB}" "${NAMESPACE}" FIND_DEP_CALL UNVERIFIED_DEP)
+            if(UNVERIFIED_DEP)
+                list(APPEND UNVERIFIED_DEPS "${UNVERIFIED_DEP}")
+            endif()
         endif()
         
         # Add the dependency to the merged list
@@ -100,12 +108,19 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     _cpp_library_get_merged_dependencies(DEPENDENCY_LINES)
     
     set(${OUTPUT_VAR} "${DEPENDENCY_LINES}" PARENT_SCOPE)
+    if(ARGC GREATER 3)
+        set(${ARGV3} "${UNVERIFIED_DEPS}" PARENT_SCOPE)
+    endif()
 endfunction()
 
 # Resolve dependency using tracked provider data
 # - Precondition: LIB is a target name, NAMESPACE is the project namespace
 # - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or error is raised
+# - Optional fourth argument receives the unverified dependency, or an empty string
 function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
+    if(ARGC GREATER 3)
+        set(${ARGV3} "" PARENT_SCOPE)
+    endif()
     # Parse the target name to extract package name
     if(LIB MATCHES "^([^:]+)::(.+)$")
         set(PKG_NAME "${CMAKE_MATCH_1}")
@@ -185,8 +200,9 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                         message(STATUS "cpp-library: Dependency ${LIB} (package: ${FIND_PACKAGE_NAME}) was not tracked.")
                         
                         # Track this as an unverified dependency for install-time validation
-                        set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_UNVERIFIED_DEPS 
-                            "${LIB}|${FIND_PACKAGE_NAME}")
+                        if(ARGC GREATER 3)
+                            set(${ARGV3} "${LIB}|${FIND_PACKAGE_NAME}" PARENT_SCOPE)
+                        endif()
                         
                         # Use a reasonable fallback for development builds
                         set(${OUTPUT_VAR} "${FIND_PACKAGE_NAME}" PARENT_SCOPE)
@@ -362,20 +378,20 @@ endfunction()
 
 # Deferred function to generate Config.cmake after all target_link_libraries() calls
 # This runs at the end of CMakeLists.txt processing via cmake_language(DEFER)
-function(_cpp_library_deferred_generate_config)
+function(_cpp_library_deferred_generate_config TARGET_NAME)
     # Include required modules
     include(CMakePackageConfigHelpers)
     
-    # Retrieve stored arguments from global properties
-    get_property(ARG_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME)
-    get_property(ARG_PACKAGE_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME)
-    get_property(ARG_VERSION GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_VERSION)
-    get_property(ARG_NAMESPACE GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE)
-    get_property(CPP_LIBRARY_ROOT GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_ROOT)
-    get_property(BINARY_DIR GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR)
+    set(ARG_NAME "${TARGET_NAME}")
+    get_target_property(ARG_PACKAGE_NAME ${TARGET_NAME} _CPP_LIBRARY_INSTALL_PACKAGE_NAME)
+    get_target_property(ARG_VERSION ${TARGET_NAME} _CPP_LIBRARY_INSTALL_VERSION)
+    get_target_property(ARG_NAMESPACE ${TARGET_NAME} _CPP_LIBRARY_INSTALL_NAMESPACE)
+    get_target_property(CPP_LIBRARY_ROOT ${TARGET_NAME} _CPP_LIBRARY_INSTALL_ROOT)
+    get_target_property(BINARY_DIR ${TARGET_NAME} _CPP_LIBRARY_INSTALL_BINARY_DIR)
     
     # Now generate find_dependency() calls with complete link information
-    _cpp_library_generate_dependencies(PACKAGE_DEPENDENCIES ${ARG_NAME} ${ARG_NAMESPACE})
+    _cpp_library_generate_dependencies(PACKAGE_DEPENDENCIES ${ARG_NAME} ${ARG_NAMESPACE}
+        UNVERIFIED_DEPS)
     
     # Generate package version file
     write_basic_package_version_file(
@@ -392,14 +408,12 @@ function(_cpp_library_deferred_generate_config)
     )
     
     # Save unverified dependencies to a file for install-time validation
-    get_property(UNVERIFIED_DEPS GLOBAL PROPERTY _CPP_LIBRARY_UNVERIFIED_DEPS)
+    set_property(TARGET ${TARGET_NAME} PROPERTY _CPP_LIBRARY_INSTALL_UNVERIFIED_DEPS
+        "${UNVERIFIED_DEPS}")
     if(UNVERIFIED_DEPS)
         set(UNVERIFIED_FILE "${BINARY_DIR}/${ARG_PACKAGE_NAME}_unverified_deps.cmake")
         file(WRITE "${UNVERIFIED_FILE}" "# Unverified dependencies for ${ARG_PACKAGE_NAME}\n")
         file(APPEND "${UNVERIFIED_FILE}" "set(_UNVERIFIED_DEPS_LIST [[${UNVERIFIED_DEPS}]])\n")
-        set_property(GLOBAL PROPERTY _CPP_LIBRARY_HAS_UNVERIFIED_DEPS TRUE)
-    else()
-        set_property(GLOBAL PROPERTY _CPP_LIBRARY_HAS_UNVERIFIED_DEPS FALSE)
     endif()
     
     message(STATUS "cpp-library: Generated ${ARG_PACKAGE_NAME}Config.cmake with dependencies")
@@ -409,19 +423,24 @@ endfunction()
 # - Precondition: NAME, PACKAGE_NAME, VERSION, and NAMESPACE specified; target NAME exists
 # - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
 # - Supports header-only (INTERFACE) and compiled libraries, uses SameMajorVersion compatibility
-# - Installation can be controlled via ${NAMESPACE}_INSTALL option (defaults to PROJECT_IS_TOP_LEVEL)
+# - Installation is controlled via INSTALL_OPTION or uppercase ${NAMESPACE}_INSTALL
+#   (defaults to PROJECT_IS_TOP_LEVEL)
 function(_cpp_library_setup_install)
     set(oneValueArgs
         NAME            # Target name (e.g., "stlab-enum-ops")
         PACKAGE_NAME    # Package name for find_package() (e.g., "stlab-enum-ops")
         VERSION         # Version string (e.g., "1.2.3")
         NAMESPACE       # Namespace for alias (e.g., "stlab")
+        INSTALL_OPTION  # Optional custom installation option name
     )
     set(multiValueArgs
         HEADERS     # List of header file paths (for FILE_SET support check)
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+        message(FATAL_ERROR "_cpp_library_setup_install: INSTALL_OPTION requires a value")
+    endif()
     
     # Validate required arguments
     if(NOT ARG_NAME)
@@ -437,15 +456,17 @@ function(_cpp_library_setup_install)
         message(FATAL_ERROR "_cpp_library_setup_install: NAMESPACE is required")
     endif()
     
-    # Define installation option with PROJECT_IS_TOP_LEVEL as default
-    # This allows explicit control: -D${NAMESPACE}_INSTALL=ON/OFF
-    # Upper-case the namespace for the option name
-    string(TOUPPER "${ARG_NAMESPACE}" NAMESPACE_UPPER)
-    option(${NAMESPACE_UPPER}_INSTALL "Enable installation of ${ARG_PACKAGE_NAME}" ${PROJECT_IS_TOP_LEVEL})
+    if(DEFINED ARG_INSTALL_OPTION)
+        set(install_option "${ARG_INSTALL_OPTION}")
+    else()
+        string(TOUPPER "${ARG_NAMESPACE}" NAMESPACE_UPPER)
+        set(install_option "${NAMESPACE_UPPER}_INSTALL")
+    endif()
+    option(${install_option} "Enable installation of ${ARG_PACKAGE_NAME}" ${PROJECT_IS_TOP_LEVEL})
     
     # Check if installation is enabled
-    if(NOT ${NAMESPACE_UPPER}_INSTALL)
-        message(STATUS "cpp-library: Installation disabled for ${ARG_PACKAGE_NAME} (${NAMESPACE_UPPER}_INSTALL=OFF)")
+    if(NOT ${install_option})
+        message(STATUS "cpp-library: Installation disabled for ${ARG_PACKAGE_NAME} (${install_option}=OFF)")
         return()
     endif()
     
@@ -475,45 +496,39 @@ function(_cpp_library_setup_install)
         )
     endif()
     
-    # Defer Config.cmake generation until end of CMakeLists.txt processing
-    # This ensures all target_link_libraries() calls have been made first
-    # Store arguments in global properties for the deferred function
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME "${ARG_NAME}")
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME "${ARG_PACKAGE_NAME}")
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_VERSION "${ARG_VERSION}")
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE "${ARG_NAMESPACE}")
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_ROOT "${CPP_LIBRARY_ROOT}")
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    set_target_properties(${ARG_NAME} PROPERTIES
+        _CPP_LIBRARY_INSTALL_PACKAGE_NAME "${ARG_PACKAGE_NAME}"
+        _CPP_LIBRARY_INSTALL_VERSION "${ARG_VERSION}"
+        _CPP_LIBRARY_INSTALL_NAMESPACE "${ARG_NAMESPACE}"
+        _CPP_LIBRARY_INSTALL_ROOT "${CPP_LIBRARY_ROOT}"
+        _CPP_LIBRARY_INSTALL_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+
+    # Freeze the target name now: deferred arguments are evaluated after function locals expire.
+    cmake_language(EVAL CODE
+        "cmake_language(DEFER CALL _cpp_library_finish_install [[${ARG_NAME}]])")
     
-    # Defer install validation and file installation setup until after config generation
-    # This ensures:
-    # 1. The unverified deps file is created first
-    # 2. Validation install code is registered before export/config file installation
-    # 3. At install time, validation runs before any config files are written
-    # Note: DEFER uses LIFO ordering, so register validation first (runs last)
-    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        CALL _cpp_library_setup_install_validation)
-    
-    # Register config generation second so it runs first (LIFO) and sets properties
-    cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        CALL _cpp_library_deferred_generate_config)
-    
+endfunction()
+
+# Finalizes one target after its directory has finished declaring link dependencies.
+# - Postcondition: configuration generated before validation and export installation are registered
+function(_cpp_library_finish_install TARGET_NAME)
+    _cpp_library_deferred_generate_config("${TARGET_NAME}")
+    _cpp_library_setup_install_validation("${TARGET_NAME}")
 endfunction()
 
 # Deferred function to setup install validation after config generation
 # This runs after _cpp_library_deferred_generate_config() has created the unverified deps file
 # Registers validation BEFORE export/config file installation to prevent broken configs from being written
-function(_cpp_library_setup_install_validation)
-    # Retrieve stored arguments from global properties (set by _cpp_library_setup_install)
-    get_property(NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAME)
-    get_property(PACKAGE_NAME GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_PACKAGE_NAME)
-    get_property(NAMESPACE GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_NAMESPACE)
-    get_property(BINARY_DIR GLOBAL PROPERTY _CPP_LIBRARY_DEFERRED_INSTALL_BINARY_DIR)
+function(_cpp_library_setup_install_validation TARGET_NAME)
+    set(NAME "${TARGET_NAME}")
+    get_target_property(PACKAGE_NAME ${TARGET_NAME} _CPP_LIBRARY_INSTALL_PACKAGE_NAME)
+    get_target_property(NAMESPACE ${TARGET_NAME} _CPP_LIBRARY_INSTALL_NAMESPACE)
+    get_target_property(BINARY_DIR ${TARGET_NAME} _CPP_LIBRARY_INSTALL_BINARY_DIR)
     
     # Check if there are unverified dependencies
-    get_property(HAS_UNVERIFIED GLOBAL PROPERTY _CPP_LIBRARY_HAS_UNVERIFIED_DEPS)
+    get_target_property(UNVERIFIED_DEPS ${TARGET_NAME} _CPP_LIBRARY_INSTALL_UNVERIFIED_DEPS)
     
-    if(HAS_UNVERIFIED)
+    if(UNVERIFIED_DEPS)
         set(UNVERIFIED_FILE "${BINARY_DIR}/${PACKAGE_NAME}_unverified_deps.cmake")
         
         # Add install-time validation to ensure all dependencies are properly tracked
@@ -527,7 +542,7 @@ function(_cpp_library_setup_install_validation)
             if(_UNVERIFIED_DEPS_LIST)
                 # Parse the unverified dependencies list
                 string(REPLACE \";\" \"\\n  - \" FORMATTED_DEPS \"\${_UNVERIFIED_DEPS_LIST}\")
-                string(REGEX REPLACE \"\\\\|[a-zA-Z0-9_:.\\\\- ]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
+                string(REGEX REPLACE \"\\\\|[a-zA-Z0-9_:. -]+\" \"\" FORMATTED_DEPS \"\${FORMATTED_DEPS}\")
                 
                 message(FATAL_ERROR
                     \"cpp-library: Cannot install ${PACKAGE_NAME} - untracked dependencies detected:\\n\"
