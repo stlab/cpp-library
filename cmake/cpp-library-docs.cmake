@@ -23,7 +23,7 @@ function(_cpp_library_setup_docs)
     # https://github.com/jothepro/doxygen-awesome-css
     CPMAddPackage(
         # [DEPENDENCY] https://github.com/jothepro/doxygen-awesome-css/releases
-        URI gh:jothepro/doxygen-awesome-css@2.4.2
+        URI gh:jothepro/doxygen-awesome-css@2.5.0
         DOWNLOAD_ONLY YES
     )
 

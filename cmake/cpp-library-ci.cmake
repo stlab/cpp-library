@@ -16,8 +16,8 @@ function(_cpp_library_setup_ci PACKAGE_NAME force_init)
     # @1.13.0
     set(CI_ACTION_MSVC_DEV_CMD "ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756")
     # [DEPENDENCY] https://github.com/ssciwr/doxygen-install/releases
-    # @2.0.1
-    set(CI_ACTION_DOXYGEN_INSTALL "ssciwr/doxygen-install@329d88f5a303066a5bd006db7516b1925b86350e")
+    # @2.0.3
+    set(CI_ACTION_DOXYGEN_INSTALL "ssciwr/doxygen-install@fa3e94d34131d3990b6b8ba939ab982964aa3758")
     # [DEPENDENCY] https://github.com/actions/configure-pages/releases
     set(CI_ACTION_CONFIGURE_PAGES "actions/configure-pages@v6")
     # [DEPENDENCY] https://github.com/actions/upload-pages-artifact/releases
