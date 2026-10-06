@@ -433,6 +433,72 @@ All file specifications use filenames only, automatically placed in standard dir
   `BUILD_SHARED_LIBS` (static by default; shared when `ON`), leaving the choice
   to the library consumer.
 
+### Windows DLLs and ABI boundaries
+
+Static linking is the default. When consumers require a Windows DLL, follow the
+[stlab-execution](https://github.com/stlab/stlab-execution) pattern: put the
+compiled runtime behind a small, explicitly versioned C ABI and list its exports
+in a checked-in module-definition (`.def`) file. Keep the C++ convenience layer in
+headers rather than exporting C++ implementation symbols. Execution's
+`src/execution.def` is the model for this export list.
+
+For example, after `cpp_library_setup(...)` creates `my-library`:
+
+```cmake
+get_target_property(library_type my-library TYPE)
+if(WIN32 AND library_type STREQUAL "SHARED_LIBRARY")
+    target_sources(my-library PRIVATE src/my-library.def)
+    target_compile_definitions(my-library INTERFACE MY_LIBRARY_USING_DLL)
+endif()
+```
+
+The `.def` file names only the intended ABI entry points:
+
+```text
+EXPORTS
+    my_library_v1_initialize
+    my_library_v1_shutdown
+```
+
+Public declarations use `extern "C"` and `__declspec(dllimport)` when consuming the
+DLL. In this example, the target's `MY_LIBRARY_USING_DLL` interface definition
+selects imports for shared consumers, including installed consumers, but is absent
+when compiling the library itself or consuming a static build:
+
+```cpp
+#if defined(_WIN32) && defined(MY_LIBRARY_USING_DLL)
+#define MY_LIBRARY_API __declspec(dllimport)
+#else
+#define MY_LIBRARY_API
+#endif
+
+extern "C" {
+MY_LIBRARY_API int my_library_v1_initialize(void);
+MY_LIBRARY_API void my_library_v1_shutdown(void);
+}
+```
+
+The `.def` file controls exports when building the DLL; `dllexport` is not needed
+for these entry points. Do not enable `WINDOWS_EXPORT_ALL_SYMBOLS` or broadly mark
+implementation classes `dllexport`. A `.def` file and C linkage do not by themselves
+guarantee ABI stability: preserve calling conventions, argument layouts, ownership
+and lifetime rules, and version incompatible entry points. Do not expose standard
+library types or let C++ exceptions cross this boundary. Allocate and release
+owned resources on the same side of the boundary.
+
+cpp-library installs DLLs in `CMAKE_INSTALL_BINDIR` and import/static libraries in
+`CMAKE_INSTALL_LIBDIR`. Consumers should link the exported CMake target so that
+include paths, import definitions, and transitive dependencies are preserved;
+`BUILD_SHARED_LIBS` does not change the type of an already installed library.
+
+For the tests and examples created through `TESTS` and `EXAMPLES`, cpp-library
+automatically copies runtime DLL dependencies beside each executable after linking
+on Windows, including DLLs from installed packages. Dependencies must provide
+proper CMake shared-library targets with their DLL locations. Static builds with
+no runtime DLL dependencies need no copies. Deploying downstream applications and
+their DLLs remains the application's responsibility; this convenience does not
+add application installation rules or deploy the compiler runtime.
+
 ## Reference
 
 ### CMake Presets

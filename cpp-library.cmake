@@ -134,6 +134,16 @@ function(_cpp_library_setup_executables)
                 add_executable(${executable_base} "${source_dir}/${executable}")
                 target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
 
+                if(WIN32)
+                    # A script handles empty DLL lists without requiring newer copy commands.
+                    add_custom_command(TARGET ${executable_base} POST_BUILD
+                        COMMAND "${CMAKE_COMMAND}"
+                            "-DCPP_LIBRARY_RUNTIME_DLLS=$<TARGET_RUNTIME_DLLS:${executable_base}>"
+                            "-DCPP_LIBRARY_RUNTIME_DESTINATION=$<TARGET_FILE_DIR:${executable_base}>"
+                            -P "${CPP_LIBRARY_ROOT}/cmake/cpp-library-copy-runtime-dlls.cmake"
+                        VERBATIM)
+                endif()
+
                 # Register as CTest test
                 add_test(NAME ${executable_base} COMMAND ${executable_base})
 

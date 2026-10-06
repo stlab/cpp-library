@@ -1,5 +1,3 @@
 #include <stlab/leaf.hpp>
 
-namespace stlab {
-int leaf() { return 22; }
-}
+extern "C" int stlab_fixture_leaf_v1() { return 22; }

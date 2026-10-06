@@ -1,0 +1,2 @@
+#pragma once
+#define LEAF_SHARED @LEAF_SHARED@

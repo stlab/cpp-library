@@ -32,6 +32,21 @@ jobs:
       - name: Run setup.cmake version resolution test
         run: cmake -P tests/setup/test_setup_version_resolution.cmake
 
+  windows-packages:
+    name: Windows static and DLL consumers
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      # [DEPENDENCY] https://github.com/ilammy/msvc-dev-cmd/releases
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
+
+      - name: Run target type tests
+        run: cmake -P tests/setup/test_target_type.cmake
+
+      - name: Run nested static and shared installation round trips
+        run: cmake -P tests/install/test_nested_install.cmake
+
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest

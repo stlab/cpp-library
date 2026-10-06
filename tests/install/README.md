@@ -30,6 +30,26 @@ The test suite covers:
 8. **Generator Expressions**: BUILD_INTERFACE dependencies skipped
 9. **Edge Cases**: Empty libraries, different versions, override behavior
 
+## Installation Round Trips
+
+The separate integration script requires Ninja and a C++ compiler:
+
+```bash
+cmake -P tests/install/test_nested_install.cmake
+```
+
+On Windows, run it from an x64 Visual Studio developer environment. It builds and
+installs nested parent/leaf packages, then builds and runs separate installed
+consumers. The leaf is tested as both static and shared, with explicit versioned
+C ABI exports from a `.def` file for the Windows DLL.
+
+The consumers exercise cpp-library's test and example executable setup in
+separate output directories containing spaces. Windows checks verify transitive
+installed DLL deployment, an empty DLL list for static builds, and the case where
+a DLL is already in the destination directory. The remaining cases cover
+independent install options, legacy namespace options, and isolated dependency
+validation failures. These round trips run on both Ubuntu and Windows in CI.
+
 ## Test Output
 
 Successful run:
@@ -80,4 +100,3 @@ verify_output("${RESULT}" "find_dependency(package-name 1.0.0)" "Test N")
 ## CI Integration
 
 These tests run automatically on every push/PR via GitHub Actions. See `.github/workflows/ci.yml` for the workflow configuration.
-
