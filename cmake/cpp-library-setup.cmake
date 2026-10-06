@@ -66,7 +66,6 @@ function(_cpp_library_setup_core)
         PACKAGE_NAME
         CLEAN_NAME
         REQUIRES_CPP_VERSION
-        LIBRARY_TYPE
         INSTALL_OPTION
     )
     set(multiValueArgs
@@ -89,21 +88,9 @@ function(_cpp_library_setup_core)
         set(ARG_VERSION "${GIT_VERSION}")
     endif()
 
-    if(DEFINED ARG_LIBRARY_TYPE AND NOT ARG_LIBRARY_TYPE STREQUAL ""
-        AND NOT ARG_LIBRARY_TYPE MATCHES "^(STATIC|SHARED)$")
-        message(FATAL_ERROR "cpp_library_setup: LIBRARY_TYPE must be STATIC or SHARED")
-    endif()
-    if(ARG_LIBRARY_TYPE AND NOT ARG_SOURCES)
-        message(FATAL_ERROR "cpp_library_setup: LIBRARY_TYPE requires SOURCES")
-    endif()
-
     if(ARG_SOURCES)
-        # Use the explicit type, or respect BUILD_SHARED_LIBS when omitted.
-        if(ARG_LIBRARY_TYPE)
-            add_library(${ARG_NAME} ${ARG_LIBRARY_TYPE} ${ARG_SOURCES})
-        else()
-            add_library(${ARG_NAME} ${ARG_SOURCES})
-        endif()
+        # Respect the consumer's BUILD_SHARED_LIBS setting.
+        add_library(${ARG_NAME} ${ARG_SOURCES})
         add_library(${ARG_NAMESPACE}::${ARG_CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

@@ -164,7 +164,6 @@ function(cpp_library_setup)
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION # C++ version (default: 17)
-        LIBRARY_TYPE # Explicit compiled library type (STATIC or SHARED)
         INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
@@ -177,9 +176,6 @@ function(cpp_library_setup)
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    if("LIBRARY_TYPE" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
-        message(FATAL_ERROR "cpp_library_setup: LIBRARY_TYPE requires a value")
-    endif()
     if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
         message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
     endif()
@@ -285,7 +281,6 @@ function(cpp_library_setup)
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
-        LIBRARY_TYPE "${ARG_LIBRARY_TYPE}"
         ${install_args}
     )
 
