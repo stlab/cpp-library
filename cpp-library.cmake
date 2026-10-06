@@ -134,6 +134,16 @@ function(_cpp_library_setup_executables)
                 add_executable(${executable_base} "${source_dir}/${executable}")
                 target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
 
+                if(WIN32)
+                    # A script handles empty DLL lists without requiring newer copy commands.
+                    add_custom_command(TARGET ${executable_base} POST_BUILD
+                        COMMAND "${CMAKE_COMMAND}"
+                            "-DCPP_LIBRARY_RUNTIME_DLLS=$<TARGET_RUNTIME_DLLS:${executable_base}>"
+                            "-DCPP_LIBRARY_RUNTIME_DESTINATION=$<TARGET_FILE_DIR:${executable_base}>"
+                            -P "${CPP_LIBRARY_ROOT}/cmake/cpp-library-copy-runtime-dlls.cmake"
+                        VERBATIM)
+                endif()
+
                 # Register as CTest test
                 add_test(NAME ${executable_base} COMMAND ${executable_base})
 
@@ -156,13 +166,15 @@ endfunction()
 # - Precondition: PROJECT_NAME defined via project(), at least one HEADERS specified
 # - Postcondition: library target created, version set from git tags, optional tests/docs/examples configured
 # - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, and docs
-# - Installation is controlled by ${NAMESPACE}_INSTALL (defaults to PROJECT_IS_TOP_LEVEL)
+# - Installation is controlled by INSTALL_OPTION or uppercase ${NAMESPACE}_INSTALL
+#   (defaults to PROJECT_IS_TOP_LEVEL)
 function(cpp_library_setup)
     # Parse arguments
     set(oneValueArgs
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION # C++ version (default: 17)
+        INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
         HEADERS # List of header filenames (e.g., "your_header.hpp")
@@ -173,6 +185,14 @@ function(cpp_library_setup)
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+        message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
+    endif()
+    set(install_args)
+    if(DEFINED ARG_INSTALL_OPTION)
+        list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
+    endif()
 
     # Validate required arguments
     if(NOT ARG_DESCRIPTION)
@@ -271,6 +291,7 @@ function(cpp_library_setup)
         HEADERS "${GENERATED_HEADERS}"
         SOURCES "${GENERATED_SOURCES}"
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
+        ${install_args}
     )
 
     # Only setup development infrastructure when building as top-level project
