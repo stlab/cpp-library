@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: BSL-1.0
 #
-# cpp-library-testing.cmake - Testing setup with doctest
+# cpp-library-testing.cmake - Runtime DLL deployment and testing compatibility
 # 
-# Note: Testing logic has been consolidated into the main cpp-library.cmake file
-# This file is kept for backward compatibility but the actual implementation
-# is now in the _cpp_library_setup_executables function.
+# Provides cpp_library_copy_runtime_dlls for custom and toolkit-created executables.
+# _cpp_library_setup_testing delegates to _cpp_library_setup_executables for compatibility.
 
 # Deploys runtime DLLs beside a custom target on Windows; empty lists need no copy.
 # Call in the directory that created the target, as required by POST_BUILD commands.

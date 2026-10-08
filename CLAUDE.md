@@ -50,7 +50,7 @@ or pin to a specific commit: `CPMAddPackage("gh:stlab/cpp-library#<commit-sha>")
 - **`cpp-library-dependency-provider.cmake`** — implements the CMake dependency-provider callback (`SET_DEPENDENCY_PROVIDER`) that intercepts every `find_package()`/`FetchContent_MakeAvailable()` call to record the exact package/version/components used, so `Config.cmake` can regenerate accurate `find_dependency()` calls at install time. State is stored in `GLOBAL` properties (`_CPP_LIBRARY_TRACKED_DEP_*`, `_CPP_LIBRARY_PKG_KEYS`, etc.) — there's no other persistence mechanism, so tests reset these properties between cases (see `tests/install/CMakeLists.txt`).
 - **`cpp-library-docs.cmake`** — Doxygen + doxygen-awesome-css target (`docs`).
 - **`cpp-library-ci.cmake`** — generates `.github/workflows/ci.yml` for the *consumer* project from `templates/.github/workflows/ci.yml.in`, substituting the package name.
-- **`cpp-library-testing.cmake`** — thin backward-compat wrapper; real test/example executable logic lives in `_cpp_library_setup_executables()` in `cpp-library.cmake`.
+- **`cpp-library-testing.cmake`** — public `cpp_library_copy_runtime_dlls()` helper and backward-compatibility `_cpp_library_setup_testing()` wrapper; test/example executable creation lives in `_cpp_library_setup_executables()` in `cpp-library.cmake`.
 
 ### Key control flow
 
