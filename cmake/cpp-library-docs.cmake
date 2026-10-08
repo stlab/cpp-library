@@ -13,9 +13,28 @@ function(_cpp_library_setup_docs)
     )
     set(multiValueArgs
         DOCS_EXCLUDE_SYMBOLS
+        DOCS_INPUTS
+        DOCS_OPTIONS
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    set(docs_extensions "")
+    foreach(input IN LISTS ARG_DOCS_INPUTS)
+        get_filename_component(input "${input}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+        if(NOT EXISTS "${input}")
+            message(FATAL_ERROR "cpp-library: Documentation input does not exist: ${input}")
+        endif()
+        string(REPLACE "\"" "\\\"" input "${input}")
+        string(APPEND docs_extensions "INPUT += \"${input}\"\n")
+    endforeach()
+    foreach(option IN LISTS ARG_DOCS_OPTIONS)
+        if(NOT option MATCHES "^[A-Z][A-Z0-9_]*[ \t]*\\+?=[^\r\n]*$")
+            message(FATAL_ERROR
+                "cpp-library: DOCS_OPTIONS requires single-line Doxygen assignments: ${option}")
+        endif()
+        string(APPEND docs_extensions "${option}\n")
+    endforeach()
 
     find_package(Doxygen REQUIRED)
 
@@ -59,6 +78,10 @@ function(_cpp_library_setup_docs)
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile" ${DOXYFILE_OUT} @ONLY)
     else()
         configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+    endif()
+    if(NOT docs_extensions STREQUAL "")
+        file(APPEND "${DOXYFILE_OUT}"
+            "\n# Project documentation settings supplied through cpp_library_setup.\n${docs_extensions}")
     endif()
 
     # Add custom target for documentation with proper stderr capture

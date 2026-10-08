@@ -29,6 +29,9 @@ jobs:
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
 
+      - name: Run custom executable runtime deployment tests
+        run: cmake -P tests/setup/test_runtime_dlls.cmake
+
       - name: Run setup.cmake version resolution test
         run: cmake -P tests/setup/test_setup_version_resolution.cmake
 
@@ -43,6 +46,9 @@ jobs:
 
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
+
+      - name: Run custom executable runtime deployment tests
+        run: cmake -P tests/setup/test_runtime_dlls.cmake
 
       - name: Run nested static and shared installation round trips
         run: cmake -P tests/install/test_nested_install.cmake
@@ -164,6 +170,13 @@ jobs:
     steps:
       # [DEPENDENCY] https://github.com/actions/checkout/releases
       - uses: actions/checkout@v7
+
+      - name: Install Doxygen
+        # [DEPENDENCY] https://github.com/ssciwr/doxygen-install/releases
+        uses: ssciwr/doxygen-install@fa3e94d34131d3990b6b8ba939ab982964aa3758
+
+      - name: Test documentation configuration and rendered output
+        run: cmake -P tests/docs/test_docs.cmake
 
       - name: Check README examples
         run: |
