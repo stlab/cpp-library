@@ -5,7 +5,8 @@ get_filename_component(toolkit_source "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE
 string(RANDOM LENGTH 16 ALPHABET 0123456789abcdef test_id)
 set(test_root "${toolkit_source}/build/docs-${test_id}")
 
-foreach(case default extended custom missing-input malformed-option multiline-option
+foreach(case default extended custom missing-input malformed-option
+    malformed-terminal-continuation-option malformed-continuation-option multiline-option
     missing-input-value missing-option-value)
     set(source "${test_root}/${case}/source with spaces")
     set(binary "${test_root}/${case}/build with spaces")

@@ -387,7 +387,8 @@ paths and paths containing spaces are supported. Missing inputs fail configurati
 template. Each quoted CMake argument must be a single `TAG = value` or
 `TAG += value` assignment, with Doxygen quoting inside the value when needed.
 Use spaces, not CMake semicolons, to separate Doxygen list values. The toolkit
-validates assignment syntax; Doxygen validates tag names and values. Settings
+validates assignment syntax and rejects line-continuation backslashes, including
+those followed by whitespace; Doxygen validates tag names and values. Settings
 are literal, not `configure_file` templates: use `${...}` for CMake variables.
 
 ```cmake

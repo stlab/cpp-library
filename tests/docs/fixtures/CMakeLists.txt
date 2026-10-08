@@ -21,12 +21,19 @@ if(CASE STREQUAL "extended")
         DOCS_OPTIONS
             "PROJECT_BRIEF = \"Customized documentation\""
             "WARN_IF_UNDOCUMENTED = NO"
+            [=[PREDEFINED = "FIXTURE_PATH=C:\\docs\\"]=]
             "EXCLUDE_SYMBOLS += fixture::extra"
         DOCS_EXCLUDE_SYMBOLS "fixture::hidden")
 elseif(CASE STREQUAL "missing-input")
     list(APPEND docs_args DOCS_INPUTS "missing docs")
 elseif(CASE STREQUAL "malformed-option")
     list(APPEND docs_args DOCS_OPTIONS "not a Doxygen assignment")
+elseif(CASE STREQUAL "malformed-terminal-continuation-option")
+    list(APPEND docs_args DOCS_OPTIONS [=[PREDEFINED = A= \]=])
+elseif(CASE STREQUAL "malformed-continuation-option")
+    list(APPEND docs_args DOCS_OPTIONS
+        [=[PREDEFINED = A= \ ]=]
+        "WARN_IF_UNDOCUMENTED = NO")
 elseif(CASE STREQUAL "multiline-option")
     list(APPEND docs_args DOCS_OPTIONS "QUIET = YES\nGENERATE_XML = YES")
 elseif(CASE STREQUAL "missing-input-value")

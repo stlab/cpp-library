@@ -29,7 +29,8 @@ function(_cpp_library_setup_docs)
         string(APPEND docs_extensions "INPUT += \"${input}\"\n")
     endforeach()
     foreach(option IN LISTS ARG_DOCS_OPTIONS)
-        if(NOT option MATCHES "^[A-Z][A-Z0-9_]*[ \t]*\\+?=[^\r\n]*$")
+        if(NOT option MATCHES "^[A-Z][A-Z0-9_]*[ \t]*\\+?=[^\r\n]*$"
+            OR option MATCHES "\\\\[ \t]*$")
             message(FATAL_ERROR
                 "cpp-library: DOCS_OPTIONS requires single-line Doxygen assignments: ${option}")
         endif()
