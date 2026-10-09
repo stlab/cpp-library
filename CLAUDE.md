@@ -12,15 +12,20 @@ Two ways consumers use this repo:
 
 ## Commands
 
-Run cpp-library's own test suite (pure CMake scripts, no C++ compilation involved):
+Run cpp-library's tests through CMake scripts. Integration fixtures require a
+C++ compiler and Ninja; documentation rendering also requires Doxygen:
 
 ```bash
 cmake -P tests/install/CMakeLists.txt              # dependency mapping/merging unit tests
 cmake -P tests/install/test_provider_merge.cmake   # dependency provider merge tests
 cmake -P tests/setup/test_setup_version_resolution.cmake  # setup.cmake version-resolution integration test
+cmake -P tests/setup/test_runtime_dlls.cmake     # custom target DLL deployment; requires compiler and Ninja
+cmake -P tests/docs/test_docs.cmake              # docs extensions and rendering; requires Doxygen and Ninja
 ```
 
-These are the same commands CI (`.github/workflows/ci.yml`, job `unit-tests`) runs. There is no build step for cpp-library itself — `cmake -P` executes the scripts directly.
+CI (`.github/workflows/ci.yml`) runs these scripts in its unit-test, Windows
+package, and documentation jobs. There is no library build step for cpp-library
+itself; integration scripts configure and build their own consumer fixtures.
 
 CI also runs an `integration-tests` job that generates a throwaway consumer project, configures/builds/installs it against this repo via `CPMAddPackage(... SOURCE_DIR ...)`, then verifies `find_package()` works against the installed package — this is the best reference for the full round-trip a downstream project goes through.
 
@@ -45,7 +50,7 @@ or pin to a specific commit: `CPMAddPackage("gh:stlab/cpp-library#<commit-sha>")
 - **`cpp-library-dependency-provider.cmake`** — implements the CMake dependency-provider callback (`SET_DEPENDENCY_PROVIDER`) that intercepts every `find_package()`/`FetchContent_MakeAvailable()` call to record the exact package/version/components used, so `Config.cmake` can regenerate accurate `find_dependency()` calls at install time. State is stored in `GLOBAL` properties (`_CPP_LIBRARY_TRACKED_DEP_*`, `_CPP_LIBRARY_PKG_KEYS`, etc.) — there's no other persistence mechanism, so tests reset these properties between cases (see `tests/install/CMakeLists.txt`).
 - **`cpp-library-docs.cmake`** — Doxygen + doxygen-awesome-css target (`docs`).
 - **`cpp-library-ci.cmake`** — generates `.github/workflows/ci.yml` for the *consumer* project from `templates/.github/workflows/ci.yml.in`, substituting the package name.
-- **`cpp-library-testing.cmake`** — thin backward-compat wrapper; real test/example executable logic lives in `_cpp_library_setup_executables()` in `cpp-library.cmake`.
+- **`cpp-library-testing.cmake`** — public `cpp_library_copy_runtime_dlls()` helper and backward-compatibility `_cpp_library_setup_testing()` wrapper; test/example executable creation lives in `_cpp_library_setup_executables()` in `cpp-library.cmake`.
 
 ### Key control flow
 

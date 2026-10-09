@@ -361,6 +361,8 @@ cpp_library_setup(
     [EXAMPLES example_list]        # Example source files to build (e.g., "example.cpp example_fail.cpp")
     [TESTS test_list]              # Test source files to build (e.g., "tests.cpp")
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
+    [DOCS_INPUTS input_list]       # Additional documentation files/directories
+    [DOCS_OPTIONS setting_list]    # Additive single-line Doxygen assignments
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
     [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
 )
@@ -373,6 +375,57 @@ cpp_library_setup(
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
 - Installation is controlled by `INSTALL_OPTION`, or the uppercase `${NAMESPACE}_INSTALL` option
   when omitted. Options default to `PROJECT_IS_TOP_LEVEL`.
+
+### Documentation configuration
+
+Keep the toolkit's Doxyfile template instead of copying it into your project.
+`DOCS_INPUTS` adds files or directories to the default `include` input. Relative
+paths are resolved against the directory calling `cpp_library_setup`; absolute
+paths and paths containing spaces are supported. Missing inputs fail configuration.
+
+`DOCS_OPTIONS` applies project-specific Doxygen assignments after the shared
+template. Each quoted CMake argument must be a single `TAG = value` or
+`TAG += value` assignment, with Doxygen quoting inside the value when needed.
+Use spaces, not CMake semicolons, to separate Doxygen list values. The toolkit
+validates assignment syntax and rejects line-continuation backslashes, including
+those followed by whitespace; Doxygen validates tag names and values. Settings
+are literal, not `configure_file` templates: use `${...}` for CMake variables.
+
+```cmake
+cpp_library_setup(
+    DESCRIPTION "My library"
+    NAMESPACE mylib
+    HEADERS api.hpp
+    DOCS_INPUTS docs/doxygen "${PROJECT_BINARY_DIR}/generated docs"
+    DOCS_EXCLUDE_SYMBOLS "mylib::detail"
+    DOCS_OPTIONS
+        "WARN_IF_UNDOCUMENTED = NO"
+        "INCLUDE_PATH = \"${PROJECT_BINARY_DIR}/include\""
+        "MACRO_EXPANSION = YES"
+        "PREDEFINED = MYLIB_API= MYLIB_NAMESPACE_BEGIN()= MYLIB_NAMESPACE_END()="
+)
+```
+
+Existing `docs/Doxyfile` overrides remain supported. Additional inputs and options
+are applied after that configuration too, but a full override does not inherit
+future toolkit-template changes. Prefer the shared template with only the
+project-specific deltas above. Documentation is configured only for top-level
+projects with `BUILD_DOCS` enabled.
+
+### `cpp_library_copy_runtime_dlls`
+
+```cmake
+add_executable(custom-test main.cpp support.cpp)
+target_link_libraries(custom-test PRIVATE mylib::my-library)
+cpp_library_copy_runtime_dlls(custom-test)
+```
+
+Call this helper in the directory that created the target. On Windows, it deploys
+`TARGET_RUNTIME_DLLS` beside the target after building, including transitive
+runtime DLLs. Static targets with no runtime DLLs require no copy; on other
+platforms the helper does nothing. It uses CMake 3.24-compatible copy operations
+and handles DLLs already in the destination. Toolkit-created test/example
+executables use the same helper automatically.
 
 ### Target Naming
 

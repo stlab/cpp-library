@@ -1,0 +1,3 @@
+/** @defgroup extra_group Absolute fixture group
+ *  @brief This group comes from an absolute input file.
+ */

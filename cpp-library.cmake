@@ -134,15 +134,7 @@ function(_cpp_library_setup_executables)
                 add_executable(${executable_base} "${source_dir}/${executable}")
                 target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
 
-                if(WIN32)
-                    # A script handles empty DLL lists without requiring newer copy commands.
-                    add_custom_command(TARGET ${executable_base} POST_BUILD
-                        COMMAND "${CMAKE_COMMAND}"
-                            "-DCPP_LIBRARY_RUNTIME_DLLS=$<TARGET_RUNTIME_DLLS:${executable_base}>"
-                            "-DCPP_LIBRARY_RUNTIME_DESTINATION=$<TARGET_FILE_DIR:${executable_base}>"
-                            -P "${CPP_LIBRARY_ROOT}/cmake/cpp-library-copy-runtime-dlls.cmake"
-                        VERBATIM)
-                endif()
+                cpp_library_copy_runtime_dlls(${executable_base})
 
                 # Register as CTest test
                 add_test(NAME ${executable_base} COMMAND ${executable_base})
@@ -182,6 +174,8 @@ function(cpp_library_setup)
         EXAMPLES # Example source files to build (e.g., "example.cpp example_fail.cpp")
         TESTS # Test source files to build (e.g., "tests.cpp")
         DOCS_EXCLUDE_SYMBOLS # Symbols to exclude from docs
+        DOCS_INPUTS # Additional documentation files or directories
+        DOCS_OPTIONS # Single-line Doxygen assignments applied after the template
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -189,6 +183,11 @@ function(cpp_library_setup)
     if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
         message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
     endif()
+    foreach(keyword DOCS_INPUTS DOCS_OPTIONS)
+        if(keyword IN_LIST ARG_KEYWORDS_MISSING_VALUES)
+            message(FATAL_ERROR "cpp_library_setup: ${keyword} requires a value")
+        endif()
+    endforeach()
     set(install_args)
     if(DEFINED ARG_INSTALL_OPTION)
         list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
@@ -333,6 +332,8 @@ function(cpp_library_setup)
             VERSION "${ARG_VERSION}"
             DESCRIPTION "${ARG_DESCRIPTION}"
             DOCS_EXCLUDE_SYMBOLS "${ARG_DOCS_EXCLUDE_SYMBOLS}"
+            DOCS_INPUTS "${ARG_DOCS_INPUTS}"
+            DOCS_OPTIONS "${ARG_DOCS_OPTIONS}"
         )
     endif()
 
