@@ -1,0 +1,210 @@
+description = "cpp-library CMake toolkit search quality: public API, internal modules, consumer templates, and regressions"
+
+[[queries]]
+id = "ident-setup"
+query = "cpp_library_setup"
+class = "identifier"
+
+[judgments.ident-setup]
+"cpp-library.cmake" = 3
+"README.md" = 2
+"setup.cmake" = 1
+
+[[queries]]
+id = "ident-provider"
+query = "cpp_library_enable_dependency_tracking"
+class = "identifier"
+
+[judgments.ident-provider]
+"cpp-library.cmake" = 3
+"cmake/cpp-library-dependency-provider.cmake" = 2
+"README.md" = 2
+"setup.cmake" = 1
+
+[[queries]]
+id = "ident-mapping"
+query = "cpp_library_map_dependency"
+class = "identifier"
+
+[judgments.ident-mapping]
+"cmake/cpp-library-install.cmake" = 3
+"README.md" = 2
+"tests/install/test_dependency_mapping.cmake" = 2
+
+[[queries]]
+id = "ident-runtime-dlls"
+query = "cpp_library_copy_runtime_dlls"
+class = "identifier"
+
+[judgments.ident-runtime-dlls]
+"cmake/cpp-library-testing.cmake" = 3
+"cmake/cpp-library-copy-runtime-dlls.cmake" = 2
+"README.md" = 2
+"cpp-library.cmake" = 1
+"setup.cmake" = 0
+
+[[queries]]
+id = "ident-version"
+query = "_cpp_library_get_git_version"
+class = "identifier"
+
+[judgments.ident-version]
+"cmake/cpp-library-setup.cmake" = 3
+"cmake/cpp-library-install.cmake" = 2
+"cpp-library.cmake" = 2
+
+[[queries]]
+id = "ident-docs"
+query = "_cpp_library_setup_docs"
+class = "identifier"
+
+[judgments.ident-docs]
+"cmake/cpp-library-docs.cmake" = 3
+"cpp-library.cmake" = 2
+"cmake/cpp-library-copy-runtime-dlls.cmake" = 0
+
+[[queries]]
+id = "ident-ci"
+query = "_cpp_library_setup_ci"
+class = "identifier"
+
+[judgments.ident-ci]
+"cmake/cpp-library-ci.cmake" = 3
+"cmake/cpp-library-setup.cmake" = 2
+
+[[queries]]
+id = "ident-executables"
+query = "_cpp_library_setup_executables"
+class = "identifier"
+
+[judgments.ident-executables]
+"cpp-library.cmake" = 3
+"cmake/cpp-library-testing.cmake" = 2
+
+[[queries]]
+id = "nl-version"
+query = "determine the consumer library version from git tags or an explicit override"
+class = "natural_language"
+
+[judgments.nl-version]
+"cmake/cpp-library-setup.cmake" = 3
+"cpp-library.cmake" = 2
+"cmake/cpp-library-install.cmake" = 2
+"README.md" = 1
+
+[[queries]]
+id = "nl-install-validation"
+query = "reject installation when linked dependencies were not tracked and generate package dependency declarations"
+class = "natural_language"
+
+[judgments.nl-install-validation]
+"cmake/cpp-library-install.cmake" = 3
+"cmake/cpp-library-dependency-provider.cmake" = 2
+"README.md" = 1
+"setup.cmake" = 0
+
+[[queries]]
+id = "nl-library-kind"
+query = "create a header-only interface library or a compiled static or shared library with exported headers"
+class = "natural_language"
+
+[judgments.nl-library-kind]
+"cmake/cpp-library-setup.cmake" = 3
+"cpp-library.cmake" = 2
+"README.md" = 1
+
+[[queries]]
+id = "nl-runtime-dlls"
+query = "deploy runtime DLL dependencies beside executables on Windows without copying a file onto itself"
+class = "natural_language"
+
+[judgments.nl-runtime-dlls]
+"cmake/cpp-library-copy-runtime-dlls.cmake" = 3
+"cmake/cpp-library-testing.cmake" = 3
+"cpp-library.cmake" = 2
+"tests/install/README.md" = 1
+"setup.cmake" = 0
+
+[[queries]]
+id = "nl-docs-inputs"
+query = "add extra documentation inputs and validate single-line Doxygen assignments before rendering HTML"
+class = "natural_language"
+
+[judgments.nl-docs-inputs]
+"cmake/cpp-library-docs.cmake" = 3
+"cpp-library.cmake" = 2
+"README.md" = 1
+
+[[queries]]
+id = "nl-ci-generation"
+query = "generate the consumer GitHub Actions workflow from a template and substitute pinned action versions"
+class = "natural_language"
+
+[judgments.nl-ci-generation]
+"cmake/cpp-library-ci.cmake" = 3
+"templates/.github/workflows/ci.yml.in" = 2
+"cmake/cpp-library-setup.cmake" = 1
+".github/workflows/ci.yml" = 0
+
+[[queries]]
+id = "nl-scaffolding"
+query = "scaffold a new consumer project with an initial header, tests, examples, and CMakeLists"
+class = "natural_language"
+
+[judgments.nl-scaffolding]
+"setup.cmake" = 3
+"README.md" = 2
+"cpp-library.cmake" = 1
+
+[[queries]]
+id = "nl-consumer-presets"
+query = "consumer presets for Ninja builds, testing, documentation, clang-tidy, and forced template initialization"
+class = "natural_language"
+
+[judgments.nl-consumer-presets]
+"templates/CMakePresets.json" = 3
+"README.md" = 2
+"cmake/cpp-library-setup.cmake" = 1
+
+[[queries]]
+id = "filt-runtime-dlls"
+query = "cpp_library_copy_runtime_dlls"
+class = "filtered"
+extensions = ["cmake"]
+paths = ["cmake"]
+
+[judgments.filt-runtime-dlls]
+"cmake/cpp-library-testing.cmake" = 3
+"cmake/cpp-library-copy-runtime-dlls.cmake" = 2
+
+[[queries]]
+id = "filt-docs-options"
+query = "DOCS_OPTIONS"
+class = "filtered"
+extensions = ["cmake"]
+paths = ["cmake"]
+
+[judgments.filt-docs-options]
+"cmake/cpp-library-docs.cmake" = 3
+"cmake/cpp-library-copy-runtime-dlls.cmake" = 0
+
+[[queries]]
+id = "filt-consumer-presets"
+query = "BUILD_TESTING"
+class = "filtered"
+extensions = ["json"]
+paths = ["templates"]
+
+[judgments.filt-consumer-presets]
+"templates/CMakePresets.json" = 3
+
+[[queries]]
+id = "filt-version"
+query = "_cpp_library_get_git_version"
+class = "filtered"
+extensions = ["cmake"]
+paths = ["cmake"]
+
+[judgments.filt-version]
+"cmake/cpp-library-setup.cmake" = 3
+"cmake/cpp-library-install.cmake" = 2

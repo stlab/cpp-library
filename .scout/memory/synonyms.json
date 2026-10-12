@@ -1,0 +1,5918 @@
+{
+  "forward": {
+    "project scaffolding": [
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ]
+    ],
+    "testing and example executable target generation gated by build_testing": [
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ]
+    ],
+    "set-dependency-provider": [
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ]
+    ],
+    "documentation setup and theme integration with build_docs": [
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ]
+    ],
+    "lightweight consumer mode": [
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ]
+    ],
+    "find-dependency": [
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ]
+    ],
+    "package-name": [
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ]
+    ],
+    "toolkit-architecture": [
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ]
+    ],
+    "set_dependency_provider": [
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ]
+    ],
+    "testing-setup": [
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ]
+    ],
+    "consumer-initialization": [
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ]
+    ],
+    "doxygen": [
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ]
+    ],
+    "dependency provider": [
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ]
+    ],
+    "runtime-dll-copy": [
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ]
+    ],
+    "cpp-library overview": [
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ]
+    ],
+    "build_testing": [
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ]
+    ],
+    "cpp-library architecture": [
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ]
+    ],
+    "clean_name": [
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ]
+    ],
+    "runtime dll copy": [
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ]
+    ],
+    "cpp-library-architecture": [
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ]
+    ],
+    "cmake alias convention": [
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ]
+    ],
+    "test target setup": [
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ]
+    ],
+    "dependency-provider": [
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ]
+    ],
+    "build_docs": [
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ]
+    ],
+    "setup-cmake": [
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ]
+    ],
+    "cpp-library-force-init": [
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ]
+    ],
+    "cmake-project-top-level-includes": [
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ]
+    ],
+    "_cpp_library_setup_install_validation": [
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ]
+    ],
+    "interactive and headless project scaffolding with setup.cmake": [
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ]
+    ],
+    "architecture-overview": [
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ]
+    ],
+    "install validation": [
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ]
+    ],
+    "architecture overview": [
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ]
+    ],
+    "template initialization": [
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ]
+    ],
+    "cpp-library-setup-script": [
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ]
+    ],
+    "cpp-library-enable-dependency-tracking": [
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ]
+    ],
+    "project-is-top-level": [
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ]
+    ],
+    "documentation generation": [
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ]
+    ],
+    "doxygen setup": [
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ]
+    ],
+    "cmake-infrastructure-overview": [
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ]
+    ],
+    "target-naming": [
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ]
+    ],
+    "setup.cmake": [
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ]
+    ],
+    "install-validation": [
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ]
+    ],
+    "cpp-library setup script": [
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ]
+    ],
+    "deferred install": [
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ]
+    ],
+    "alias deduplication": [
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ]
+    ],
+    "project-scaffolding": [
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ]
+    ],
+    "dependency tracking": [
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ]
+    ],
+    "cmake infrastructure overview": [
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ]
+    ],
+    "target naming": [
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ]
+    ],
+    "doctest": [
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ]
+    ],
+    "lightweight-consumer-mode": [
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ]
+    ],
+    "doxygen-awesome-css": [
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ]
+    ],
+    "project_is_top_level template copying": [
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ]
+    ],
+    "consumer lifecycle and template overwrite controls": [
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ]
+    ],
+    "consumer initialization": [
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ]
+    ],
+    "deferred-install": [
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ]
+    ],
+    "template-copying": [
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ]
+    ],
+    "cpp-library-overview": [
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ],
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "toolkit architecture",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ]
+    ],
+    "untracked dependencies": [
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ]
+    ],
+    "cpp_library_enable_dependency_tracking": [
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ]
+    ],
+    "_cpp_library_finish_install": [
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ]
+    ],
+    "standalone generator": [
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "standalone-generator",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "setup.cmake",
+        1.0
+      ]
+    ],
+    "alias-deduplication": [
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ]
+    ],
+    "cmake_project_top_level_includes": [
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ]
+    ],
+    "target naming and alias deduplication convention": [
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ]
+    ],
+    "dependency tracking lifecycle and provider ordering": [
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "dependency-tracking",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ]
+    ],
+    "deferred install dependency validation and config generation": [
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ]
+    ],
+    "cmake-language-defer": [
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "untracked-dependencies",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ]
+    ],
+    "docs target": [
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ]
+    ],
+    "docs-target": [
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ]
+    ],
+    "untracked-dependencies": [
+      [
+        "_cpp_library_setup_install_validation",
+        1.0
+      ],
+      [
+        "install-validation",
+        1.0
+      ],
+      [
+        "deferred-install",
+        1.0
+      ],
+      [
+        "find-dependency",
+        1.0
+      ],
+      [
+        "deferred install dependency validation and config generation",
+        1.0
+      ],
+      [
+        "untracked dependencies",
+        1.0
+      ],
+      [
+        "install validation",
+        1.0
+      ],
+      [
+        "deferred install",
+        1.0
+      ],
+      [
+        "cmake-language-defer",
+        1.0
+      ],
+      [
+        "_cpp_library_finish_install",
+        1.0
+      ]
+    ],
+    "package_name": [
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ]
+    ],
+    "negative compilation tests": [
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ]
+    ],
+    "template-initialization": [
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "cpp_library_force_init",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ]
+    ],
+    "negative-compilation-tests": [
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ]
+    ],
+    "standalone-generator": [
+      [
+        "setup.cmake",
+        1.0
+      ],
+      [
+        "cpp-library setup script",
+        1.0
+      ],
+      [
+        "project-scaffolding",
+        1.0
+      ],
+      [
+        "consumer initialization",
+        1.0
+      ],
+      [
+        "cpp-library-setup-script",
+        1.0
+      ],
+      [
+        "standalone generator",
+        1.0
+      ],
+      [
+        "interactive and headless project scaffolding with setup.cmake",
+        1.0
+      ],
+      [
+        "project scaffolding",
+        1.0
+      ],
+      [
+        "setup-cmake",
+        1.0
+      ],
+      [
+        "consumer-initialization",
+        1.0
+      ]
+    ],
+    "documentation-generation": [
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "build-docs",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ]
+    ],
+    "cmake-alias-convention": [
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "clean-name",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ]
+    ],
+    "cpp_library_force_init": [
+      [
+        "template initialization",
+        1.0
+      ],
+      [
+        "project_is_top_level template copying",
+        1.0
+      ],
+      [
+        "cpp-library-force-init",
+        1.0
+      ],
+      [
+        "template-copying",
+        1.0
+      ],
+      [
+        "consumer lifecycle and template overwrite controls",
+        1.0
+      ],
+      [
+        "template-initialization",
+        1.0
+      ],
+      [
+        "lightweight-consumer-mode",
+        1.0
+      ],
+      [
+        "project-is-top-level",
+        1.0
+      ],
+      [
+        "lightweight consumer mode",
+        1.0
+      ]
+    ],
+    "toolkit architecture": [
+      [
+        "architecture overview",
+        1.0
+      ],
+      [
+        "architecture-overview",
+        1.0
+      ],
+      [
+        "toolkit-architecture",
+        1.0
+      ],
+      [
+        "cpp-library architecture",
+        1.0
+      ],
+      [
+        "cpp-library overview",
+        1.0
+      ],
+      [
+        "cmake infrastructure overview",
+        1.0
+      ],
+      [
+        "cpp-library-architecture",
+        1.0
+      ],
+      [
+        "cpp-library-overview",
+        1.0
+      ],
+      [
+        "cmake-infrastructure-overview",
+        1.0
+      ]
+    ],
+    "doctest integration": [
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "build-testing",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ]
+    ],
+    "clean-name": [
+      [
+        "cmake-alias-convention",
+        1.0
+      ],
+      [
+        "package_name",
+        1.0
+      ],
+      [
+        "target-naming",
+        1.0
+      ],
+      [
+        "cmake alias convention",
+        1.0
+      ],
+      [
+        "target naming and alias deduplication convention",
+        1.0
+      ],
+      [
+        "package-name",
+        1.0
+      ],
+      [
+        "target naming",
+        1.0
+      ],
+      [
+        "alias-deduplication",
+        1.0
+      ],
+      [
+        "alias deduplication",
+        1.0
+      ],
+      [
+        "clean_name",
+        1.0
+      ]
+    ],
+    "build-testing": [
+      [
+        "build_testing",
+        1.0
+      ],
+      [
+        "testing and example executable target generation gated by build_testing",
+        1.0
+      ],
+      [
+        "runtime-dll-copy",
+        1.0
+      ],
+      [
+        "negative compilation tests",
+        1.0
+      ],
+      [
+        "doctest integration",
+        1.0
+      ],
+      [
+        "doctest",
+        1.0
+      ],
+      [
+        "testing-setup",
+        1.0
+      ],
+      [
+        "negative-compilation-tests",
+        1.0
+      ],
+      [
+        "test target setup",
+        1.0
+      ],
+      [
+        "runtime dll copy",
+        1.0
+      ]
+    ],
+    "build-docs": [
+      [
+        "documentation setup and theme integration with build_docs",
+        1.0
+      ],
+      [
+        "doxygen setup",
+        1.0
+      ],
+      [
+        "doxygen-awesome-css",
+        1.0
+      ],
+      [
+        "doxygen",
+        1.0
+      ],
+      [
+        "docs-target",
+        1.0
+      ],
+      [
+        "docs target",
+        1.0
+      ],
+      [
+        "documentation-generation",
+        1.0
+      ],
+      [
+        "documentation generation",
+        1.0
+      ],
+      [
+        "build_docs",
+        1.0
+      ]
+    ],
+    "dependency-tracking": [
+      [
+        "dependency-provider",
+        1.0
+      ],
+      [
+        "cpp-library-enable-dependency-tracking",
+        1.0
+      ],
+      [
+        "cmake-project-top-level-includes",
+        1.0
+      ],
+      [
+        "set_dependency_provider",
+        1.0
+      ],
+      [
+        "dependency provider",
+        1.0
+      ],
+      [
+        "set-dependency-provider",
+        1.0
+      ],
+      [
+        "cmake_project_top_level_includes",
+        1.0
+      ],
+      [
+        "cpp_library_enable_dependency_tracking",
+        1.0
+      ],
+      [
+        "dependency tracking lifecycle and provider ordering",
+        1.0
+      ],
+      [
+        "dependency tracking",
+        1.0
+      ]
+    ]
+  },
+  "provenance": {
+    "set-dependency-provider|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-overview|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "doctest integration|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "package_name|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "dependency-provider|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "lightweight-consumer-mode|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "set_dependency_provider|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "clean-name|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen setup|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "clean-name|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "negative-compilation-tests|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "find-dependency|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "build_testing|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp_library_enable_dependency_tracking|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "set-dependency-provider|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "dependency provider|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "template-copying|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "consumer-initialization|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "documentation setup and theme integration with build_docs|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "consumer-initialization|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build_docs|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "consumer lifecycle and template overwrite controls|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp-library architecture|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "target naming and alias deduplication convention|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "target naming and alias deduplication convention|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "docs target|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "_cpp_library_finish_install|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime-dll-copy|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "project scaffolding|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred install dependency validation and config generation|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "documentation setup and theme integration with build_docs|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "template initialization|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "lightweight-consumer-mode|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-alias-convention|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "setup.cmake|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "testing and example executable target generation gated by build_testing|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "_cpp_library_setup_install_validation|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "set-dependency-provider|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "docs target|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "template initialization|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "deferred install dependency validation and config generation|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "package-name|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "test target setup|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "standalone-generator|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "testing and example executable target generation gated by build_testing|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "toolkit architecture|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake_project_top_level_includes|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "dependency provider|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake alias convention|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "docs-target|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "architecture overview|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library overview|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "deferred install|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library setup script|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "target naming and alias deduplication convention|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "toolkit architecture|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "doxygen-awesome-css|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "build_docs|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "dependency-provider|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "negative-compilation-tests|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "test target setup|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "project-scaffolding|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "install validation|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "negative compilation tests|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "testing-setup|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "clean_name|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake-language-defer|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "alias-deduplication|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "setup.cmake|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup.cmake|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project-is-top-level|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency provider|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-enable-dependency-tracking|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "target naming|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "dependency provider|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "project scaffolding|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project-scaffolding|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "template initialization|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency tracking|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "setup-cmake|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup-cmake|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library setup script|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "alias deduplication|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library architecture|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "build-testing|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library overview|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "install validation|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doxygen|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-overview|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "consumer lifecycle and template overwrite controls|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp-library-overview|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library setup script|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup.cmake|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-architecture|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake infrastructure overview|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "documentation generation|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "setup.cmake|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "target naming and alias deduplication convention|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "documentation-generation|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "runtime dll copy|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "build-docs|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-enable-dependency-tracking|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "architecture overview|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library architecture|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "docs target|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "lightweight-consumer-mode|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "deferred install|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "setup.cmake|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred-install|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "project_is_top_level template copying|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "doxygen|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-architecture|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "build_testing|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "dependency-tracking|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "untracked-dependencies|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "find-dependency|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "set_dependency_provider|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-project-top-level-includes|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "install validation|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "find-dependency|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime dll copy|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "target naming|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake_project_top_level_includes|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "setup.cmake|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build_docs|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "project-scaffolding|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "alias deduplication|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp_library_force_init|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doxygen|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cmake-infrastructure-overview|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "toolkit-architecture|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "project_is_top_level template copying|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-project-top-level-includes|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library overview|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "doxygen|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "target-naming|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "build-testing|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation setup and theme integration with build_docs|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp_library_force_init|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "package-name|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "docs-target|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cmake-project-top-level-includes|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doctest|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "docs-target|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "runtime dll copy|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "build-testing|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "testing-setup|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "dependency tracking|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doctest|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp-library architecture|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "_cpp_library_setup_install_validation|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "documentation-generation|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "_cpp_library_finish_install|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency tracking|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doctest|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation setup and theme integration with build_docs|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "architecture-overview|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library-architecture|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "standalone generator|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "architecture overview|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "set_dependency_provider|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "dependency tracking|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "negative compilation tests|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "untracked dependencies|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "deferred-install|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "install-validation|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library setup script|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "consumer-initialization|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "template-copying|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp_library_force_init|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "toolkit-architecture|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "docs-target|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "deferred install dependency validation and config generation|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "_cpp_library_setup_install_validation|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "build-docs|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cmake-project-top-level-includes|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "architecture overview|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "deferred install|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doxygen setup|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library setup script|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "set-dependency-provider|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "lightweight-consumer-mode|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doctest integration|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "set_dependency_provider|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "deferred-install|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency tracking|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "setup-cmake|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "toolkit-architecture|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "lightweight-consumer-mode|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "build-testing|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doctest|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "architecture-overview|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library-force-init|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "testing-setup|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "setup.cmake|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build-testing|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "dependency-tracking|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "negative compilation tests|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "deferred install dependency validation and config generation|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency provider|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library overview|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "testing and example executable target generation gated by build_testing|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "_cpp_library_finish_install|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake-language-defer|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency provider|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "clean-name|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp_library_enable_dependency_tracking|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-architecture|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "set-dependency-provider|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "toolkit-architecture|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "consumer-initialization|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "dependency tracking|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "architecture-overview|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "consumer lifecycle and template overwrite controls|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "documentation generation|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cmake-alias-convention|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "target naming and alias deduplication convention|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "documentation generation|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-overview|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake-alias-convention|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "toolkit architecture|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "package-name|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "project scaffolding|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cmake-infrastructure-overview|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "doctest integration|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doxygen-awesome-css|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "build-docs|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "target-naming|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "documentation setup and theme integration with build_docs|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-architecture|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "negative-compilation-tests|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "project-is-top-level|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "docs target|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "runtime dll copy|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation generation|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "package-name|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "clean_name|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake infrastructure overview|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "build-docs|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "toolkit-architecture|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library overview|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "lightweight-consumer-mode|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake_project_top_level_includes|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "package_name|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-overview|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "set-dependency-provider|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "alias-deduplication|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "testing-setup|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "architecture overview|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "package-name|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doctest integration|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "target naming|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen setup|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "project-scaffolding|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup.cmake|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "untracked dependencies|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "alias deduplication|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "test target setup|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake alias convention|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-force-init|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency-provider|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-enable-dependency-tracking|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "set_dependency_provider|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "install-validation|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "alias deduplication|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "alias-deduplication|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "build_docs|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "doctest integration|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp-library-architecture|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "testing and example executable target generation gated by build_testing|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "untracked-dependencies|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime dll copy|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "setup-cmake|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "testing and example executable target generation gated by build_testing|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "build-docs|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "dependency tracking|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-infrastructure-overview|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "find-dependency|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp_library_force_init|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "project-is-top-level|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "build-docs|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-enable-dependency-tracking|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "template initialization|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "lightweight-consumer-mode|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "runtime-dll-copy|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build_testing|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "install validation|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "_cpp_library_finish_install|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp_library_enable_dependency_tracking|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "build-docs|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "untracked dependencies|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "clean_name|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project scaffolding|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "standalone-generator|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "negative-compilation-tests|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer lifecycle and template overwrite controls|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "deferred install|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "clean_name|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "_cpp_library_finish_install|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake infrastructure overview|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library-enable-dependency-tracking|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "deferred-install|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency-provider|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "find-dependency|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "template initialization|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "architecture overview|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "template initialization|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp-library-enable-dependency-tracking|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-project-top-level-includes|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "package-name|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "template-initialization|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "template initialization|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp_library_enable_dependency_tracking|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "standalone-generator|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "dependency-tracking|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "alias deduplication|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library architecture|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "lightweight consumer mode|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "consumer initialization|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "package_name|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen-awesome-css|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "alias-deduplication|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "template-copying|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp-library-force-init|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "project-is-top-level|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "testing-setup|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doctest|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "build-testing|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp_library_enable_dependency_tracking|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doxygen setup|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-force-init|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "test target setup|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "build_docs|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "install-validation|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake_project_top_level_includes|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "target-naming|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-enable-dependency-tracking|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-force-init|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "architecture overview|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library overview|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "standalone-generator|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "install validation|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "documentation-generation|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "testing-setup|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "package_name|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "_cpp_library_finish_install|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "project-scaffolding|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "alias deduplication|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "template-initialization|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "project scaffolding|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cmake-language-defer|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "set_dependency_provider|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake alias convention|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen-awesome-css|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "standalone-generator|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "template-copying|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "setup-cmake|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "clean_name|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "package_name|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "target-naming|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "template-copying|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "project scaffolding|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "clean_name|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "clean-name|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "standalone generator|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred install|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "negative-compilation-tests|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "alias-deduplication|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "deferred install dependency validation and config generation|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library-setup-script|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup-cmake|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup-cmake|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred-install|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doxygen setup|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "standalone generator|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "doctest integration|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "target naming|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "documentation-generation|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "consumer lifecycle and template overwrite controls|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "find-dependency|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "toolkit-architecture|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "find-dependency|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "install validation|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doxygen setup|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "documentation-generation|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "consumer-initialization|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "consumer lifecycle and template overwrite controls|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "alias-deduplication|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen-awesome-css|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "install-validation|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "template-initialization|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "lightweight consumer mode|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency-tracking|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "toolkit architecture|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library-architecture|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "project scaffolding|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred install dependency validation and config generation|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doctest integration|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "template-initialization|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "project-is-top-level|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "architecture-overview|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "package-name|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "build_docs|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "docs target|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "testing-setup|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "deferred-install|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "build_testing|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake-infrastructure-overview|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp_library_enable_dependency_tracking|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "_cpp_library_setup_install_validation|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "target naming and alias deduplication convention|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "toolkit architecture|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "documentation-generation|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "project_is_top_level template copying|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "testing-setup|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "_cpp_library_setup_install_validation|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library-enable-dependency-tracking|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "dependency-tracking|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "template initialization|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-alias-convention|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "runtime-dll-copy|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "architecture-overview|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "target naming|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "setup-cmake|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "standalone generator|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "_cpp_library_setup_install_validation|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake_project_top_level_includes|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "clean-name|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "project-is-top-level|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "negative compilation tests|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "alias-deduplication|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "standalone generator|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project_is_top_level template copying|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "toolkit-architecture|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "dependency tracking|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "testing and example executable target generation gated by build_testing|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "negative-compilation-tests|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "install validation|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "test target setup|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation generation|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "alias deduplication|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "untracked dependencies|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency provider|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "project-scaffolding|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-overview|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doctest integration|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "template-copying|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-project-top-level-includes|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "build-docs|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "template-copying|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "standalone generator|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred install|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doctest|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake-language-defer|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library-setup-script|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "untracked-dependencies|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "package_name|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake alias convention|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "runtime-dll-copy|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "set_dependency_provider|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "consumer-initialization|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "lightweight-consumer-mode|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "architecture-overview|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "consumer lifecycle and template overwrite controls|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "negative compilation tests|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp-library architecture|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake-language-defer|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "alias-deduplication|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "testing-setup|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake alias convention|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "test target setup|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp-library-architecture|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake alias convention|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "dependency-provider|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-alias-convention|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "docs-target|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library setup script|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cmake infrastructure overview|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "negative compilation tests|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "deferred install|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doxygen-awesome-css|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "build-docs|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "dependency provider|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-infrastructure-overview|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "runtime dll copy|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "untracked dependencies|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "clean_name|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-overview|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp-library setup script|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "standalone-generator|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library setup script|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred install|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "lightweight consumer mode|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "_cpp_library_finish_install|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "_cpp_library_finish_install|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "project-is-top-level|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake_project_top_level_includes|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "build_testing|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "architecture overview|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "untracked-dependencies|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake-alias-convention|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-setup-script|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build_docs|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "lightweight consumer mode|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "template-copying|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "package_name|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "deferred install dependency validation and config generation|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "clean-name|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "project_is_top_level template copying|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "find-dependency|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "standalone-generator|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "architecture-overview|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "install validation|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime-dll-copy|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "lightweight consumer mode|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "target-naming|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "template-initialization|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "untracked dependencies|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake-alias-convention|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "deferred-install|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp_library_enable_dependency_tracking|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "doxygen|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "install-validation|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library overview|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "dependency-tracking|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "install-validation|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "build_testing|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation generation|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "build_testing|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doctest|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "setup-cmake|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "dependency-tracking|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "consumer initialization|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "docs target|build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "standalone-generator|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-setup-script|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "docs target|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "docs target|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "template initialization|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "untracked dependencies|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "untracked-dependencies|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime dll copy|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "install-validation|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "clean-name|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "setup-cmake|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-enable-dependency-tracking|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "alias deduplication|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake alias convention|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "negative compilation tests|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "set-dependency-provider|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "alias deduplication|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library architecture|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "toolkit architecture|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "template-initialization|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-infrastructure-overview|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "doxygen setup|documentation-generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library setup script|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred install dependency validation and config generation|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "package-name|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "dependency tracking|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "set-dependency-provider|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "negative-compilation-tests|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation generation|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-setup-script|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project-is-top-level|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "consumer-initialization|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project-scaffolding|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "consumer-initialization|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "test target setup|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer-initialization|setup-cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library overview|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "package_name|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "deferred-install|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "_cpp_library_setup_install_validation|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "untracked-dependencies|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "doxygen|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "negative-compilation-tests|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "dependency tracking lifecycle and provider ordering|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "docs-target|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "untracked-dependencies|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "lightweight consumer mode|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake_project_top_level_includes|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "standalone generator|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "target naming and alias deduplication convention|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "negative-compilation-tests|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-setup-script|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "standalone-generator|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "clean-name|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "project-is-top-level|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-alias-convention|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake-alias-convention|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake-language-defer|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "install-validation|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "documentation setup and theme integration with build_docs|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "doxygen-awesome-css|documentation generation": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "set-dependency-provider|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake alias convention|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "runtime dll copy|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake alias convention|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "alias-deduplication|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "runtime dll copy|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "untracked-dependencies|cmake-language-defer": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime-dll-copy|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "toolkit architecture|cpp-library-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake-project-top-level-includes|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-language-defer|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "runtime-dll-copy|negative compilation tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake infrastructure overview|architecture overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "target naming|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "documentation generation|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "target naming|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "target-naming|clean-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "testing and example executable target generation gated by build_testing|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "negative compilation tests|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doxygen|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cmake infrastructure overview|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp_library_force_init|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "build_testing|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "_cpp_library_finish_install|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency provider|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-overview|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "lightweight consumer mode|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "standalone generator|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "deferred-install|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library-setup-script|standalone-generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-force-init|lightweight-consumer-mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "project-scaffolding|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "target naming|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "documentation-generation|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "dependency tracking|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "install validation|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp_library_force_init|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "deferred install dependency validation and config generation|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "install validation|_cpp_library_setup_install_validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "documentation setup and theme integration with build_docs|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "documentation-generation|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "consumer lifecycle and template overwrite controls|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency-provider|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "untracked-dependencies|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "_cpp_library_setup_install_validation|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library overview|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "untracked dependencies|find-dependency": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "target naming and alias deduplication convention|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "target naming|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "deferred install dependency validation and config generation|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "package-name|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "toolkit-architecture|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "_cpp_library_finish_install|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake infrastructure overview|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "template-initialization|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "package_name|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "runtime dll copy|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "set_dependency_provider|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "deferred install|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library architecture|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "doxygen-awesome-css|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library architecture|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cmake-alias-convention|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp_library_force_init|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "doxygen|documentation setup and theme integration with build_docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "dependency provider|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp_library_enable_dependency_tracking|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake-infrastructure-overview|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "documentation setup and theme integration with build_docs|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "doctest|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "untracked-dependencies|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake-language-defer|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "setup.cmake|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cmake_project_top_level_includes|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "consumer initialization|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "doctest integration|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doxygen-awesome-css|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cmake-project-top-level-includes|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "alias-deduplication|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "template-initialization|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "clean-name|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake-infrastructure-overview|cpp-library-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "build-testing|doctest integration": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doxygen setup|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "toolkit architecture|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "build_docs|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "lightweight-consumer-mode|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake alias convention|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cmake-project-top-level-includes|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "clean_name|package_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "deferred install|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "set_dependency_provider|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "docs-target|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "project-scaffolding|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "target-naming|package-name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "dependency-tracking|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "project-scaffolding|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "set-dependency-provider|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp-library-setup-script|cpp-library setup script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "consumer-initialization|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "find-dependency|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency-provider|dependency tracking lifecycle and provider ordering": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "build-testing|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake-infrastructure-overview|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "set_dependency_provider|cmake-project-top-level-includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cmake infrastructure overview|cpp-library architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "target naming|target-naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "doxygen setup|build-docs": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "template-initialization|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "alias deduplication|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "test target setup|runtime dll copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doctest|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|consumer-initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cmake_project_top_level_includes|cpp_library_enable_dependency_tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "find-dependency|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "testing and example executable target generation gated by build_testing|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "project_is_top_level template copying|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake-language-defer|deferred install dependency validation and config generation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "build_docs|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "cpp-library-setup-script|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "runtime-dll-copy|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "architecture overview|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "_cpp_library_setup_install_validation|_cpp_library_finish_install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "project_is_top_level template copying|template-initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp-library-architecture|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "target-naming|alias-deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-force-init|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "build-testing|negative-compilation-tests": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "consumer initialization|project scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "standalone generator|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "testing and example executable target generation gated by build_testing|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "project scaffolding|cpp-library-setup-script": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "project scaffolding|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "runtime-dll-copy|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "package-name|alias deduplication": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "clean_name|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "test target setup|build-testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp-library-force-init|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "testing and example executable target generation gated by build_testing|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "clean-name|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "architecture-overview|cmake infrastructure overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "cpp_library_force_init|project_is_top_level template copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "standalone generator|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build_testing|testing-setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "interactive and headless project scaffolding with setup.cmake|project-scaffolding": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "documentation setup and theme integration with build_docs|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "docs-target|doxygen-awesome-css": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "target-naming|target naming and alias deduplication convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "negative-compilation-tests|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cmake_project_top_level_includes|dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "negative compilation tests|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "doctest|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "template-copying|project-is-top-level": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "doctest integration|test target setup": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "target-naming|cmake alias convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-force-init|consumer lifecycle and template overwrite controls": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "target naming and alias deduplication convention|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "architecture-overview|cpp-library overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "toolkit architecture|architecture-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "toolkit-architecture|cmake-infrastructure-overview": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "testing-setup|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "project_is_top_level template copying|lightweight consumer mode": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "dependency-tracking|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "cpp_library_force_init|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "target naming and alias deduplication convention|clean_name": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "clean_name|target naming": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "project_is_top_level template copying|template initialization": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cmake infrastructure overview|toolkit-architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "consumer lifecycle and template overwrite controls|cpp_library_force_init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "cpp-library-overview|toolkit architecture": [
+      "knowledge\\architecture-overview.md"
+    ],
+    "lightweight consumer mode|template-copying": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "negative compilation tests|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "dependency-provider|dependency provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "documentation generation|doxygen": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "install-validation|untracked-dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "standalone-generator|interactive and headless project scaffolding with setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "build_testing|testing and example executable target generation gated by build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp_library_enable_dependency_tracking|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "build-testing|doctest": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "documentation-generation|docs target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "docs target|docs-target": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "project scaffolding|setup.cmake": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "cpp-library-enable-dependency-tracking|cmake_project_top_level_includes": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "untracked dependencies|install-validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cpp-library setup script|standalone generator": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "docs-target|doxygen setup": [
+      "knowledge\\documentation-setup-and-theme-integration-with-build-docs.md"
+    ],
+    "deferred-install|untracked dependencies": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake-project-top-level-includes|dependency tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "test target setup|runtime-dll-copy": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "untracked dependencies|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "install-validation|deferred install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "cmake-language-defer|install validation": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency-provider|set_dependency_provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "package_name|cmake-alias-convention": [
+      "knowledge\\target-naming-and-alias-deduplication-convention.md"
+    ],
+    "cpp-library-setup-script|consumer initialization": [
+      "procedures\\interactive-and-headless-project-scaffolding-with-setup-cmake.md"
+    ],
+    "_cpp_library_setup_install_validation|deferred-install": [
+      "knowledge\\deferred-install-dependency-validation-and-config-generation.md"
+    ],
+    "dependency-provider|cpp-library-enable-dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "lightweight consumer mode|cpp-library-force-init": [
+      "knowledge\\consumer-lifecycle-and-template-overwrite-controls.md"
+    ],
+    "runtime-dll-copy|build_testing": [
+      "knowledge\\testing-and-example-executable-target-generation-gated-by-build-testing.md"
+    ],
+    "cpp_library_enable_dependency_tracking|dependency-tracking": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ],
+    "dependency-tracking|set-dependency-provider": [
+      "knowledge\\dependency-tracking-lifecycle-and-provider-ordering.md"
+    ]
+  },
+  "entries_processed": 8,
+  "built_at": "2026-10-12T21:16:16.486378900+00:00"
+}
