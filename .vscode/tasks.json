@@ -7,12 +7,12 @@
     {
       "label": "worktree: create",
       "type": "shell",
-      "command": "git worktree add \".claude/worktrees/${input:worktreeName}\" -b \"worktree-${input:worktreeName}\" && (command -v tokensave >/dev/null 2>&1 && tokensave init \".claude/worktrees/${input:worktreeName}\" && tokensave branch add \"worktree-${input:worktreeName}\" --path \".claude/worktrees/${input:worktreeName}\" || true) && code --new-window \".claude/worktrees/${input:worktreeName}\"",
+      "command": "git worktree add \".claude/worktrees/${input:worktreeName}\" -b \"worktree-${input:worktreeName}\" && code --new-window \".claude/worktrees/${input:worktreeName}\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "windows": {
-        "command": "git worktree add \".claude/worktrees/${input:worktreeName}\" -b \"worktree-${input:worktreeName}\" && (where tokensave >nul 2>&1 && (tokensave init \".claude/worktrees/${input:worktreeName}\" && tokensave branch add \"worktree-${input:worktreeName}\" --path \".claude/worktrees/${input:worktreeName}\") || ver>nul) && code --new-window \".claude/worktrees/${input:worktreeName}\"",
+        "command": "git worktree add \".claude/worktrees/${input:worktreeName}\" -b \"worktree-${input:worktreeName}\" && code --new-window \".claude/worktrees/${input:worktreeName}\"",
         "options": {
           "shell": {
             "executable": "cmd.exe",
@@ -25,17 +25,17 @@
         "reveal": "always",
         "panel": "dedicated"
       },
-      "detail": "Prompts for a name, creates a git worktree at .claude/worktrees/<name> on branch worktree-<name>, best-effort syncs it with tokensave if installed, and opens it in a new window."
+      "detail": "Prompts for a name, creates a git worktree at .claude/worktrees/<name> on branch worktree-<name>, and opens it in a new window."
     },
     {
       "label": "worktree: remove",
       "type": "shell",
-      "command": "git worktree remove \".claude/worktrees/${input:worktreeName}\" && (command -v tokensave >/dev/null 2>&1 && tokensave branch gc || true)",
+      "command": "git worktree remove \".claude/worktrees/${input:worktreeName}\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "windows": {
-        "command": "git worktree remove \".claude/worktrees/${input:worktreeName}\" && (where tokensave >nul 2>&1 && tokensave branch gc || ver>nul)",
+        "command": "git worktree remove \".claude/worktrees/${input:worktreeName}\"",
         "options": {
           "shell": {
             "executable": "cmd.exe",
@@ -48,7 +48,7 @@
         "reveal": "always",
         "panel": "dedicated"
       },
-      "detail": "Prompts for a name, removes the git worktree at .claude/worktrees/<name>, and best-effort garbage-collects tokensave's branch tracking if installed."
+      "detail": "Prompts for a name and removes the git worktree at .claude/worktrees/<name>."
     }
   ]
 }
