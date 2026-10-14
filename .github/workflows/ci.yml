@@ -101,10 +101,10 @@ jobs:
           fi
       - name: Check configure-only header commands and fresh clangd navigation
         run: cmake -DCPP_LIBRARY_TEST_CLANGD=ON -DCPP_LIBRARY_TEST_COMPILER_ID=${{ matrix.compiler_id }} -P tests/setup/test_clangd.cmake
-      - name: Check existing setup and package behavior
-        run: |
-          cmake -P tests/setup/test_target_type.cmake
-          cmake -P tests/install/test_nested_install.cmake
+      - name: Check existing setup behavior
+        run: cmake -P tests/setup/test_target_type.cmake
+      - name: Check existing package behavior
+        run: cmake -P tests/install/test_nested_install.cmake
 
   integration-tests:
     name: Integration Tests
