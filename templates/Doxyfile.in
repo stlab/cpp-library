@@ -9,6 +9,10 @@ GENERATE_LATEX          = NO
 QUIET                   = YES
 WARN_IF_UNDOCUMENTED    = YES
 INPUT                   = "@INPUT_DIR@"
+LAYOUT_FILE             = "@CPP_LIBRARY_ROOT@/templates/DoxygenLayout.xml"
+# Missing entries intentionally inherit defaults. Enable and review layout warnings
+# whenever the layout is updated; see README.md's documentation configuration.
+WARN_LAYOUT_FILE        = NO
 RECURSIVE               = YES
 EXCLUDE_SYMBOLS         = @EXCLUDE_SYMBOLS@
 EXAMPLE_PATH            = "@EXAMPLES_PATH@"

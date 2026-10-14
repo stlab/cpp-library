@@ -3,3 +3,4 @@
 .worktrees/
 .claude/worktrees/
 .tokensave
+build/

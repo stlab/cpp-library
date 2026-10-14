@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: BSL-1.0 -->
+<doxygenlayout version="2.0">
+  <!-- Doxygen 1.13.1+ supplies omitted page and member sections from its defaults. -->
+  <!-- When editing this layout, enable WARN_LAYOUT_FILE and review all warnings. -->
+  <navindex>
+    <tab type="mainpage" visible="yes" />
+    <tab type="pages" visible="yes" />
+    <tab type="topics" visible="yes" title="Reference" />
+    <tab type="usergroup" title="Index">
+      <tab type="modules" visible="yes">
+        <tab type="modulelist" visible="yes" />
+        <tab type="modulemembers" visible="yes" />
+      </tab>
+      <tab type="namespaces" visible="yes">
+        <tab type="namespacelist" visible="yes" />
+        <tab type="namespacemembers" visible="yes" />
+      </tab>
+      <tab type="concepts" visible="yes" />
+      <tab type="interfaces" visible="yes">
+        <tab type="interfacelist" visible="yes" />
+        <tab type="interfaceindex" visible="$ALPHABETICAL_INDEX" />
+        <tab type="interfacehierarchy" visible="yes" />
+      </tab>
+      <tab type="classes" visible="yes">
+        <tab type="classlist" visible="yes" />
+        <tab type="classindex" visible="$ALPHABETICAL_INDEX" />
+        <tab type="hierarchy" visible="yes" />
+        <tab type="classmembers" visible="yes" />
+      </tab>
+      <tab type="structs" visible="yes">
+        <tab type="structlist" visible="yes" />
+        <tab type="structindex" visible="$ALPHABETICAL_INDEX" />
+      </tab>
+      <tab type="exceptions" visible="yes">
+        <tab type="exceptionlist" visible="yes" />
+        <tab type="exceptionindex" visible="$ALPHABETICAL_INDEX" />
+        <tab type="exceptionhierarchy" visible="yes" />
+      </tab>
+      <tab type="files" visible="yes">
+        <tab type="filelist" visible="yes" />
+        <tab type="globals" visible="yes" />
+      </tab>
+    </tab>
+    <tab type="examples" visible="yes" />
+  </navindex>
+
+  <group>
+    <briefdescription visible="yes" />
+    <detaileddescription visible="yes" />
+    <groupgraph visible="yes" />
+    <memberdecl>
+      <nestedgroups visible="yes" />
+      <modules visible="yes" />
+      <dirs visible="yes" />
+      <files visible="yes" />
+      <namespaces visible="yes" />
+      <concepts visible="yes" />
+      <classes visible="yes" />
+      <defines visible="yes" />
+      <typedefs visible="yes" />
+      <sequences visible="yes" />
+      <dictionaries visible="yes" />
+      <enums visible="yes" />
+      <enumvalues visible="yes" />
+      <functions visible="yes" />
+      <variables visible="yes" />
+      <signals visible="yes" />
+      <publicslots visible="yes" />
+      <protectedslots visible="yes" />
+      <privateslots visible="yes" />
+      <events visible="yes" />
+      <properties visible="yes" />
+      <friends visible="yes" />
+      <membergroups visible="yes" />
+    </memberdecl>
+    <memberdef>
+      <pagedocs />
+      <inlineclasses visible="yes" />
+      <defines visible="yes" />
+      <typedefs visible="yes" />
+      <sequences visible="yes" />
+      <dictionaries visible="yes" />
+      <enums visible="yes" />
+      <enumvalues visible="yes" />
+      <functions visible="yes" />
+      <variables visible="yes" />
+      <signals visible="yes" />
+      <publicslots visible="yes" />
+      <protectedslots visible="yes" />
+      <privateslots visible="yes" />
+      <events visible="yes" />
+      <properties visible="yes" />
+      <friends visible="yes" />
+    </memberdef>
+    <authorsection visible="yes" />
+  </group>
+</doxygenlayout>

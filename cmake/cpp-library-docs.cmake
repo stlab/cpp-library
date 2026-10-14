@@ -3,7 +3,7 @@
 # cpp-library-docs.cmake - Documentation setup with Doxygen
 
 # Creates 'docs' target for generating API documentation with Doxygen and doxygen-awesome-css theme.
-# - Precondition: NAME, VERSION, and DESCRIPTION specified; Doxygen available
+# - Precondition: NAME, VERSION, and DESCRIPTION specified; Doxygen 1.13.1+ available
 # - Postcondition: 'docs' custom target created, Doxyfile configured, theme downloaded via CPM
 function(_cpp_library_setup_docs)
     set(oneValueArgs
@@ -37,7 +37,7 @@ function(_cpp_library_setup_docs)
         string(APPEND docs_extensions "${option}\n")
     endforeach()
 
-    find_package(Doxygen REQUIRED)
+    find_package(Doxygen 1.13.1 REQUIRED)
 
     # Download doxygen-awesome-css theme via CPM
     # https://github.com/jothepro/doxygen-awesome-css
@@ -87,9 +87,9 @@ function(_cpp_library_setup_docs)
 
     # Add custom target for documentation with proper stderr capture
     if(WIN32)
-        # On Windows, use PowerShell to redirect stderr to stdout
+        # Preserve Doxygen's exit code when PowerShell receives non-fatal warnings.
         add_custom_target(docs
-            COMMAND PowerShell -Command "& '${DOXYGEN_EXECUTABLE}' '${DOXYFILE_OUT}' 2>&1"
+            COMMAND PowerShell -Command "& '${DOXYGEN_EXECUTABLE}' '${DOXYFILE_OUT}' 2>&1; exit $LASTEXITCODE"
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM

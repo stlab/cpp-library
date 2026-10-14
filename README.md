@@ -412,6 +412,47 @@ future toolkit-template changes. Prefer the shared template with only the
 project-specific deltas above. Documentation is configured only for top-level
 projects with `BUILD_DOCS` enabled.
 
+The shared template uses `templates/DoxygenLayout.xml` for reference-first
+navigation: grouped APIs appear under **Reference**, with namespace, class, file,
+and other lookup pages under **Index**. Group descriptions precede member lists,
+and group briefs remain visible even with `REPEAT_BRIEF = NO`. The compact
+version-2 layout inherits unspecified page sections from Doxygen, avoiding a
+version-specific copy of its entire default layout. Documentation generation
+therefore requires **Doxygen 1.13.1 or newer**; non-documentation builds do not
+require Doxygen.
+
+`WARN_LAYOUT_FILE = NO` suppresses warnings about intentionally inherited layout
+entries. It also suppresses other layout diagnostics, including malformed XML;
+normal documentation builds therefore do not validate layout edits. Other
+documentation warnings remain errors.
+
+**Whenever the layout is updated**, temporarily enable layout warnings and review
+all of them. Use these review-only overrides to see the complete warning list
+rather than stopping at the first inherited-entry warning:
+
+```cmake
+DOCS_OPTIONS
+    "WARN_LAYOUT_FILE = YES"
+    "WARN_AS_ERROR = NO"
+```
+
+Reconfigure and build the `docs` target. Accept missing-entry warnings only for
+sections intentionally inherited from Doxygen's defaults; fix malformed XML,
+unknown entries, and other unexpected diagnostics. Then remove the review-only
+overrides to restore `WARN_LAYOUT_FILE = NO` and `WARN_AS_ERROR = YES`.
+
+The layout stays in the toolkit rather than being copied into each project.
+Override it through the existing options when needed (quote paths containing
+spaces):
+
+```cmake
+DOCS_OPTIONS
+    "LAYOUT_FILE = \"${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/DoxygenLayout.xml\""
+```
+
+A project's custom `docs/Doxyfile` retains its own layout configuration; the shared
+layout is not appended to or imposed on that override.
+
 ### `cpp_library_copy_runtime_dlls`
 
 ```cmake
