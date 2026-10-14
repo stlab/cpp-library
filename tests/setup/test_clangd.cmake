@@ -2,15 +2,25 @@
 # Run as: cmake -P tests/setup/test_clangd.cmake
 cmake_minimum_required(VERSION 3.24)
 
-string(RANDOM LENGTH 16 ALPHABET 0123456789abcdef test_id)
+string(RANDOM LENGTH 8 ALPHABET 0123456789abcdef test_id)
 get_filename_component(toolkit_source "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 set(test_root "${toolkit_source}/build/clangd ${test_id}")
+if(CPP_LIBRARY_TEST_CLANGD)
+    find_program(clangd NAMES clangd REQUIRED)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+else()
+    find_program(clangd NAMES clangd)
+    find_package(Python3 QUIET COMPONENTS Interpreter)
+endif()
 
 function(run_checked)
     execute_process(COMMAND ${ARGV}
         RESULT_VARIABLE result OUTPUT_VARIABLE out ERROR_VARIABLE err)
     if(NOT result EQUAL 0)
         message(FATAL_ERROR "Command failed (${result}): ${ARGV}\n${out}\n${err}")
+    endif()
+    if(err)
+        message(FATAL_ERROR "Unexpected command diagnostics: ${ARGV}\n${err}")
     endif()
 endfunction()
 
@@ -65,6 +75,7 @@ foreach(kind IN ITEMS proof_compiled proof_interface compiled interface shared d
     endif()
     run_checked("${CMAKE_COMMAND}" -S "${source}" -B "${binary}" -G Ninja
         "-DTOOLKIT_SOURCE=${toolkit_source}" -DCMAKE_BUILD_TYPE=Debug
+        "-DEXPECTED_COMPILER_ID=${CPP_LIBRARY_TEST_COMPILER_ID}"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_UNITY_BUILD=ON
         "-DHEADER_ONLY=${header_only}" ${options})
     file(READ "${binary}/index-target.txt" index_target)
@@ -83,6 +94,12 @@ foreach(kind IN ITEMS proof_compiled proof_interface compiled interface shared d
             "${binary}/generated/fixture/config.hpp" PUBLIC_CONTEXT=42 LATE_CONTEXT=61 DEPENDENCY_CONTEXT=19)
         check_header("${binary}/compile_commands.json"
             "${binary}/generated/fixture/build_generated.hpp" PUBLIC_CONTEXT=42 LATE_CONTEXT=61)
+        check_header("${binary}/compile_commands.json"
+            "${source}/include/fixture/navigation.hpp" PUBLIC_CONTEXT=42 LATE_CONTEXT=61)
+        if(NOT header_command MATCHES "CONSUMER_CONTEXT=1" OR
+            header_command MATCHES "PRODUCER_CONTEXT=1")
+            message(FATAL_ERROR "Header command used producer target context: ${header_command}")
+        endif()
         check_header("${binary}/compile_commands.json"
             "${source}/nested/include/nested/api.hpp" NESTED_CONTEXT=29)
         if(header_command MATCHES "PUBLIC_CONTEXT")
@@ -109,6 +126,13 @@ foreach(kind IN ITEMS proof_compiled proof_interface compiled interface shared d
             if(NOT production_count EQUAL 1)
                 message(FATAL_ERROR "Production sources changed: ${production_count}")
             endif()
+        endif()
+        if(clangd AND Python3_Interpreter_FOUND)
+            run_checked("${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/check_clangd.py"
+                "${clangd}" "${binary}" "${source}/include/fixture/navigation.hpp")
+            message(STATUS "PASS ${kind}: fresh clangd exact definition ranges before build")
+        else()
+            message(STATUS "SKIP ${kind} protocol check: clangd and Python3 required (enforce with CPP_LIBRARY_TEST_CLANGD=ON)")
         endif()
     endif()
     run_checked("${CMAKE_COMMAND}" --build "${binary}")
@@ -146,9 +170,16 @@ foreach(kind IN ITEMS proof_compiled proof_interface compiled interface shared d
     if(NOT properties STREQUAL "${header}\n")
         message(FATAL_ERROR "Production source properties or FILE_SET changed: ${properties}")
     endif()
-    find_program(clangd clangd)
     if(clangd)
-        run_checked("${clangd}" "--check=${header}" "--compile-commands-dir=${binary}" --tweaks=)
+        execute_process(COMMAND "${clangd}" "--check=${header}"
+            "--compile-commands-dir=${binary}" --tweaks=
+            RESULT_VARIABLE result OUTPUT_VARIABLE out ERROR_VARIABLE err)
+        if(NOT result EQUAL 0 OR NOT err MATCHES "Compile command from CDB is:" OR
+            err MATCHES "command inferred from")
+            message(FATAL_ERROR "clangd did not parse with its exact header command:\n${out}\n${err}")
+        endif()
+    else()
+        message(STATUS "SKIP clangd parse check: clangd not found")
     endif()
     message(STATUS "PASS ${kind}: exact configure-time header command, isolated properties and excluded build")
 endforeach()
@@ -170,9 +201,21 @@ foreach(error_case IN ITEMS conflict missing imported executable relative)
     endif()
     message(STATUS "PASS ${error_case}: registration rejected")
 endforeach()
+set(source "${test_root}/multi-config/source")
+file(MAKE_DIRECTORY "${source}")
+file(COPY "${CMAKE_CURRENT_LIST_DIR}/fixtures/clangd/" DESTINATION "${source}")
+execute_process(COMMAND "${CMAKE_COMMAND}" -S "${source}"
+    -B "${test_root}/multi-config/build" -G "Ninja Multi-Config"
+    "-DTOOLKIT_SOURCE=${toolkit_source}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    RESULT_VARIABLE result OUTPUT_VARIABLE out ERROR_VARIABLE err)
+if(result EQUAL 0 OR NOT err MATCHES "multi-configuration generators" OR
+    NOT err MATCHES "CPP_LIBRARY_ENABLE_CLANGD=OFF")
+    message(FATAL_ERROR "Missing actionable multi-config diagnostic:\n${out}\n${err}")
+endif()
+message(STATUS "PASS unsupported multi-config generator: explicit diagnostic")
 foreach(settings_case IN ITEMS fresh existing)
-    set(source "${test_root}/settings/${settings_case}/source")
-    set(binary "${test_root}/settings/${settings_case}/build")
+    set(source "${test_root}/ws/${settings_case}/src")
+    set(binary "${test_root}/ws/${settings_case}/build")
     file(MAKE_DIRECTORY "${source}")
     file(COPY "${CMAKE_CURRENT_LIST_DIR}/fixtures/clangd/" DESTINATION "${source}")
     set(settings "${source}/.vscode/settings.json")
@@ -211,7 +254,7 @@ foreach(settings_case IN ITEMS fresh existing)
         endif()
     endif()
     foreach(preset IN ITEMS default test)
-        run_checked("${CMAKE_COMMAND}" --preset "${preset}" -S "${source}"
+        run_checked("${CMAKE_COMMAND}" --no-warn-unused-cli --preset "${preset}" -S "${source}"
             "-DTOOLKIT_SOURCE=${toolkit_source}" -DWORKSPACE=ON)
         set(expected_context 1)
         if(preset STREQUAL test)

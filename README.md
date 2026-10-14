@@ -804,6 +804,11 @@ cmake -P tests/setup/test_clangd.cmake
 cmake -P tests/setup/test_setup_version_resolution.cmake
 ```
 
+To require fresh-clangd protocol checks as CI does, run
+`cmake -DCPP_LIBRARY_TEST_CLANGD=ON -P tests/setup/test_clangd.cmake`.
+This requires clangd on `PATH` and a Python 3 interpreter; otherwise the default
+script reports unavailable protocol checks as skipped.
+
 The nested-install regression configures, builds, installs, and runs a downstream consumer,
 checks independent and legacy installation controls, and verifies package-local dependency validation.
 The consumer links only the parent target and calls its API, which requires a compiled static

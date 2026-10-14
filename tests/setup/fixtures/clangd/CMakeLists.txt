@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.24)
 project(clangd_fixture LANGUAGES CXX)
+if(EXPECTED_COMPILER_ID AND NOT CMAKE_CXX_COMPILER_ID STREQUAL EXPECTED_COMPILER_ID)
+    message(FATAL_ERROR "Expected ${EXPECTED_COMPILER_ID}, got ${CMAKE_CXX_COMPILER_ID}")
+endif()
 include("${TOOLKIT_SOURCE}/cpp-library.cmake")
 
 if(WORKSPACE)
@@ -48,7 +51,8 @@ else()
     set(generated "${CMAKE_CURRENT_BINARY_DIR}/generated/fixture/config.hpp")
     set_source_files_properties("${generated}" PROPERTIES GENERATED TRUE)
     cpp_library_add_clangd_headers(TARGET owner HEADERS "${generated}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/fixture/extra.hpp")
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/fixture/extra.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/fixture/navigation.hpp")
     set(build_generated "${CMAKE_CURRENT_BINARY_DIR}/generated/fixture/build_generated.hpp")
     add_custom_command(OUTPUT "${build_generated}"
         COMMAND "${CMAKE_COMMAND}" -E copy "${generated}" "${build_generated}"
@@ -64,7 +68,10 @@ else()
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>")
     target_compile_definitions(owner ${usage} LATE_CONTEXT=61
         "$<$<CONFIG:Debug>:DEBUG_CONTEXT=1>"
-        "$<$<CONFIG:Release>:RELEASE_CONTEXT=1>")
+        "$<$<CONFIG:Release>:RELEASE_CONTEXT=1>"
+        "$<$<BOOL:$<TARGET_PROPERTY:FIXTURE_CONSUMER_MARKER>>:PRODUCER_CONTEXT=1>"
+        "$<$<NOT:$<BOOL:$<TARGET_PROPERTY:FIXTURE_CONSUMER_MARKER>>>:CONSUMER_CONTEXT=1>")
+    set_property(TARGET owner PROPERTY FIXTURE_CONSUMER_MARKER TRUE)
     if(BUILD_SHARED_LIBS AND NOT HEADER_ONLY)
         target_compile_definitions(owner PRIVATE OWNER_EXPORT=1)
         target_compile_definitions(owner INTERFACE OWNER_IMPORT=1)
