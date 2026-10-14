@@ -1,0 +1,5 @@
+set(header "${PROJECT_SOURCE_DIR}/include/fixture/api.hpp")
+set_source_files_properties("${header}" PROPERTIES LANGUAGE CXX HEADER_FILE_ONLY FALSE)
+add_library(fixture_index OBJECT EXCLUDE_FROM_ALL "${header}")
+set_target_properties(fixture_index PROPERTIES UNITY_BUILD OFF)
+target_link_libraries(fixture_index PRIVATE owner)

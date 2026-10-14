@@ -78,6 +78,7 @@ include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-setup.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-testing.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-docs.cmake")
 include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-ci.cmake")
+include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-clangd.cmake")
 
 # Creates test or example executables and registers them with CTest.
 # - Precondition: doctest target available via CPM, source files exist in TYPE directory, enable_testing() called
@@ -292,6 +293,8 @@ function(cpp_library_setup)
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
         ${install_args}
     )
+
+    cpp_library_add_clangd_headers(TARGET "${ARG_NAME}" HEADERS ${GENERATED_HEADERS})
 
     # Only setup development infrastructure when building as top-level project
     if(NOT PROJECT_IS_TOP_LEVEL)
