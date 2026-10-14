@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.24)
 project(clangd_fixture LANGUAGES CXX)
 include("${TOOLKIT_SOURCE}/cpp-library.cmake")
 
+if(WORKSPACE)
+    set(CPP_LIBRARY_VERSION 1.0.0)
+    set(FIXTURE_INSTALL OFF CACHE BOOL "" FORCE)
+    cpp_library_setup(DESCRIPTION "Workspace settings fixture" NAMESPACE fixture
+        HEADERS api.hpp REQUIRES_CPP_VERSION 20)
+    target_compile_definitions(clangd_fixture INTERFACE PUBLIC_CONTEXT=42
+        "$<IF:$<CONFIG:Debug>,PRESET_CONTEXT=2,PRESET_CONTEXT=1>")
+    return()
+endif()
+
 if(HEADER_ONLY)
     add_library(owner INTERFACE)
     set(usage INTERFACE)
