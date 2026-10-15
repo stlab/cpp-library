@@ -53,6 +53,59 @@ jobs:
       - name: Run nested static and shared installation round trips
         run: cmake -P tests/install/test_nested_install.cmake
 
+  clangd:
+    name: clangd (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cxx: g++
+            compiler_id: GNU
+          - os: windows-latest
+            cxx: cl
+            compiler_id: MSVC
+          - os: macos-latest
+            cxx: clang++
+            compiler_id: AppleClang
+    runs-on: ${{ matrix.os }}
+    env:
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
+        if: runner.os == 'Windows'
+      - name: Locate Windows clangd
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $llvm = Join-Path $env:ProgramFiles 'LLVM\bin'
+          if (-not (Test-Path (Join-Path $llvm 'clangd.exe'))) {
+            choco install llvm --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          $llvm | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Ensure Linux clangd
+        if: runner.os == 'Linux'
+        run: |
+          if ! command -v clangd >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y clangd
+          fi
+      - name: Ensure macOS clangd
+        if: runner.os == 'macOS'
+        run: |
+          if ! command -v clangd >/dev/null; then
+            brew install llvm
+            echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+          fi
+      - name: Check configure-only header commands and fresh clangd navigation
+        run: cmake -DCPP_LIBRARY_TEST_CLANGD=ON -DCPP_LIBRARY_TEST_COMPILER_ID=${{ matrix.compiler_id }} -P tests/setup/test_clangd.cmake
+      - name: Check existing setup behavior
+        run: cmake -P tests/setup/test_target_type.cmake
+      - name: Check existing package behavior
+        run: cmake -P tests/install/test_nested_install.cmake
+
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest

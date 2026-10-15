@@ -412,6 +412,47 @@ future toolkit-template changes. Prefer the shared template with only the
 project-specific deltas above. Documentation is configured only for top-level
 projects with `BUILD_DOCS` enabled.
 
+The shared template uses `templates/DoxygenLayout.xml` for reference-first
+navigation: grouped APIs appear under **Reference**, with namespace, class, file,
+and other lookup pages under **Index**. Group descriptions precede member lists,
+and group briefs remain visible even with `REPEAT_BRIEF = NO`. The compact
+version-2 layout inherits unspecified page sections from Doxygen, avoiding a
+version-specific copy of its entire default layout. Documentation generation
+therefore requires **Doxygen 1.13.1 or newer**; non-documentation builds do not
+require Doxygen.
+
+`WARN_LAYOUT_FILE = NO` suppresses warnings about intentionally inherited layout
+entries. It also suppresses other layout diagnostics, including malformed XML;
+normal documentation builds therefore do not validate layout edits. Other
+documentation warnings remain errors.
+
+**Whenever the layout is updated**, temporarily enable layout warnings and review
+all of them. Use these review-only overrides to see the complete warning list
+rather than stopping at the first inherited-entry warning:
+
+```cmake
+DOCS_OPTIONS
+    "WARN_LAYOUT_FILE = YES"
+    "WARN_AS_ERROR = NO"
+```
+
+Reconfigure and build the `docs` target. Accept missing-entry warnings only for
+sections intentionally inherited from Doxygen's defaults; fix malformed XML,
+unknown entries, and other unexpected diagnostics. Then remove the review-only
+overrides to restore `WARN_LAYOUT_FILE = NO` and `WARN_AS_ERROR = YES`.
+
+The layout stays in the toolkit rather than being copied into each project.
+Override it through the existing options when needed (quote paths containing
+spaces):
+
+```cmake
+DOCS_OPTIONS
+    "LAYOUT_FILE = \"${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/DoxygenLayout.xml\""
+```
+
+A project's custom `docs/Doxyfile` retains its own layout configuration; the shared
+layout is not appended to or imposed on that override.
+
 ### `cpp_library_copy_runtime_dlls`
 
 ```cmake
@@ -686,6 +727,91 @@ The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage
 
 **Solution**: This is a known clang-tidy issue ([CMake #22979](https://gitlab.kitware.com/cmake/cmake/-/issues/22979)) where clang-tidy doesn't properly recognize MSVC's `/EHsc` exception handling flag. cpp-library automatically detects this scenario and adds `--extra-arg=/EHsc` to `CMAKE_CXX_CLANG_TIDY` when both MSVC and clang-tidy are enabled. This workaround is applied transparently and only on MSVC platforms.
 
+## clangd and VSCode
+
+With `CMAKE_EXPORT_COMPILE_COMMANDS=ON` (already enabled by the supplied Ninja
+presets), `cpp_library_setup()` registers each public header with an exact C++
+consumer command in CMake's ordinary `compile_commands.json`. This also works for
+header-only and nested dependency libraries without tests or implementation
+sources. Commands use the owner's public/transitive usage requirements, including
+requirements added after setup; private implementation flags and DLL-export
+definitions are not copied. Dependencies never consume their downstream owners.
+
+Indexing OBJECT targets are excluded from normal builds and are not installed or
+exported. They do not change the production target's sources or public-header
+FILE_SET. No database postprocessor or configure-time clangd dependency is needed.
+Set `CPP_LIBRARY_ENABLE_CLANGD=OFF` to opt out. With database export disabled,
+registration still validates ownership but creates no indexing targets or warnings.
+
+For manually created local INTERFACE, STATIC or SHARED libraries, register explicit
+absolute paths (a local alias is also accepted):
+
+```cmake
+cpp_library_add_clangd_headers(
+    TARGET my_library
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/my_library/api.hpp"
+)
+```
+
+Repeated registration with one owner is idempotent; additional headers extend its
+registration. Registering a header with two different owners fails with both names
+and the path, rather than leaving clangd to choose an arbitrary command. Imported
+targets and generator expressions in header paths are not supported. Explicit
+generated headers can be registered before they exist, provided they are declared
+`GENERATED`; headers needed immediately by the editor must actually be generated
+during configure (for example with `configure_file()`). Registering a build-time
+header does not run its generator or add default-build prerequisites.
+
+### Editor setup and migration
+
+Install CMake 3.24+, Ninja, the selected compiler/SDK, clangd, VSCode CMake Tools,
+and the clangd extension. Dependencies must be available and configuration must
+succeed. Select a configure preset with **CMake: Select Configure Preset**, then
+run **CMake: Configure**. No build or previously opened includer is required:
+restart clangd if necessary and open a registered public header first.
+
+New projects receive `.vscode/settings.json` with:
+
+```json
+{
+    "cmake.useCMakePresets": "always",
+    "cmake.configureOnOpen": true,
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json"
+}
+```
+
+CMake Tools copies the selected build tree's unmodified database to the workspace
+root after successful configuration. Selecting another preset and configuring
+refreshes that copy. No `cmake.postConfigureTask` is added, and clangd is not pinned
+to any preset directory. CLI-only `cmake --preset ...` configuration generates the
+build-tree database but does **not** invoke CMake Tools' root-copy action.
+
+Ordinary configuration preserves an existing settings file byte-for-byte, including
+custom copy destinations, post-configure hooks, and unrelated settings. For an
+existing workspace, add the three keys above manually, reconciling your current
+copy destination/hook rather than adding a competing database writer. The `init`
+preset / `CPP_LIBRARY_FORCE_INIT=ON` intentionally regenerates templates, **including
+settings.json**; back up custom settings before using it.
+
+### Supported boundaries
+
+Use a single-configuration Ninja or Makefile generator. Visual Studio and Xcode
+generators are not supported for database export. Active multi-configuration
+generators (including Ninja Multi-Config) are rejected: their duplicate per-header
+configuration entries do not select clangd's active variant. Use single-config
+Ninja or disable this feature instead.
+
+Normal configuration-dependent usage requirements are evaluated by CMake at
+generation time. Target-context-sensitive expressions evaluate in the private
+indexing **consumer** context, not the producer's: custom consumer properties are
+not automatically copied from the library. This is not a compilation-database
+merger or a standalone-header validation build.
+
+The focused CI regression covers Windows/MSVC, Linux/GCC and macOS/Apple Clang.
+Local evidence from this change is Windows/MSVC; the other platforms require their
+CI runs. Protocol checks use fresh clangd processes and require Python only for the
+test harness, never for consuming projects.
+
 ## Development
 
 To update cpp-library dependencies search for `[DEPENDENCY]`. Embed the marker in an HTML
@@ -715,8 +841,14 @@ cmake -P tests/install/CMakeLists.txt
 cmake -P tests/install/test_provider_merge.cmake
 cmake -P tests/install/test_nested_install.cmake
 cmake -P tests/setup/test_target_type.cmake
+cmake -P tests/setup/test_clangd.cmake
 cmake -P tests/setup/test_setup_version_resolution.cmake
 ```
+
+To require fresh-clangd protocol checks as CI does, run
+`cmake -DCPP_LIBRARY_TEST_CLANGD=ON -P tests/setup/test_clangd.cmake`.
+This requires clangd on `PATH` and a Python 3 interpreter; otherwise the default
+script reports unavailable protocol checks as skipped.
 
 The nested-install regression configures, builds, installs, and runs a downstream consumer,
 checks independent and legacy installation controls, and verifies package-local dependency validation.

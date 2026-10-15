@@ -1,0 +1,86 @@
+# SPDX-License-Identifier: BSL-1.0
+include_guard(GLOBAL)
+
+option(CPP_LIBRARY_ENABLE_CLANGD "Generate public-header consumer commands for clangd" ON)
+
+# Register absolute public header paths, including declared generated headers.
+function(cpp_library_add_clangd_headers)
+    cmake_parse_arguments(PARSE_ARGV 0 ARG "" "TARGET" "HEADERS")
+    if(ARG_UNPARSED_ARGUMENTS OR ARG_KEYWORDS_MISSING_VALUES OR
+        NOT ARG_TARGET OR NOT ARG_HEADERS)
+        message(FATAL_ERROR
+            "cpp_library_add_clangd_headers: expected TARGET <local-library> HEADERS <absolute-path>...")
+    endif()
+    if(NOT TARGET "${ARG_TARGET}")
+        message(FATAL_ERROR "cpp_library_add_clangd_headers: target '${ARG_TARGET}' does not exist")
+    endif()
+    get_target_property(owner "${ARG_TARGET}" ALIASED_TARGET)
+    if(NOT owner)
+        set(owner "${ARG_TARGET}")
+    endif()
+    get_target_property(imported "${owner}" IMPORTED)
+    get_target_property(type "${owner}" TYPE)
+    if(imported OR NOT type MATCHES "^(INTERFACE|STATIC|SHARED)_LIBRARY$")
+        message(FATAL_ERROR
+            "cpp_library_add_clangd_headers: '${owner}' must be a local INTERFACE, STATIC or SHARED library (not imported)")
+    endif()
+
+    set(headers)
+    foreach(header IN LISTS ARG_HEADERS)
+        if(NOT IS_ABSOLUTE "${header}" OR header MATCHES "\\$<")
+            message(FATAL_ERROR
+                "cpp_library_add_clangd_headers: '${header}' must be an absolute header path, not a generator expression")
+        endif()
+        cmake_path(NORMAL_PATH header)
+        set(key_path "${header}")
+        if(WIN32)
+            string(TOLOWER "${key_path}" key_path)
+        endif()
+        string(SHA256 key "${key_path}")
+        get_property(previous GLOBAL PROPERTY "_CPP_LIBRARY_CLANGD_OWNER_${key}")
+        if(previous AND NOT previous STREQUAL owner)
+            message(FATAL_ERROR
+                "cpp_library_add_clangd_headers: header '${header}' is registered to both '${previous}' and '${owner}'; assign a single owner")
+        endif()
+        set_property(GLOBAL PROPERTY "_CPP_LIBRARY_CLANGD_OWNER_${key}" "${owner}")
+        list(APPEND headers "${header}")
+    endforeach()
+    list(REMOVE_DUPLICATES headers)
+
+    if(NOT CPP_LIBRARY_ENABLE_CLANGD OR NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+        return()
+    endif()
+    if(CMAKE_CONFIGURATION_TYPES)
+        message(FATAL_ERROR
+            "cpp_library_add_clangd_headers: multi-configuration generators produce ambiguous header commands; use single-config Ninja/Makefiles or set CPP_LIBRARY_ENABLE_CLANGD=OFF")
+    endif()
+    if(NOT CMAKE_GENERATOR MATCHES "(Ninja|Makefiles|WMake)")
+        message(WARNING
+            "cpp_library_add_clangd_headers: '${CMAKE_GENERATOR}' cannot export supported header commands; use a Ninja/Makefile generator or set CPP_LIBRARY_ENABLE_CLANGD=OFF")
+        return()
+    endif()
+
+    get_property(index_target TARGET "${owner}" PROPERTY _CPP_LIBRARY_CLANGD_TARGET)
+    if(NOT index_target)
+        string(SHA256 owner_key "${owner}")
+        string(SUBSTRING "${owner_key}" 0 12 owner_key)
+        set(index_target "_cpp_library_clangd_${owner_key}")
+        if(TARGET "${index_target}")
+            message(FATAL_ERROR
+                "cpp_library_add_clangd_headers: reserved indexing target '${index_target}' already exists")
+        endif()
+        set(index_binary "${CMAKE_CURRENT_BINARY_DIR}/clangd/${owner_key}")
+        set_property(TARGET "${owner}" PROPERTY _CPP_LIBRARY_CLANGD_TARGET "${index_target}")
+        set_property(TARGET "${owner}" PROPERTY _CPP_LIBRARY_CLANGD_DIRECTORY "${index_binary}")
+        add_subdirectory("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/clangd" "${index_binary}" EXCLUDE_FROM_ALL)
+    else()
+        get_property(index_binary TARGET "${owner}" PROPERTY _CPP_LIBRARY_CLANGD_DIRECTORY)
+        get_target_property(registered "${index_target}" SOURCES)
+        list(REMOVE_ITEM headers ${registered})
+        if(headers)
+            set_source_files_properties(${headers} DIRECTORY "${index_binary}"
+                PROPERTIES LANGUAGE CXX HEADER_FILE_ONLY FALSE)
+            target_sources("${index_target}" PRIVATE ${headers})
+        endif()
+    endif()
+endfunction()

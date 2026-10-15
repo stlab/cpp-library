@@ -15,7 +15,29 @@ function(CPMAddPackage)
 endfunction()
 
 set(docs_args)
-if(CASE STREQUAL "extended")
+if(CASE STREQUAL "layout-brief")
+    list(APPEND docs_args DOCS_OPTIONS "REPEAT_BRIEF = NO")
+elseif(CASE STREQUAL "layout-review")
+    list(APPEND docs_args DOCS_OPTIONS "WARN_LAYOUT_FILE = YES")
+elseif(CASE STREQUAL "layout-review-all")
+    list(APPEND docs_args DOCS_OPTIONS "WARN_LAYOUT_FILE = YES" "WARN_AS_ERROR = NO")
+elseif(CASE STREQUAL "layout-override" OR CASE STREQUAL "invalid-layout")
+    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/custom layout.xml"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        "<doxygenlayout version=\"2.0\"><navindex>"
+        "<tab type=\"mainpage\" visible=\"yes\"/>"
+        "<tab type=\"topics\" visible=\"yes\" title=\"Custom reference\"/>"
+        "</navindex></doxygenlayout>\n")
+    if(CASE STREQUAL "invalid-layout")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/custom layout.xml"
+            "<doxygenlayout version=\"2.0\"><navindex>")
+    endif()
+    list(APPEND docs_args DOCS_OPTIONS
+        "LAYOUT_FILE = \"${CMAKE_CURRENT_SOURCE_DIR}/custom layout.xml\"")
+    if(CASE STREQUAL "invalid-layout")
+        list(APPEND docs_args DOCS_OPTIONS "WARN_LAYOUT_FILE = YES")
+    endif()
+elseif(CASE STREQUAL "extended")
     list(APPEND docs_args
         DOCS_INPUTS "extra docs" "${CMAKE_CURRENT_SOURCE_DIR}/absolute docs/group.dox"
         DOCS_OPTIONS
