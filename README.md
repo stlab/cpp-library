@@ -412,9 +412,12 @@ future toolkit-template changes. Prefer the shared template with only the
 project-specific deltas above. Documentation is configured only for top-level
 projects with `BUILD_DOCS` enabled.
 
-The shared template uses `templates/DoxygenLayout.xml` for reference-first
-navigation: grouped APIs appear under **Reference**, with namespace, class, file,
-and other lookup pages under **Index**. Group descriptions precede member lists,
+The shared template uses the stlab-derived `templates/DoxygenLayout.xml` for
+tutorial-first navigation: **Tutorials** contains the main page and authored
+guides, grouped APIs appear under **Reference**, and namespace, class, file,
+example, and other lookup pages appear under **Index**. Supply tutorial pages
+through `DOCS_INPUTS` and organize APIs with Doxygen `\defgroup` and `\ingroup`.
+Reference appears when the project defines groups. Group descriptions precede member lists,
 and group briefs remain visible even with `REPEAT_BRIEF = NO`. The compact
 version-2 layout inherits unspecified page sections from Doxygen, avoiding a
 version-specific copy of its entire default layout. Documentation generation

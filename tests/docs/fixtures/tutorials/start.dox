@@ -1,0 +1,7 @@
+/** \page fixture_install Install the fixture
+ * Build and install the fixture before compiling your first program.
+ */
+
+/** \example client.cpp
+ * A standalone client.
+ */

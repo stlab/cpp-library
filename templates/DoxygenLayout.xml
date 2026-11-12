@@ -4,8 +4,10 @@
   <!-- Doxygen 1.13.1+ supplies omitted page and member sections from its defaults. -->
   <!-- When editing this layout, enable WARN_LAYOUT_FILE and review all warnings. -->
   <navindex>
-    <tab type="mainpage" visible="yes" />
-    <tab type="pages" visible="yes" />
+    <tab type="usergroup" title="Tutorials">
+      <tab type="mainpage" visible="yes" title="Getting started" />
+      <tab type="pages" visible="yes" title="Guides" />
+    </tab>
     <tab type="topics" visible="yes" title="Reference" />
     <tab type="usergroup" title="Index">
       <tab type="modules" visible="yes">
@@ -41,8 +43,8 @@
         <tab type="filelist" visible="yes" />
         <tab type="globals" visible="yes" />
       </tab>
+      <tab type="examples" visible="yes" />
     </tab>
-    <tab type="examples" visible="yes" />
   </navindex>
 
   <group>

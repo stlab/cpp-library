@@ -15,6 +15,14 @@ function(CPMAddPackage)
 endfunction()
 
 set(docs_args)
+if(CASE STREQUAL "tutorials")
+    list(APPEND docs_args DOCS_INPUTS "tutorials")
+elseif(CASE STREQUAL "no-groups")
+    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/include/fixture/api.hpp"
+        "/** @file\n * @brief An API without reference groups.\n */\n"
+        "/** @brief Return the fixture value. */\n"
+        "inline int value() { return 42; }\n")
+endif()
 if(CASE STREQUAL "layout-brief")
     list(APPEND docs_args DOCS_OPTIONS "REPEAT_BRIEF = NO")
 elseif(CASE STREQUAL "layout-review")
