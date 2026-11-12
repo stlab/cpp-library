@@ -417,12 +417,19 @@ tutorial-first navigation: **Tutorials** contains the main page and authored
 guides, grouped APIs appear under **Reference**, and namespace, class, file,
 example, and other lookup pages appear under **Index**. Supply tutorial pages
 through `DOCS_INPUTS` and organize APIs with Doxygen `\defgroup` and `\ingroup`.
+Tutorials and Index are expandable headings, not landing pages. Doxygen hides
+lookup sections without documented contents.
 Reference appears when the project defines groups. Group descriptions precede member lists,
 and group briefs remain visible even with `REPEAT_BRIEF = NO`. The compact
 version-2 layout inherits unspecified page sections from Doxygen, avoiding a
 version-specific copy of its entire default layout. Documentation generation
 therefore requires **Doxygen 1.13.1 or newer**; non-documentation builds do not
 require Doxygen.
+
+To add a program to the Examples index, put a `\example example.cpp` documentation
+block in a `DOCS_INPUTS` file. The shared template searches the project's
+`examples` directory. Building a source through `EXAMPLES` or displaying it with
+`\include` does not create an example page.
 
 `WARN_LAYOUT_FILE = NO` suppresses warnings about intentionally inherited layout
 entries. It also suppresses other layout diagnostics, including malformed XML;
