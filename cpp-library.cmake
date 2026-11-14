@@ -301,7 +301,7 @@ function(cpp_library_setup)
         return() # Early return for lightweight consumer mode
     endif()
 
-    _cpp_library_setup_package_test("${ARG_NAME}" "${PACKAGE_NAME}" "${ARG_NAMESPACE}")
+    _cpp_library_setup_package_test("${PACKAGE_NAME}")
 
     # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
     if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)

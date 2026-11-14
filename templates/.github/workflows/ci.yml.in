@@ -61,7 +61,7 @@ jobs:
         run: |
           cmake --preset=default
           cmake --build --preset=default
-          cmake --install build/default --prefix ${{ runner.temp }}/install
+          cmake --install build/default --prefix "${{ runner.temp }}/install"
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
@@ -71,12 +71,12 @@ jobs:
         run: |
           cmake --preset=default
           cmake --build --preset=default
-          cmake --install build/default --prefix ${{ runner.temp }}/install
+          cmake --install build/default --prefix "${{ runner.temp }}/install"
         if: ${{ !matrix.cc }}
 
-      - name: Test find_package
+      - name: Check installed package artifacts
         run: |
-          cmake -P build/default/cpp-library-test-package.cmake
+          cmake "-DPACKAGE_TEST_PREFIX=${{ runner.temp }}/install" -P build/default/cpp-library-test-package.cmake
 
   clang-tidy:
     runs-on: ubuntu-latest
