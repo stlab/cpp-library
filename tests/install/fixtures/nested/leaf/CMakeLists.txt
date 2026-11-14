@@ -11,6 +11,11 @@ cpp_library_setup(
     HEADERS leaf.hpp
     SOURCES leaf.cpp
     ${install_args})
+if(PACKAGE_TEST_EXTRA)
+    add_subdirectory(extra EXCLUDE_FROM_ALL)
+    target_link_libraries(leaf PUBLIC stlab::extra)
+    cpp_library_map_dependency("stlab::extra" "stlab-extra 1.0.0")
+endif()
 get_target_property(leaf_type leaf TYPE)
 set(LEAF_SHARED 0)
 if(leaf_type STREQUAL "SHARED_LIBRARY")
