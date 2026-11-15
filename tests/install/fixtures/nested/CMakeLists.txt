@@ -19,7 +19,11 @@ cpp_library_setup(
     NAMESPACE stlab
     HEADERS parent.hpp
     ${install_args})
-add_subdirectory(leaf)
+if(EXCLUDE_LEAF_FROM_ALL)
+    add_subdirectory(leaf EXCLUDE_FROM_ALL)
+else()
+    add_subdirectory(leaf)
+endif()
 # Resolve the installed target downstream, even when leaf is not exported in this build.
 target_link_libraries(parent INTERFACE
     $<BUILD_INTERFACE:stlab::leaf>

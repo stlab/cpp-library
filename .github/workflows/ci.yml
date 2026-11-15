@@ -26,6 +26,9 @@ jobs:
       - name: Run nested installation round-trip tests
         run: cmake -P tests/install/test_nested_install.cmake
 
+      - name: Run generated packaging checks
+        run: cmake -P tests/install/test_package_ci.cmake
+
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
 
@@ -52,6 +55,9 @@ jobs:
 
       - name: Run nested static and shared installation round trips
         run: cmake -P tests/install/test_nested_install.cmake
+
+      - name: Run generated packaging checks
+        run: cmake -P tests/install/test_package_ci.cmake
 
   clangd:
     name: clangd (${{ matrix.os }})

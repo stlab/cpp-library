@@ -37,3 +37,18 @@ function(_cpp_library_setup_ci PACKAGE_NAME force_init)
         message(WARNING "CI template file not found: ${ci_template}")
     endif()
 endfunction()
+
+# Generates an installed-artifact check after the project's directories are configured.
+function(_cpp_library_generate_package_test package root)
+    include(GNUInstallDirs)
+    set(PACKAGE_TEST_NAME "${package}")
+    set(PACKAGE_TEST_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}")
+    configure_file("${root}/templates/test-package.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/cpp-library-test-package.cmake" @ONLY)
+endfunction()
+
+# Schedules artifact-check generation without changing install rules.
+function(_cpp_library_setup_package_test package)
+    cmake_language(EVAL CODE
+        "cmake_language(DEFER CALL _cpp_library_generate_package_test [[${package}]] [[${CPP_LIBRARY_ROOT}]])")
+endfunction()
