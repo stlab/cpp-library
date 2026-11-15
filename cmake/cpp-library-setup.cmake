@@ -91,6 +91,9 @@ function(_cpp_library_setup_core)
     if(ARG_SOURCES)
         # Respect the consumer's BUILD_SHARED_LIBS setting.
         add_library(${ARG_NAME} ${ARG_SOURCES})
+        if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
+            set_target_properties(${ARG_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+        endif()
         add_library(${ARG_NAMESPACE}::${ARG_CLEAN_NAME} ALIAS ${ARG_NAME})
         target_include_directories(${ARG_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
