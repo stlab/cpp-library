@@ -7,6 +7,7 @@
 - [[knowledge/deferred-install-dependency-validation-and-config-generation.md|Deferred Install Dependency Validation and Config Generation]] (pattern, 0.75) `deferred-install` `install-validation` `untracked-dependencies` `cmake-language-defer` `find-dependency`
 - [[knowledge/dependency-tracking-lifecycle-and-provider-ordering.md|Dependency Tracking Lifecycle and Provider Ordering]] (observation, 0.75) `dependency-tracking` `dependency-provider` `cpp-library-enable-dependency-tracking` `cmake-project-top-level-includes` `set-dependency-provider`
 - [[knowledge/documentation-setup-and-theme-integration-with-build-docs.md|Documentation Setup and Theme Integration with BUILD_DOCS]] (pattern, 0.75) `build-docs` `doxygen` `doxygen-awesome-css` `documentation-generation` `docs-target`
+- [[knowledge/generated-ci-package-artifact-check.md|Generated CI package artifact check]] (decision, 0.95) `ci` `packaging` `cmake`
 - [[knowledge/target-naming-and-alias-deduplication-convention.md|Target Naming and Alias Deduplication Convention]] (pattern, 0.75) `target-naming` `alias-deduplication` `package-name` `clean-name` `cmake-alias-convention`
 - [[knowledge/testing-and-example-executable-target-generation-gated-by-build-testing.md|Testing and Example Executable Target Generation Gated by BUILD_TESTING]] (pattern, 0.75) `build-testing` `doctest` `testing-setup` `negative-compilation-tests` `runtime-dll-copy`
 
