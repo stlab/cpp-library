@@ -119,7 +119,7 @@ include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 cpp_library_enable_dependency_tracking()
 
 # Now declare project
-project(your-library)
+project(your-library LANGUAGES CXX)
 
 # Enable testing infrastructure (required for TESTS and EXAMPLES)
 include(CTest)
@@ -137,6 +137,9 @@ cpp_library_setup(
 )
 ```
 
+These examples are for C++-only projects. If your project also contains C
+sources, use `project(your-library LANGUAGES C CXX)`.
+
 ### Consuming Libraries Built with cpp-library
 
 #### Using CPMAddPackage (recommended)
@@ -145,7 +148,7 @@ The preferred way to consume a library built with cpp-library is via [CPM.cmake]
 
 ```cmake
 cmake_minimum_required(VERSION 3.24)
-project(my-app)
+project(my-app LANGUAGES CXX)
 
 include(cmake/CPM.cmake)
 
@@ -227,7 +230,7 @@ CPMAddPackage("gh:stlab/cpp-library@X.Y.Z")
 include(${cpp-library_SOURCE_DIR}/cpp-library.cmake)
 
 cpp_library_enable_dependency_tracking()
-project(my-library)
+project(my-library LANGUAGES CXX)
 
 include(CTest)  # Required if you have TESTS or EXAMPLES
 
@@ -304,7 +307,7 @@ Updates the project version from git tags after `project()` has been called. Thi
 **Usage:**
 
 ```cmake
-project(my-library)  # No VERSION specified
+project(my-library LANGUAGES CXX)  # No VERSION specified
 cpp_library_set_version()
 # Now PROJECT_VERSION, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR,
 # and PROJECT_VERSION_PATCH are set from git tags
@@ -483,7 +486,7 @@ executables use the same helper automatically.
 Use the component name as your project name, and specify the organizational namespace separately:
 
 ```cmake
-project(enum-ops)  # Component name only
+project(enum-ops LANGUAGES CXX)  # Component name only
 
 cpp_library_setup(
     NAMESPACE stlab  # Organizational namespace

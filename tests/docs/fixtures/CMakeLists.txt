@@ -22,6 +22,10 @@ elseif(CASE STREQUAL "no-groups")
         "/** @file\n * @brief An API without reference groups.\n */\n"
         "/** @brief Return the fixture value. */\n"
         "inline int value() { return 42; }\n")
+elseif(CASE STREQUAL "path-overrides")
+    list(APPEND docs_args DOCS_OPTIONS
+        "FULL_PATH_NAMES = YES"
+        "STRIP_FROM_PATH = \"${CMAKE_CURRENT_SOURCE_DIR}\"")
 endif()
 if(CASE STREQUAL "layout-brief")
     list(APPEND docs_args DOCS_OPTIONS "REPEAT_BRIEF = NO")

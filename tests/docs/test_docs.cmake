@@ -5,7 +5,7 @@ get_filename_component(toolkit_source "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE
 string(RANDOM LENGTH 16 ALPHABET 0123456789abcdef test_id)
 set(test_root "${toolkit_source}/build/docs-${test_id}")
 
-foreach(case default tutorials no-groups extended custom layout-brief layout-override layout-review layout-review-all
+foreach(case default tutorials no-groups extended custom path-overrides layout-brief layout-override layout-review layout-review-all
     invalid-layout missing-input malformed-option
     malformed-terminal-continuation-option malformed-continuation-option multiline-option
     missing-input-value missing-option-value)
@@ -59,6 +59,7 @@ foreach(case default tutorials no-groups extended custom layout-brief layout-ove
         endif()
         file(READ "${binary}/html/index.html" index)
         if(case STREQUAL "default" OR case STREQUAL "tutorials" OR case STREQUAL "no-groups"
+            OR case STREQUAL "path-overrides"
             OR case MATCHES "^layout-")
             string(FIND "${index}" "Documentation fixture" brief)
         else()
@@ -90,6 +91,24 @@ foreach(case default tutorials no-groups extended custom layout-brief layout-ove
             string(FIND "${index}" "Legacy configuration" legacy)
             if(legacy LESS 0)
                 message(FATAL_ERROR "Custom Doxyfile compatibility was lost")
+            endif()
+        endif()
+        if(case STREQUAL "default" OR case STREQUAL "path-overrides")
+            file(READ "${binary}/html/files.html" files)
+            string(REGEX MATCHALL "api\\.hpp" api_paths "${files}")
+            list(LENGTH api_paths api_path_count)
+            if(api_path_count LESS 2 OR NOT files MATCHES ">nested</a>")
+                message(FATAL_ERROR "${case}: Duplicate header paths are not distinguishable")
+            endif()
+            file(READ "${binary}/html/structfixture_1_1hidden.html" class)
+            if(case STREQUAL "default")
+                if(class MATCHES "source with spaces" OR NOT class MATCHES "fixture/api\\.hpp")
+                    message(FATAL_ERROR "Default file reference or class include hint is not public-root-relative")
+                endif()
+            elseif(class MATCHES "source with spaces"
+                OR NOT class MATCHES "include/fixture/"
+                OR NOT class MATCHES ">fixture/api\\.hpp</a>")
+                message(FATAL_ERROR "DOCS_OPTIONS path override did not produce project-relative file references")
             endif()
         endif()
         file(READ "${binary}/html/menudata.js" navigation)
