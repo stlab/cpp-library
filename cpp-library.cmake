@@ -148,6 +148,9 @@ function(_cpp_library_setup_executables)
                     )
                 endif()
             endif()
+            if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
+                set_target_properties(${executable_base} PROPERTIES CXX_EXTENSIONS OFF)
+            endif()
         else()
             message(WARNING "${ARG_TYPE} file ${source_dir}/${executable} not found")
         endif()
@@ -166,7 +169,7 @@ function(cpp_library_setup)
     set(oneValueArgs
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
-        REQUIRES_CPP_VERSION # C++ version (default: 17)
+        REQUIRES_CPP_VERSION # C++ version (default: 20)
         INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
@@ -235,6 +238,13 @@ function(cpp_library_setup)
     # Include installation module that requires project() to be called first
     # (GNUInstallDirs needs language/architecture information)
     include("${CPP_LIBRARY_ROOT}/cmake/cpp-library-install.cmake")
+    include(GNUInstallDirs)
+    foreach(dir IN ITEMS BINDIR SBINDIR LIBEXECDIR SYSCONFDIR SHAREDSTATEDIR
+            LOCALSTATEDIR RUNSTATEDIR LIBDIR INCLUDEDIR OLDINCLUDEDIR
+            DATAROOTDIR DATADIR INFODIR LOCALEDIR MANDIR DOCDIR)
+        set(CMAKE_INSTALL_${dir} "${CMAKE_INSTALL_${dir}}" PARENT_SCOPE)
+        set(CMAKE_INSTALL_FULL_${dir} "${CMAKE_INSTALL_FULL_${dir}}" PARENT_SCOPE)
+    endforeach()
 
     # Calculate clean name (without namespace prefix) for target alias
     # If PROJECT_NAME starts with NAMESPACE-, strip it; otherwise use PROJECT_NAME as-is
@@ -251,7 +261,7 @@ function(cpp_library_setup)
 
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
-        set(ARG_REQUIRES_CPP_VERSION 17)
+        set(ARG_REQUIRES_CPP_VERSION 20)
     endif()
 
     # Get version from git tags and update project version variables

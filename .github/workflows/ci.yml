@@ -32,6 +32,9 @@ jobs:
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
 
+      - name: Run install directory tests
+        run: cmake -P tests/setup/test_install_dirs.cmake
+
       - name: Run custom executable runtime deployment tests
         run: cmake -P tests/setup/test_runtime_dlls.cmake
 
@@ -49,6 +52,9 @@ jobs:
 
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
+
+      - name: Run install directory tests
+        run: cmake -P tests/setup/test_install_dirs.cmake
 
       - name: Run custom executable runtime deployment tests
         run: cmake -P tests/setup/test_runtime_dlls.cmake

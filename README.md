@@ -366,7 +366,7 @@ cpp_library_setup(
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [DOCS_INPUTS input_list]       # Additional documentation files/directories
     [DOCS_OPTIONS setting_list]    # Additive single-line Doxygen assignments
-    [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
+    [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 20)
     [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
 )
 ```
@@ -378,6 +378,12 @@ cpp_library_setup(
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
 - Installation is controlled by `INSTALL_OPTION`, or the uppercase `${NAMESPACE}_INSTALL` option
   when omitted. Options default to `PROJECT_IS_TOP_LEVEL`.
+- `cpp_library_setup()` makes the effective `GNUInstallDirs` directory variables
+  available to subsequent caller install rules, including when installation is disabled.
+- `REQUIRES_CPP_VERSION` sets the minimum C++ standard. Compiled library, test,
+  and example targets default to `CXX_EXTENSIONS OFF` unless
+  `CMAKE_CXX_EXTENSIONS` is set by the caller. This does not impose a dialect on
+  consumers or enable pedantic diagnostics.
 
 ### Documentation configuration
 
