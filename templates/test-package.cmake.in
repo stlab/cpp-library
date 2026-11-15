@@ -5,16 +5,21 @@ cmake_minimum_required(VERSION 3.24)
 if(NOT DEFINED PACKAGE_TEST_PREFIX OR PACKAGE_TEST_PREFIX STREQUAL "")
     message(FATAL_ERROR "PACKAGE_TEST_PREFIX must name the install prefix")
 endif()
-if(NOT IS_DIRECTORY "${PACKAGE_TEST_PREFIX}")
-    message(FATAL_ERROR "Package install prefix does not exist: ${PACKAGE_TEST_PREFIX}")
-endif()
-
 set(package_install_dir "@PACKAGE_TEST_INSTALL_LIBDIR@/cmake/@PACKAGE_TEST_NAME@")
 if(IS_ABSOLUTE "${package_install_dir}")
     set(package_dir "${package_install_dir}")
 else()
+    if(NOT IS_DIRECTORY "${PACKAGE_TEST_PREFIX}")
+        message(FATAL_ERROR "Package install prefix does not exist: ${PACKAGE_TEST_PREFIX}")
+    endif()
     set(package_dir "${PACKAGE_TEST_PREFIX}/${package_install_dir}")
 endif()
+
+set(manifest "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
+if(NOT EXISTS "${manifest}")
+    message(FATAL_ERROR "Package install manifest is missing: ${manifest}")
+endif()
+file(STRINGS "${manifest}" installed_files)
 
 foreach(artifact IN ITEMS
         "@PACKAGE_TEST_NAME@Config.cmake"
@@ -23,6 +28,10 @@ foreach(artifact IN ITEMS
     set(artifact_path "${package_dir}/${artifact}")
     if(NOT EXISTS "${artifact_path}")
         message(FATAL_ERROR "Installed package artifact is missing: ${artifact_path}")
+    endif()
+    cmake_path(NORMAL_PATH artifact_path)
+    if(NOT artifact_path IN_LIST installed_files)
+        message(FATAL_ERROR "Package artifact was not installed: ${artifact_path}")
     endif()
 endforeach()
 
