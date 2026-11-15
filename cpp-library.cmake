@@ -169,7 +169,7 @@ function(cpp_library_setup)
     set(oneValueArgs
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
-        REQUIRES_CPP_VERSION # C++ version (default: 17)
+        REQUIRES_CPP_VERSION # C++ version (default: 20)
         INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
@@ -261,7 +261,7 @@ function(cpp_library_setup)
 
     # Set defaults
     if(NOT ARG_REQUIRES_CPP_VERSION)
-        set(ARG_REQUIRES_CPP_VERSION 17)
+        set(ARG_REQUIRES_CPP_VERSION 20)
     endif()
 
     # Get version from git tags and update project version variables

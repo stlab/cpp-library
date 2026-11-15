@@ -366,7 +366,7 @@ cpp_library_setup(
     [DOCS_EXCLUDE_SYMBOLS symbols] # Symbols to exclude from docs
     [DOCS_INPUTS input_list]       # Additional documentation files/directories
     [DOCS_OPTIONS setting_list]    # Additive single-line Doxygen assignments
-    [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 17)
+    [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 20)
     [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
 )
 ```

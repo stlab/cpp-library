@@ -22,11 +22,14 @@ set(source_args SOURCES sample.cpp)
 if(OMIT_SOURCES)
     set(source_args)
 endif()
+if(DEFINED FIXTURE_CPP_VERSION)
+    set(version_args REQUIRES_CPP_VERSION "${FIXTURE_CPP_VERSION}")
+endif()
 cpp_library_setup(
     DESCRIPTION "Consumer-selected target type fixture"
     NAMESPACE fixture
     HEADERS sample.hpp
-    REQUIRES_CPP_VERSION 20
+    ${version_args}
     ${test_args}
     ${source_args})
 if(CHECK_INSTALL_DIRS)
@@ -47,6 +50,12 @@ endif()
 get_target_property(actual sample TYPE)
 if(NOT actual STREQUAL EXPECTED_TYPE)
     message(FATAL_ERROR "Expected ${EXPECTED_TYPE}, got ${actual}")
+endif()
+if(DEFINED EXPECTED_CPP_VERSION)
+    get_target_property(features sample INTERFACE_COMPILE_FEATURES)
+    if(NOT "cxx_std_${EXPECTED_CPP_VERSION}" IN_LIST features)
+        message(FATAL_ERROR "Expected C++${EXPECTED_CPP_VERSION} requirement, got '${features}'")
+    endif()
 endif()
 if(NOT BUILD_SHARED_LIBS STREQUAL EXPECTED_BUILD_SHARED_LIBS)
     message(FATAL_ERROR "Setup changed parent BUILD_SHARED_LIBS")
