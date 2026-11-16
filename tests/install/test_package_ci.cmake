@@ -70,7 +70,9 @@ function(run_single)
     endif()
 
     expect_check_failure("${check}" "${prefix}" "Package install prefix does not exist")
-    run_workflow_install("${workflow}" "${binary}" "${prefix}")
+    set(workflow_prefix "${root}/./install prefix")
+    cmake_path(NATIVE_PATH workflow_prefix workflow_prefix)
+    run_workflow_install("${workflow}" "${binary}" "${workflow_prefix}")
     run_command("${CMAKE_COMMAND}" "-DPACKAGE_TEST_PREFIX=${prefix}" -P "${check}")
 
     set(package_dir "lib64/cmake/stlab-single")
