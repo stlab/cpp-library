@@ -77,7 +77,7 @@
     {
       "name": "install",
       "displayName": "Install Configuration",
-      "description": "Release build for installation with CPM_USE_LOCAL_PACKAGES enabled for testing installed packages",
+      "description": "Release build for installation, preferring locally installed dependencies before fetching",
       "binaryDir": "${sourceDir}/build/install",
       "generator": "Ninja",
       "cacheVariables": {

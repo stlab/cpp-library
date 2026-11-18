@@ -1,15 +1,20 @@
 include("${TOOLKIT_SOURCE}/cpp-library.cmake")
 project(leaf LANGUAGES CXX)
-set(CPP_LIBRARY_VERSION 1.0.0)
+set(CPP_LIBRARY_VERSION_leaf 1.0.0)
 set(install_args INSTALL_OPTION STLAB_LEAF_INSTALL)
 if(LEGACY_OPTIONS)
     set(install_args)
+endif()
+set(license_args)
+if(LICENSE_TEST)
+    set(license_args LICENSE_FILES "licenses/leaf notice.txt")
 endif()
 cpp_library_setup(
     DESCRIPTION "Leaf package fixture"
     NAMESPACE stlab
     HEADERS leaf.hpp
     SOURCES leaf.cpp
+    ${license_args}
     ${install_args})
 if(PACKAGE_TEST_EXTRA)
     add_subdirectory(extra EXCLUDE_FROM_ALL)
@@ -35,5 +40,5 @@ target_include_directories(leaf PUBLIC
 target_compile_definitions(leaf PRIVATE LEAF_BUILD)
 if(INVALID_PACKAGE STREQUAL "leaf")
     add_library(UnknownLeaf::dep INTERFACE IMPORTED)
-    target_link_libraries(leaf INTERFACE $<BUILD_INTERFACE:UnknownLeaf::dep>)
+    target_link_libraries(leaf INTERFACE UnknownLeaf::dep)
 endif()

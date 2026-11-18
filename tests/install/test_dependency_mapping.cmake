@@ -109,12 +109,16 @@ mock_target_links(test13_target)
 _cpp_library_generate_dependencies(RESULT test13_target "mylib")
 verify_output("${RESULT}" "" "Test 13")
 
-# Test 14: Generator expressions should be skipped
+# Test 14: Build-only links must not become installed package requirements
 run_test("Generator expressions skipped")
 set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
-mock_target_links(test14_target "Threads::Threads" "$<BUILD_INTERFACE:some_local_target>")
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_BuildOnly" "BuildOnly 1.0 CONFIG")
+cpp_library_map_dependency("MappedBuildOnly::dep" "MappedBuildOnly 2.0 CONFIG")
+mock_target_links(test14_target "Threads::Threads" "$<BUILD_INTERFACE:some_local_target>"
+    "$<BUILD_INTERFACE:BuildOnly::dep>" "$<BUILD_INTERFACE:MappedBuildOnly::dep>"
+    "$<INSTALL_INTERFACE:$<1:BuildOnly::dep>>")
 _cpp_library_generate_dependencies(RESULT test14_target "mylib")
-verify_output("${RESULT}" "find_dependency(Threads)" "Test 14")
+verify_output("${RESULT}" "find_dependency(Threads)" "Build-only dependencies are not installed requirements")
 
 # Test 15: Multiple Boost components (same package, different components)
 run_test("Boost with multiple components")

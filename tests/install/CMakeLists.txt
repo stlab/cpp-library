@@ -5,6 +5,7 @@
 # Run as: cmake -P tests/install/CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.20)
+set(PROJECT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Include the modules we're testing
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/cpp-library-install.cmake)
@@ -29,10 +30,22 @@ function(get_target_property OUTPUT_VAR TARGET PROPERTY)
         else()
             set(${OUTPUT_VAR} "NOTFOUND" PARENT_SCOPE)
         endif()
+    elseif(PROPERTY STREQUAL "BINARY_DIR")
+        set(${OUTPUT_VAR} "${CMAKE_CURRENT_BINARY_DIR}" PARENT_SCOPE)
     else()
-        # For other properties, return NOTFOUND since we're only mocking INTERFACE_LINK_LIBRARIES
         set(${OUTPUT_VAR} "NOTFOUND" PARENT_SCOPE)
     endif()
+endfunction()
+
+# Supplies the owning project for mock targets without configured directories.
+function(get_directory_property OUTPUT_VAR DIRECTORY_KEYWORD DIRECTORY_PATH DEFINITION_KEYWORD VARIABLE)
+    if(NOT DIRECTORY_KEYWORD STREQUAL "DIRECTORY"
+            OR NOT DIRECTORY_PATH STREQUAL CMAKE_CURRENT_BINARY_DIR
+            OR NOT DEFINITION_KEYWORD STREQUAL "DEFINITION"
+            OR NOT VARIABLE STREQUAL "PROJECT_BINARY_DIR")
+        message(FATAL_ERROR "Unexpected mock directory lookup: ${ARGN}")
+    endif()
+    set(${OUTPUT_VAR} "${PROJECT_BINARY_DIR}" PARENT_SCOPE)
 endfunction()
 
 # Helper macro to run a test
@@ -48,11 +61,11 @@ macro(run_test TEST_NAME)
     endforeach()
     
     # Clear all dependency mappings from previous tests
-    get_property(ALL_MAPPED_TARGETS GLOBAL PROPERTY _CPP_LIBRARY_ALL_MAPPED_TARGETS)
-    foreach(target IN LISTS ALL_MAPPED_TARGETS)
-        set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${target})
+    get_property(ALL_MAPPING_PROPERTIES GLOBAL PROPERTY _CPP_LIBRARY_ALL_MAPPING_PROPERTIES)
+    foreach(property IN LISTS ALL_MAPPING_PROPERTIES)
+        set_property(GLOBAL PROPERTY "${property}")
     endforeach()
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_MAPPED_TARGETS "")
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_MAPPING_PROPERTIES "")
     
     # Clear dependency provider tracking state
     get_property(ALL_TRACKED_DEPS GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS)
@@ -89,6 +102,7 @@ endmacro()
 include(${CMAKE_CURRENT_LIST_DIR}/test_dependency_mapping.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/test_dependency_provider.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/test_cpm_registry.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/test_mapping_scope.cmake)
 
 # Print summary
 message(STATUS "")

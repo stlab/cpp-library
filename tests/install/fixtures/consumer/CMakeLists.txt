@@ -3,9 +3,13 @@ project(consumer LANGUAGES CXX)
 include(CTest)
 include("${TOOLKIT_SOURCE}/cpp-library.cmake")
 find_package(stlab-parent 1.0.0 REQUIRED)
+find_package(stlab-leaf 1.0.0 REQUIRED)
+add_library(client-dependencies INTERFACE)
+add_library(stlab::client-dependencies ALIAS client-dependencies)
+target_link_libraries(client-dependencies INTERFACE stlab::parent stlab::leaf)
 add_executable(ordinary-consumer tests/consumer.cpp)
 set_target_properties(ordinary-consumer PROPERTIES CXX_EXTENSIONS ON)
-target_link_libraries(ordinary-consumer PRIVATE stlab::parent)
+target_link_libraries(ordinary-consumer PRIVATE stlab::client-dependencies)
 get_target_property(consumer_extensions ordinary-consumer CXX_EXTENSIONS)
 if(NOT consumer_extensions)
     message(FATAL_ERROR "Installed library changed consumer dialect")
@@ -19,9 +23,9 @@ endif()
 # These standalone main functions need no doctest headers or runtime.
 add_library(doctest::doctest INTERFACE IMPORTED)
 _cpp_library_setup_executables(
-    NAME parent NAMESPACE stlab TYPE tests EXECUTABLES consumer.cpp)
+    NAME client-dependencies NAMESPACE stlab TYPE tests EXECUTABLES consumer.cpp)
 _cpp_library_setup_executables(
-    NAME parent NAMESPACE stlab TYPE examples EXECUTABLES example.cpp)
+    NAME client-dependencies NAMESPACE stlab TYPE examples EXECUTABLES example.cpp)
 set_target_properties(consumer PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/client apps/tests")
 set_target_properties(example PROPERTIES

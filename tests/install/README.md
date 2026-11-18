@@ -27,7 +27,8 @@ The test suite covers:
 5. **Custom Mappings**: Manual dependency mappings via `cpp_library_map_dependency()`
 6. **Non-namespaced Targets**: Custom mapping for targets like `opencv_core`
 7. **Deduplication**: Duplicate components and dependencies removed
-8. **Generator Expressions**: BUILD_INTERFACE dependencies skipped
+8. **Generator Expressions**: Build-only links, including namespaced and explicitly
+   mapped targets, do not become installed requirements
 9. **Edge Cases**: Empty libraries, different versions, override behavior
 
 ## Installation Round Trips
@@ -39,8 +40,10 @@ cmake -P tests/install/test_nested_install.cmake
 ```
 
 On Windows, run it from an x64 Visual Studio developer environment. It builds and
-installs nested parent/leaf packages, then builds and runs separate installed
-consumers. The leaf is tested as both static and shared, with explicit versioned
+installs independent packages in nested directories, then builds and runs installed
+consumers. Their local interface target links both installed packages to
+exercise transitive linkage without source-built dependency export workarounds.
+The leaf is tested as both static and shared, with explicit versioned
 C ABI exports from a `.def` file for the Windows DLL.
 
 The consumers exercise cpp-library's test and example executable setup in

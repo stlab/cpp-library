@@ -120,8 +120,9 @@ consumer templates.
   prefix, the alias strips it. Matching namespace and clean project name collapse
   to one package name rather than duplicating it.
 - Consumer versions come from Git tags with a leading `v` removed.
-  `CPP_LIBRARY_VERSION` overrides Git discovery for source archives and package
-  managers; missing tags fall back to `0.0.0` with a warning.
+  `CPP_LIBRARY_VERSION_<PROJECT_NAME>` overrides Git discovery for the exact CMake
+  project name. Legacy `CPP_LIBRARY_VERSION` applies only to the top-level project;
+  missing tags fall back to `0.0.0` with a warning.
 - Non-namespaced dependency targets need explicit mappings such as
   `cpp_library_map_dependency(opencv_core "OpenCV 4.8")`. Keep dependency
   declarations after `project()` in the top-level consumer scope; explicit

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 include("${TOOLKIT_SOURCE}/cpp-library.cmake")
 project(extra LANGUAGES CXX)
-set(CPP_LIBRARY_VERSION 1.0.0)
+set(CPP_LIBRARY_VERSION_extra 1.0.0)
 cpp_library_setup(
     DESCRIPTION "Transitive packaging dependency fixture"
     NAMESPACE stlab

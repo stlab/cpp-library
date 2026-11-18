@@ -164,9 +164,22 @@ The library will be automatically fetched and built as part of your project.
 
 **Repository Naming:** Your GitHub repository name must match the package name for CPM compatibility (see [Target Naming](#target-naming) for details).
 
-#### Installation (optional)
+#### Installation (strongly discouraged)
 
-Installation is optional and typically not required when using CPM. If you need to install your library (e.g., for system-wide deployment or use with a package manager):
+Consume libraries from source through [CPMAddPackage](#using-cpmaddpackage-recommended).
+Installation is strongly discouraged: an installed package's dependencies might not be
+installed or available to a downstream consumer, so its `find_dependency()` calls can fail.
+cpp-library does not automatically install dependencies.
+
+For installation, install required dependencies separately before configuring the
+component, and configure CPM to use those installed packages. Installing a component
+against dependencies fetched from source in the same build is not supported.
+Source consumption requires no special build/install-interface wrappers.
+CMake checks installation exports during configuration/generation, before
+`cmake --install` runs. For source-only builds without installed dependencies,
+disable the component's installation option.
+
+If system-wide deployment or a package manager requires installation, use:
 
 ```bash
 # Build and install to default system location
@@ -178,7 +191,17 @@ cmake --install build/install
 cmake --install build/install --prefix /opt/mylib
 ```
 
-The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which verifies your generated Config.cmake works correctly. See the [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages) for more about using installed packages.
+The `install` preset enables `CPM_USE_LOCAL_PACKAGES`, which makes CPM look for
+locally installed dependencies before fetching them from source. This setting is a
+preference, not a guarantee: ensure CPM resolves the required installed packages
+rather than falling back to source. It does not verify your project's installed
+package config or dependency closure. See the
+[CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
+
+The generated CI package check verifies only that the root package's
+`Config.cmake`, `ConfigVersion.cmake`, and `Targets.cmake` files exist and appear in
+the install manifest. It does not load the package or check that its dependencies
+are installed. Report installation failures if you encounter them.
 
 **Controlling installation**: The uppercase `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
 
@@ -187,7 +210,20 @@ cmake -DSTLAB_INSTALL=OFF -B build  # Disable install for top-level project
 cmake -DSTLAB_INSTALL=ON -B build   # Enable install for non-top-level (e.g., via CPM)
 ```
 
-For independent packages sharing a namespace, specify an option name with `INSTALL_OPTION`:
+Libraries must not predeclare or assign their own default to the shared
+`${NAMESPACE}_INSTALL` option, including before adding dependencies. Leave its
+declaration and default to cpp-library, and preserve the client's chosen value.
+Packages within a namespace share this cache option: the first declaration
+establishes its default for the build, so a library-specific default can
+unintentionally enable or disable installation for other packages in that namespace.
+
+Omit `INSTALL_OPTION` when installing each package in a separate build, including
+dependencies. Each package is then a top-level project, so installation defaults on.
+
+`INSTALL_OPTION` is an advanced escape hatch for selectively installing packages
+within one combined source build. Packages sharing a namespace otherwise share the
+same installation switch, so enabling it can select multiple packages. Only when
+you need independent switches in that build, give a package its own option name:
 
 ```cmake
 cpp_library_setup(
@@ -200,27 +236,44 @@ cpp_library_setup(
 
 This package then uses `STLAB_EXECUTION_INSTALL`, independently of `STLAB_INSTALL` or other
 packages' custom options. Each custom option defaults to that project's `PROJECT_IS_TOP_LEVEL`.
-Omitting `INSTALL_OPTION` preserves the shared namespace-level option and its existing behavior.
+Specifying `INSTALL_OPTION` names the switch; it does not enable installation,
+install dependencies, or change dependency requirements.
 Specifying `INSTALL_OPTION` without a value is an error.
 
-**Re-exporting CPM dependencies:** When re-exporting dependencies from `CPMAddPackage`, use separate build and install interfaces. CPM creates non-IMPORTED targets that may not be included in your install export:
+When installation is enabled, cpp-library installs an existing `${PROJECT_SOURCE_DIR}/LICENSE`
+under `${CMAKE_INSTALL_DATADIR}/licenses/<package-name>`. A missing conventional `LICENSE`
+is allowed. To include additional license or notice files, use `LICENSE_FILES`:
 
 ```cmake
-CPMAddPackage("gh:other-org/some-package@1.0.0")
-target_link_libraries(my-library INTERFACE
-    $<BUILD_INTERFACE:other::package>
-    $<INSTALL_INTERFACE:$<1:other::package>>)
+cpp_library_setup(
+    DESCRIPTION "Execution primitives"
+    NAMESPACE stlab
+    HEADERS execution.hpp
+    LICENSE_FILES licenses/CPM-MIT.txt NOTICE
+)
 ```
 
-cpp-library extracts the build-interface dependency to generate the appropriate `find_dependency()` call.
-The install interface preserves transitive linkage; its nested `$<1:...>` expression defers
-target resolution to the downstream consumer, allowing the dependency to be installed separately.
-Using only `BUILD_INTERFACE` loads the dependency's package but drops its linkage from the
-installed target. Dependencies from `find_package()` and system libraries don't need these wrappers.
+Relative `LICENSE_FILES` paths are relative to the declaring project's source root;
+absolute paths are also accepted. Files keep their basenames in the package's license
+directory, including when you customize `CMAKE_INSTALL_DATADIR`. Distinct files must have
+distinct basenames; a collision is a configuration error rather than an overwrite.
+With installation enabled,
+a missing explicitly listed file is a configuration error. `LICENSE_FILES` without a value
+is also an error. Disabled installation adds no license install rules. Only the current
+package's files are installed; cpp-library does not discover dependency licenses.
 
 #### Dependency Handling in Installed Packages
 
-cpp-library automatically generates `find_dependency()` calls in the installed CMake package configuration. Call `cpp_library_enable_dependency_tracking()` before `project()`:
+Declare public dependencies with ordinary `target_link_libraries()` calls, using
+`INTERFACE` for header-only libraries or `PUBLIC` for compiled libraries. Do not add
+build/install-interface wrappers to make source-built dependencies installable.
+For installation, clients must
+resolve dependencies from their separately installed packages, as described in
+[installation guidance](#installation-strongly-discouraged).
+
+cpp-library automatically generates `find_dependency()` calls in the installed CMake
+package configuration. Build-only links do not generate installed requirements.
+Call `cpp_library_enable_dependency_tracking()` before `project()`:
 
 ```cmake
 cmake_minimum_required(VERSION 3.24)
@@ -259,6 +312,11 @@ find_package(OpenCV 4.5.0 REQUIRED)
 cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
 target_link_libraries(my-library INTERFACE opencv_core)
 ```
+
+Mappings apply only to libraries declared in the same CMake project, including
+subdirectories that do not call `project()`. They override automatic tracking within
+that project, but do not affect parent, nested, or sibling projects. Declare a mapping
+in each project that needs it.
 
 ### Updating cpp-library
 
@@ -317,7 +375,8 @@ The function:
 
 - Queries git tags using `git describe --tags --abbrev=0`
 - Strips the 'v' prefix if present (e.g., `v1.2.3` → `1.2.3`)
-- Respects `CPP_LIBRARY_VERSION` cache variable if set (for package managers)
+- Respects project-scoped version overrides; the legacy override applies only
+  to the top-level project (see [Version Management](#version-management))
 - Falls back to `0.0.0` if no tag found
 - Updates all `PROJECT_VERSION*` variables in parent scope
 
@@ -368,6 +427,7 @@ cpp_library_setup(
     [DOCS_OPTIONS setting_list]    # Additive single-line Doxygen assignments
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 20)
     [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
+    [LICENSE_FILES file_list]      # Additional project-relative or absolute license/notice files
 )
 ```
 
@@ -378,6 +438,9 @@ cpp_library_setup(
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
 - Installation is controlled by `INSTALL_OPTION`, or the uppercase `${NAMESPACE}_INSTALL` option
   when omitted. Options default to `PROJECT_IS_TOP_LEVEL`.
+- Enabled installation includes the project-root `LICENSE` when present and any
+  `LICENSE_FILES`. See [installation guidance](#installation-strongly-discouraged)
+  for destinations and missing-file behavior.
 - `cpp_library_setup()` makes the effective `GNUInstallDirs` directory variables
   available to subsequent caller install rules, including when installation is disabled.
 - `REQUIRES_CPP_VERSION` sets the minimum C++ standard. Compiled library, test,
@@ -520,7 +583,12 @@ This produces:
 cpp_library_map_dependency(target find_dependency_call)
 ```
 
-Maps non-namespaced targets to their package. Required only for targets like `opencv_core` where the package name cannot be inferred. Call this after `find_package()` or `CPMAddPackage()`:
+Maps a dependency target to custom `find_dependency()` arguments for the declaring
+CMake project only. Mappings override automatic tracking in that project, including
+non-project subdirectories; independent projects do not share mappings.
+Use this for non-namespaced targets like `opencv_core` where the package name cannot
+be inferred, or when automatic tracking needs an override. Call this after
+`find_package()` or `CPMAddPackage()`:
 
 ```cmake
 find_package(OpenCV 4.5.0 REQUIRED)
@@ -532,12 +600,14 @@ Namespaced targets like `Qt6::Core` and `Boost::filesystem` are tracked automati
 
 ### Path Conventions
 
-All file specifications use filenames only, automatically placed in standard directories:
+Library and executable file specifications use filenames resolved under standard directories:
 
 - **HEADERS**: `include/<namespace>/` (e.g., `your_header.hpp` → `include/your_namespace/your_header.hpp`)
 - **SOURCES**: `src/` (e.g., `your_library.cpp` → `src/your_library.cpp`; omit for header-only)
 - **EXAMPLES**: `examples/` (e.g., `example.cpp`, `example_fail.cpp`)
 - **TESTS**: `tests/` (e.g., `tests.cpp`, `unit_tests.cpp`)
+
+`LICENSE_FILES` accepts paths relative to `${PROJECT_SOURCE_DIR}` or absolute paths.
 
 ### Library Types
 
@@ -628,14 +698,28 @@ Version is automatically detected from git tags:
 - Falls back to `0.0.0` if no tag is found (with warning)
 - Version used in CMake package config files
 
-For package managers or CI systems building from source archives without git history, you can override the version using the `CPP_LIBRARY_VERSION` cache variable:
+For package managers or CI systems building from source archives without Git
+history, set `CPP_LIBRARY_VERSION_<PROJECT_NAME>` to override one project's
+version. Replace `<PROJECT_NAME>` with the exact, case-sensitive name supplied to
+that project's `project()` call, including any hyphens. This is the CMake project
+name, not the namespace or derived package name.
 
-```bash
-cmake -DCPP_LIBRARY_VERSION=1.2.3 -B build
-cmake --build build
-```
+Both `cpp_library_setup()` and `cpp_library_set_version()` use this precedence:
 
-This is particularly useful for vcpkg, Conan, or other package managers that don't have access to git tags.
+1. A non-empty `CPP_LIBRARY_VERSION_<PROJECT_NAME>` override for that project.
+2. A non-empty legacy `CPP_LIBRARY_VERSION` override, only when
+   `PROJECT_IS_TOP_LEVEL` is true.
+3. The project's Git tag, with a leading `v` removed.
+4. `0.0.0` with a warning when no tag is found.
+
+Pass overrides as CMake cache entries when configuring the build. Empty override
+values are ignored. Overriding one project's version does not change independently
+named nested projects.
+
+Existing top-level builds using `CPP_LIBRARY_VERSION` continue to work. To override
+a nested project, migrate to `CPP_LIBRARY_VERSION_<PROJECT_NAME>`; the legacy
+variable no longer overrides subprojects. A matching project-scoped override takes
+precedence over the legacy variable.
 
 ### Testing
 

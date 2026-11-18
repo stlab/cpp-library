@@ -14,22 +14,32 @@ if(LEGACY_OPTIONS)
 elseif(MISSING_INSTALL_OPTION)
     set(install_args INSTALL_OPTION)
 endif()
+set(license_args)
+if(LICENSE_TEST)
+    set(license_args LICENSE_FILES "licenses/parent notice.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/licenses/absolute notice.txt")
+endif()
+if(MISSING_LICENSE)
+    set(license_args LICENSE_FILES missing-notice.txt)
+elseif(EMPTY_LICENSE_FILES)
+    set(license_args LICENSE_FILES)
+elseif(COLLIDING_LICENSE_FILES)
+    set(license_args LICENSE_FILES licenses/LICENSE)
+elseif(DUPLICATE_LICENSE_FILES)
+    list(APPEND license_args LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+endif()
 cpp_library_setup(
     DESCRIPTION "Parent package fixture"
     NAMESPACE stlab
     HEADERS parent.hpp
+    ${license_args}
     ${install_args})
 if(EXCLUDE_LEAF_FROM_ALL)
     add_subdirectory(leaf EXCLUDE_FROM_ALL)
 else()
     add_subdirectory(leaf)
 endif()
-# Resolve the installed target downstream, even when leaf is not exported in this build.
-target_link_libraries(parent INTERFACE
-    $<BUILD_INTERFACE:stlab::leaf>
-    $<INSTALL_INTERFACE:$<1:stlab::leaf>>)
-cpp_library_map_dependency("stlab::leaf" "stlab-leaf 1.0.0")
 if(INVALID_PACKAGE STREQUAL "parent")
     add_library(UnknownParent::dep INTERFACE IMPORTED)
-    target_link_libraries(parent INTERFACE $<BUILD_INTERFACE:UnknownParent::dep>)
+    target_link_libraries(parent INTERFACE UnknownParent::dep)
 endif()
