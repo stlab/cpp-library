@@ -220,47 +220,40 @@ function(_cpp_library_verify_quiet_dependency package_name)
     endif()
 endfunction()
 
-# Track a FetchContent_MakeAvailable() call
-# This is more complex because we need to extract info from prior FetchContent_Declare() calls
-function(_cpp_library_track_fetchcontent)
-    # FetchContent_MakeAvailable can take multiple package names
-    foreach(package_name IN LISTS ARGN)
-        # Try to extract useful information from FetchContent variables
-        # FetchContent stores info in variables like FETCHCONTENT_SOURCE_DIR_<name>
-        # However, for CPM, we need different handling
-        
-        # Check if this looks like a CPM-added package
-        # CPM sets <package>_SOURCE_DIR and <package>_VERSION
-        string(TOLOWER "${package_name}" package_lower)
-        string(TOUPPER "${package_name}" package_upper)
-        string(REPLACE "-" "_" package_var "${package_lower}")
-        
-        # Try to get version from various places
-        set(VERSION "")
-        if(DEFINED ${package_name}_VERSION AND NOT "${${package_name}_VERSION}" STREQUAL "")
-            set(VERSION "${${package_name}_VERSION}")
-        elseif(DEFINED ${package_var}_VERSION AND NOT "${${package_var}_VERSION}" STREQUAL "")
-            set(VERSION "${${package_var}_VERSION}")
-        elseif(DEFINED ${package_upper}_VERSION AND NOT "${${package_upper}_VERSION}" STREQUAL "")
-            set(VERSION "${${package_upper}_VERSION}")
-        endif()
-        
-        # Build find_dependency() call
-        set(FIND_DEP_CALL "${package_name}")
-        if(VERSION)
-            string(APPEND FIND_DEP_CALL " ${VERSION}")
-        endif()
-        
-        # Store the dependency
-        set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${package_name}" "${FIND_DEP_CALL}")
-        
-        get_property(ALL_DEPS GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS)
-        if(NOT package_name IN_LIST ALL_DEPS)
-            set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "${package_name}")
-        endif()
-        
-        message(DEBUG "cpp-library: Tracked FetchContent(${package_name}) → find_dependency(${FIND_DEP_CALL})")
-    endforeach()
+# Tracks one dependency made available through FetchContent_MakeAvailable()
+# - Precondition: package_name is the dependency name; ARGN holds its FetchContent_Declare()
+#   arguments, which CMake passes to FETCHCONTENT_MAKEAVAILABLE_SERIAL providers
+# - Postcondition: package_name is tracked as find_dependency(package_name [version]), where version
+#   comes from a <package_name>_VERSION variable when one is already set
+# - Note: CPM sets <package_name>_VERSION after this call; the install module resolves the version
+#   of CPM packages from CPM's package registry instead
+function(_cpp_library_track_fetchcontent package_name)
+    string(TOLOWER "${package_name}" package_lower)
+    string(TOUPPER "${package_name}" package_upper)
+    string(REPLACE "-" "_" package_var "${package_lower}")
+
+    set(VERSION "")
+    if(DEFINED ${package_name}_VERSION AND NOT "${${package_name}_VERSION}" STREQUAL "")
+        set(VERSION "${${package_name}_VERSION}")
+    elseif(DEFINED ${package_var}_VERSION AND NOT "${${package_var}_VERSION}" STREQUAL "")
+        set(VERSION "${${package_var}_VERSION}")
+    elseif(DEFINED ${package_upper}_VERSION AND NOT "${${package_upper}_VERSION}" STREQUAL "")
+        set(VERSION "${${package_upper}_VERSION}")
+    endif()
+
+    set(FIND_DEP_CALL "${package_name}")
+    if(VERSION)
+        string(APPEND FIND_DEP_CALL " ${VERSION}")
+    endif()
+
+    set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${package_name}" "${FIND_DEP_CALL}")
+
+    get_property(ALL_DEPS GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS)
+    if(NOT package_name IN_LIST ALL_DEPS)
+        set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "${package_name}")
+    endif()
+
+    message(DEBUG "cpp-library: Tracked FetchContent(${package_name}) → find_dependency(${FIND_DEP_CALL})")
 endfunction()
 
 # Helper function to retrieve tracked dependency information for a specific package

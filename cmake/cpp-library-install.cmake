@@ -113,6 +113,25 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
     endif()
 endfunction()
 
+# Returns the find_dependency() arguments for a package added through CPMAddPackage()
+# - Postcondition: OUTPUT_VAR is "package_name [version]" if CPM registered package_name in this
+#   configuration, and empty otherwise; version is omitted when CPM recorded no version or its
+#   placeholder version 0
+# - Note: CPM registers every added package, including packages served from CPM_SOURCE_CACHE,
+#   which bypass FetchContent_MakeAvailable() and therefore the dependency provider
+# - Complexity: O(n) in the number of CPM packages
+function(_cpp_library_get_cpm_dependency OUTPUT_VAR package_name)
+    set(FIND_DEP_CALL "")
+    if(package_name IN_LIST CPM_PACKAGES)
+        set(FIND_DEP_CALL "${package_name}")
+        set(VERSION "${CPM_PACKAGE_${package_name}_VERSION}")
+        if(NOT VERSION STREQUAL "" AND NOT VERSION STREQUAL "0")
+            string(APPEND FIND_DEP_CALL " ${VERSION}")
+        endif()
+    endif()
+    set(${OUTPUT_VAR} "${FIND_DEP_CALL}" PARENT_SCOPE)
+endfunction()
+
 # Resolve dependency using tracked provider data
 # - Precondition: LIB is a target name, NAMESPACE is the project namespace
 # - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or error is raised
@@ -141,7 +160,15 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
         
         # Look up tracked dependency data
         get_property(TRACKED_CALL GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${FIND_PACKAGE_NAME}")
-        
+
+        # A bare tracked name carries no more than CPM's registry, which also records the version
+        if(NOT TRACKED_CALL OR TRACKED_CALL STREQUAL FIND_PACKAGE_NAME)
+            _cpp_library_get_cpm_dependency(CPM_CALL "${FIND_PACKAGE_NAME}")
+            if(CPM_CALL)
+                set(TRACKED_CALL "${CPM_CALL}")
+            endif()
+        endif()
+
         if(TRACKED_CALL)
             # Found tracked data - use it directly
             set(${OUTPUT_VAR} "${TRACKED_CALL}" PARENT_SCOPE)
@@ -175,10 +202,11 @@ function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
                             "\n"
                             "The dependency provider is installed, but this dependency was not captured.\n"
                             "Common causes:\n"
-                            "  - find_package() or CPMAddPackage() was called in a subdirectory\n"
-                            "  - Dependency was added before project() (must be after)\n"
+                            "  - The package was added with add_subdirectory() instead of CPMAddPackage()\n"
+                            "  - find_package() was called before project() (must be after)\n"
                             "\n"
-                            "Solution: Ensure dependencies are declared after project() in the top-level CMakeLists.txt.\n"
+                            "Solution: Add the dependency with CPMAddPackage() or find_package() after project(),\n"
+                            "or use cpp_library_map_dependency() to map the target to its package.\n"
                             "\n"
                             "Correct order:\n"
                             "    cpp_library_enable_dependency_tracking()\n"
@@ -550,10 +578,10 @@ function(_cpp_library_setup_install_validation TARGET_NAME)
                     \"\\n\"
                     \"These dependencies were not captured by the dependency provider.\\n\"
                     \"Common causes:\\n\"
-                    \"  - find_package() or CPMAddPackage() was called in a subdirectory\\n\"
-                    \"  - Dependency was added before project() (must be after)\\n\"
+                    \"  - The package was added with add_subdirectory() instead of CPMAddPackage()\\n\"
+                    \"  - find_package() was called before project() (must be after)\\n\"
                     \"\\n\"
-                    \"Solution: Ensure dependencies are declared after project() in the top-level CMakeLists.txt.\\n\"
+                    \"Solution: Add the dependency with CPMAddPackage() or find_package() after project().\\n\"
                     \"Or use cpp_library_map_dependency() to manually register each dependency.\\n\"
                 )
             endif()
