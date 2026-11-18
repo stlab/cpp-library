@@ -115,17 +115,20 @@ endfunction()
 
 # Returns the find_dependency() arguments for a package added through CPMAddPackage()
 # - Postcondition: OUTPUT_VAR is "package_name [version]" if CPM registered package_name in this
-#   configuration, and empty otherwise; version is omitted when CPM recorded no version or its
-#   placeholder version 0
+#   configuration, and empty otherwise; version is included only when CPM recorded a version of
+#   the form major.minor[.patch[.tweak]]
 # - Note: CPM registers every added package, including packages served from CPM_SOURCE_CACHE,
 #   which bypass FetchContent_MakeAvailable() and therefore the dependency provider
+# - Note: without an explicit VERSION, CPM derives the version from the leading digits of
+#   GIT_TAG (0 for a full commit hash), so an abbreviated hash or branch name yields a
+#   meaningless value such as "2" or "3."; omitting it is safe, emitting it is not
 # - Complexity: O(n) in the number of CPM packages
 function(_cpp_library_get_cpm_dependency OUTPUT_VAR package_name)
     set(FIND_DEP_CALL "")
     if(package_name IN_LIST CPM_PACKAGES)
         set(FIND_DEP_CALL "${package_name}")
         set(VERSION "${CPM_PACKAGE_${package_name}_VERSION}")
-        if(NOT VERSION STREQUAL "" AND NOT VERSION STREQUAL "0")
+        if(VERSION MATCHES "^[0-9]+(\\.[0-9]+)(\\.[0-9]+)?(\\.[0-9]+)?$")
             string(APPEND FIND_DEP_CALL " ${VERSION}")
         endif()
     endif()
