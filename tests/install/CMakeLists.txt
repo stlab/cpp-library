@@ -60,6 +60,9 @@ macro(run_test TEST_NAME)
         set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_${dep}")
     endforeach()
     set_property(GLOBAL PROPERTY _CPP_LIBRARY_ALL_TRACKED_DEPS "")
+
+    # Clear the CPM package registry
+    set(CPM_PACKAGES "")
 endmacro()
 
 # Helper macro to set up mock link libraries for a test target
@@ -85,6 +88,7 @@ endmacro()
 # Include the actual tests
 include(${CMAKE_CURRENT_LIST_DIR}/test_dependency_mapping.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/test_dependency_provider.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/test_cpm_registry.cmake)
 
 # Print summary
 message(STATUS "")

@@ -679,60 +679,35 @@ During configuration, you may see messages like:
 
 ```
 -- cpp-library: Untracked dependencies (see: https://github.com/stlab/cpp-library#untracked-dependencies)
--- cpp-library: Dependency stlab::copy-on-write (package: stlab-copy-on-write) was not tracked.
--- cpp-library: Dependency stlab::enum-ops (package: stlab-enum-ops) was not tracked.
+-- cpp-library: Dependency acme::widgets (package: acme-widgets) was not tracked.
 ```
 
-**This is expected behavior** when:
+cpp-library derives each `find_dependency()` call from two sources:
 
-- Building for development (not installing)
-- Using dependencies added from subdirectories (via `CPMAddPackage` in downstream packages)
-- Testing locally without installation
+- **`CPMAddPackage()`**: CPM's package registry records every package and its version, whether
+  CPM fetches it, reuses it from `CPM_SOURCE_CACHE`, or adds it from a subdirectory.
+- **`find_package()` and `FetchContent_MakeAvailable()`**: The dependency provider records calls
+  made after `project()`, including versions and components.
+
+The message means neither source accounts for the package that provides a linked target, for
+example because the package comes from `add_subdirectory()` or from a `find_package()` call made
+before `project()`.
 
 **What it means:**
 
-- These dependencies were not captured by the dependency provider (usually because they were added in a subdirectory)
-- cpp-library uses a fallback `find_dependency()` call for these dependencies
-- Your build will work correctly
-- If you attempt to install, validation will fail to prevent broken package configs
+- cpp-library uses a fallback `find_dependency(<package>)` call without a version.
+- Development builds work.
+- Installation fails with a detailed error, preventing a broken package config.
 
-**When it matters:**
+**Solution:** Add the dependency with `CPMAddPackage()` or `find_package()` after `project()`, or
+map the target explicitly:
 
-- **Installing the package**: Installation will fail with a detailed error, preventing broken configs
-- **Not installing**: Messages are informational only - your local development builds work fine
+```cmake
+cpp_library_map_dependency("acme::widgets" "acme-widgets 2.1.0")
+```
 
-**Solutions** (if you need to install):
-
-1. **Move dependencies to top-level** (preferred):
-
-   ```cmake
-   # In your top-level CMakeLists.txt (after project())
-   CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
-   target_link_libraries(my-library INTERFACE
-       $<BUILD_INTERFACE:stlab::copy-on-write>
-       $<INSTALL_INTERFACE:$<1:stlab::copy-on-write>>)
-   ```
-
-2. **Manually register dependencies**:
-
-   ```cmake
-   # After adding the dependency
-   CPMAddPackage("gh:stlab/stlab-copy-on-write@1.1.0")
-   cpp_library_map_dependency("stlab::copy-on-write" "stlab-copy-on-write 1.1.0")
-   target_link_libraries(my-library INTERFACE
-       $<BUILD_INTERFACE:stlab::copy-on-write>
-       $<INSTALL_INTERFACE:$<1:stlab::copy-on-write>>)
-   ```
-
-3. **Use CPM_USE_LOCAL_PACKAGES**: Install dependencies first, then build with local packages:
-   ```bash
-   cmake -DCPM_USE_LOCAL_PACKAGES=ON -B build
-   ```
-
-**Why this happens:**
-The dependency provider (CMake 3.24+) tracks `find_package()` and `CPMAddPackage()` calls at the project scope. When dependencies are added in subdirectories (common with transitive CPM dependencies), they aren't captured at your project's scope.
-
-**Important:** Ensure `cpp_library_enable_dependency_tracking()` is called before `project()` - this is required for any dependency tracking to work.
+**Important:** Call `cpp_library_enable_dependency_tracking()` before `project()`; the dependency
+provider must be active for `find_package()` tracking.
 
 ### CPM Repository Name Mismatch
 
