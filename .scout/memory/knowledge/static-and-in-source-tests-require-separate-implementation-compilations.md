@@ -14,6 +14,9 @@ sources:
   - "README.md:792"
 tags: ["cmake", "testing", "doctest", "static-linkage", "private-components", "generated-headers"]
 tier: knowledge
+votes_up: 1
+votes_down: 0
+last_voted: 2026-11-19T22:02:29Z
 ---
 
 # Static and in-source tests require separate implementation compilations
