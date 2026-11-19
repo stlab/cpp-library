@@ -5,6 +5,14 @@
 
 #if CPP_LIBRARY_TESTING()
 #include <doctest/doctest.h>
+#include <fstream>
+
+TEST_CASE("compiled component") {
+    CHECK(private_value() == 42);
+    std::ofstream marker("in-source-executions", std::ios::app);
+    marker << "component\n";
+    CHECK(marker.good());
+}
 #endif
 
 int public_value() {

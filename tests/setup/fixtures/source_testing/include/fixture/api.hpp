@@ -3,6 +3,8 @@
 #if defined(_WIN32)
 #if defined(sample_EXPORTS)
 #define FIXTURE_API __declspec(dllexport)
+#elif defined(FIXTURE_USING_DLL)
+#define FIXTURE_API __declspec(dllimport)
 #else
 #define FIXTURE_API
 #endif

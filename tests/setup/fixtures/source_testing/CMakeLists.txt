@@ -7,17 +7,21 @@ set(FIXTURE_INSTALL OFF CACHE BOOL "" FORCE)
 set(BUILD_DOCS OFF CACHE BOOL "" FORCE)
 
 function(CPMAddPackage specification)
-    if(NOT specification STREQUAL "gh:doctest/doctest@2.5.3")
+    if(NOT specification MATCHES "^gh:doctest/doctest@([0-9.]+)$")
         message(FATAL_ERROR "Unexpected test dependency: ${specification}")
     endif()
+    set(version "${CMAKE_MATCH_1}")
     include(FetchContent)
-    # [DEPENDENCY] https://github.com/doctest/doctest/releases
     FetchContent_Declare(doctest
-        URL https://github.com/doctest/doctest/archive/refs/tags/v2.5.3.tar.gz)
+        URL "https://github.com/doctest/doctest/archive/refs/tags/v${version}.tar.gz")
     FetchContent_MakeAvailable(doctest)
 endfunction()
 
-set(source_args SOURCES component.cpp)
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(source_args SOURCES component.cpp registration.cpp)
 if(HEADER_ONLY)
     set(source_args)
 endif()
@@ -26,7 +30,7 @@ if(SOURCE_ONLY)
     set(test_args)
 endif()
 cpp_library_setup(DESCRIPTION "Static implementation testing" NAMESPACE fixture
-    HEADERS api.hpp ${source_args}
+    HEADERS api.hpp REQUIRES_CPP_VERSION "${CMAKE_CXX_STANDARD}" ${source_args}
     ${test_args})
 
 add_library(requirements INTERFACE)
@@ -37,8 +41,13 @@ if(HEADER_ONLY)
     return()
 endif()
 set_target_properties(sample PROPERTIES CXX_VISIBILITY_PRESET hidden)
-target_compile_definitions(sample PRIVATE PRIVATE_VALUE=23)
+target_compile_definitions(sample PRIVATE PRIVATE_VALUE=23
+    "REQUIRED_STANDARD=${CMAKE_CXX_STANDARD}"
+    "EXPECTED_INTERNAL=$<IF:$<BOOL:${FAIL_EMBEDDED}>,41,42>")
 target_link_libraries(sample PUBLIC requirements)
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(sample INTERFACE FIXTURE_USING_DLL)
+endif()
 set(generated "${CMAKE_CURRENT_BINARY_DIR}/generated/config.hpp")
 add_custom_command(OUTPUT "${generated}"
     COMMAND "${CMAKE_COMMAND}" "-DOUTPUT=${generated}"

@@ -154,10 +154,10 @@ function(_cpp_library_setup_executables)
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                     )
                 endif()
-                if(ARG_TYPE STREQUAL "tests")
-                    _cpp_library_setup_testing_config(TARGET "${executable_base}" ENABLED 1)
-                    target_include_directories("${executable_base}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-                endif()
+            endif()
+            if(ARG_TYPE STREQUAL "tests")
+                _cpp_library_setup_testing_config(TARGET "${executable_base}" ENABLED 1)
+                target_include_directories("${executable_base}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
             endif()
             if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
                 set_target_properties(${executable_base} PROPERTIES CXX_EXTENSIONS OFF)
@@ -243,7 +243,7 @@ function(cpp_library_setup)
         endif()
     endif()
 
-    # IMPORTANT: If TESTS or EXAMPLES are specified, include(CTest) MUST be called
+    # IMPORTANT: For SOURCES, TESTS, or EXAMPLES, include(CTest) MUST be called
     # at directory scope before cpp_library_setup(). This enables the testing infrastructure
     # required for add_test() and defines the BUILD_TESTING option.
     #
@@ -345,11 +345,15 @@ function(cpp_library_setup)
 
     # Download doctest if we'll need it for tests or examples
     # This must happen during normal configuration (not deferred) because CPMAddPackage uses add_subdirectory
-    if(BUILD_TESTING AND (ARG_TESTS OR ARG_EXAMPLES))
+    if(BUILD_TESTING AND (ARG_TESTS OR ARG_EXAMPLES OR ARG_SOURCES))
         if(NOT TARGET doctest::doctest)
             # [DEPENDENCY] https://github.com/doctest/doctest/releases
             CPMAddPackage("gh:doctest/doctest@2.5.3")
         endif()
+    endif()
+
+    if(BUILD_TESTING AND ARG_SOURCES)
+        _cpp_library_setup_test_support(TARGET "${ARG_NAME}")
     endif()
 
     # Setup testing (if tests are specified)
