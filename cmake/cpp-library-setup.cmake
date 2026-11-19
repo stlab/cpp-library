@@ -97,6 +97,8 @@ function(_cpp_library_setup_core)
     if(ARG_SOURCES)
         # Respect the consumer's BUILD_SHARED_LIBS setting.
         add_library(${ARG_NAME} ${ARG_SOURCES})
+        _cpp_library_setup_testing_config(TARGET "${ARG_NAME}" ENABLED 0)
+        target_include_directories(${ARG_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
         if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
             set_target_properties(${ARG_NAME} PROPERTIES CXX_EXTENSIONS OFF)
         endif()

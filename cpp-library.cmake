@@ -97,6 +97,14 @@ function(_cpp_library_setup_executables)
 
     # Extract the clean library name for linking (strip namespace prefix if present)
     string(REPLACE "${ARG_NAMESPACE}-" "" CLEAN_NAME "${ARG_NAME}")
+    set(library_target "${ARG_NAMESPACE}::${CLEAN_NAME}")
+    if(ARG_TYPE STREQUAL "tests")
+        get_target_property(library_target "${ARG_NAME}" _CPP_LIBRARY_UNIT_TEST_TARGET)
+        if(NOT library_target)
+            _cpp_library_setup_test_support(TARGET "${ARG_NAME}")
+            get_target_property(library_target "${ARG_NAME}" _CPP_LIBRARY_UNIT_TEST_TARGET)
+        endif()
+    endif()
 
     # Note: doctest dependency is downloaded by cpp_library_setup before deferring
     # This function assumes doctest::doctest target already exists
@@ -122,7 +130,7 @@ function(_cpp_library_setup_executables)
             if(fail_pos GREATER -1)
                 # Negative compile test: this executable must fail to compile
                 add_executable(${executable_base} EXCLUDE_FROM_ALL "${source_dir}/${executable}")
-                target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME})
+                target_link_libraries(${executable_base} PRIVATE ${library_target})
                 add_test(
                     NAME compile_${executable_base}
                     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${executable_base}
@@ -132,7 +140,7 @@ function(_cpp_library_setup_executables)
             else()
                 # Regular executable - build and link normally
                 add_executable(${executable_base} "${source_dir}/${executable}")
-                target_link_libraries(${executable_base} PRIVATE ${ARG_NAMESPACE}::${CLEAN_NAME} doctest::doctest)
+                target_link_libraries(${executable_base} PRIVATE ${library_target} doctest::doctest)
 
                 cpp_library_copy_runtime_dlls(${executable_base})
 
@@ -145,6 +153,10 @@ function(_cpp_library_setup_executables)
                         LABELS "doctest"
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                     )
+                endif()
+                if(ARG_TYPE STREQUAL "tests")
+                    _cpp_library_setup_testing_config(TARGET "${executable_base}" ENABLED 1)
+                    target_include_directories("${executable_base}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
                 endif()
             endif()
             if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
