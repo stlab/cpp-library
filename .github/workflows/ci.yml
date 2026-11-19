@@ -32,6 +32,9 @@ jobs:
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
 
+      - name: Run independent public header compilation tests
+        run: cmake -P tests/setup/test_header_checks.cmake
+
       - name: Run project version override tests
         run: cmake -P tests/setup/test_version_override.cmake
 
@@ -55,6 +58,9 @@ jobs:
 
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
+
+      - name: Run independent public header compilation tests
+        run: cmake -P tests/setup/test_header_checks.cmake
 
       - name: Run project version override tests
         run: cmake -P tests/setup/test_version_override.cmake

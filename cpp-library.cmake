@@ -316,6 +316,12 @@ function(cpp_library_setup)
         return() # Early return for lightweight consumer mode
     endif()
 
+    if(BUILD_TESTING)
+        set_property(TARGET "${ARG_NAME}" PROPERTY VERIFY_INTERFACE_HEADER_SETS ON)
+        add_custom_target("${ARG_NAME}_check_headers" ALL)
+        add_dependencies("${ARG_NAME}_check_headers" "${ARG_NAME}_verify_interface_header_sets")
+    endif()
+
     _cpp_library_setup_package_test("${PACKAGE_NAME}")
 
     # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
