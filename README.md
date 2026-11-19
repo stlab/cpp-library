@@ -20,13 +20,36 @@ Modern CMake template for C++ libraries with comprehensive infrastructure.
 - **CI/CD**: [GitHub Actions](https://docs.github.com/en/actions) workflows with multi-platform testing and installation verification
 - **Dependency Management**: [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) integration
 
+## Quick reference
+
+Requires CMake 3.24 or newer. The minimum C++ version defaults to 20;
+[`REQUIRES_CPP_VERSION`](#cpp_library_setup) also supports 17 and 23.
+
+Use this order in your top-level `CMakeLists.txt`:
+
+| Order | Action |
+| --- | --- |
+| 1 | Load CPM and cpp-library, as shown in [Manual Setup](#manual-setup). |
+| 2 | Call [`cpp_library_enable_dependency_tracking()`](#cpp_library_enable_dependency_tracking) **before `project()`**. |
+| 3 | Call `project(... LANGUAGES CXX)`, then declare dependencies with `CPMAddPackage()` or `find_package()`. |
+| 4 | Call `include(CTest)` at directory scope to define `BUILD_TESTING`. |
+| 5 | Call [`cpp_library_setup()`](#cpp_library_setup), using the [file-resolution conventions](#path-conventions). |
+
+For custom target setup, see [`cpp_library_set_version()`](#cpp_library_set_version).
+For non-namespaced dependency targets, see [dependency mapping](#non-namespaced-target-error).
+For automatic standalone header checks, see [public-header compilation](#public-header-compilation).
+
 ## Quick Start
 
 The easiest way to create a new library project using cpp-library is with the `setup.cmake` script. This interactive script will guide you through creating a new project with the correct structure, downloading dependencies, and generating all necessary files.
 
+Before you begin, install CMake 3.24 or newer, Git, Ninja, and a C++ compiler
+supporting your chosen standard. On Windows with MSVC, run build commands in an
+x64 Visual Studio developer environment.
+
 ### Using setup.cmake
 
-**Interactive mode:**
+**Bash, interactive mode:**
 
 ```bash
 cmake -P <(curl -sSL https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake)
@@ -39,6 +62,14 @@ curl -O https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake
 cmake -P setup.cmake
 ```
 
+In PowerShell, download and run the script:
+
+```powershell
+$setupUrl = "https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake"
+Invoke-WebRequest -UseBasicParsing -Uri $setupUrl -OutFile setup.cmake
+cmake -P setup.cmake
+```
+
 The script will prompt you for:
 
 - **Library name** (e.g., `my-library`)
@@ -48,7 +79,7 @@ The script will prompt you for:
 - **Include examples?** (yes/no)
 - **Include tests?** (yes/no)
 
-**Non-interactive mode:**
+**Bash, non-interactive mode:**
 
 ```bash
 cmake -P setup.cmake -- \
@@ -57,6 +88,18 @@ cmake -P setup.cmake -- \
   --description="My awesome library" \
   --header-only=yes \
   --examples=yes \
+  --tests=yes
+```
+
+In PowerShell, use backticks for line continuation:
+
+```powershell
+cmake -P setup.cmake -- `
+  --name=my-library `
+  --namespace=mycompany `
+  --description="My awesome library" `
+  --header-only=yes `
+  --examples=yes `
   --tests=yes
 ```
 
@@ -136,6 +179,9 @@ cpp_library_setup(
     DOCS_EXCLUDE_SYMBOLS "your_namespace::implementation"
 )
 ```
+
+`HEADERS`, `SOURCES`, `TESTS`, and `EXAMPLES` are filenames under their
+[standard directories](#path-conventions), not paths from the project root.
 
 These examples are for C++-only projects. If your project also contains C
 sources, use `project(your-library LANGUAGES C CXX)`.
@@ -354,6 +400,24 @@ Your documentation will be automatically built and deployed to `https://your-org
 
 ## API Reference
 
+### `cpp_library_enable_dependency_tracking`
+
+Registers the dependency provider used to record dependency versions and
+components for installed package requirements. Requires CMake 3.24 or newer.
+
+After loading cpp-library, call it in your top-level `CMakeLists.txt` **before
+the literal `project()` call**:
+
+```cmake
+cpp_library_enable_dependency_tracking()
+project(my-library LANGUAGES CXX)
+```
+
+Declare library dependencies after `project()`. Calling the function afterward
+doesn't activate the provider retroactively. See [Manual Setup](#manual-setup)
+for the complete loading sequence and [Untracked Dependencies](#untracked-dependencies)
+for dependency-recording failures.
+
 ### `cpp_library_set_version`
 
 ```cmake
@@ -434,7 +498,11 @@ cpp_library_setup(
 **Notes:**
 
 - The project name is automatically taken from `PROJECT_NAME` (set by the `project()` command). You must call `project(your-library)` before `cpp_library_setup()`.
-- **If you specify `TESTS` or `EXAMPLES`**, call `include(CTest)` after `project()` and before `cpp_library_setup()`.
+- Call `include(CTest)` at directory scope after `project()` and before
+  `cpp_library_setup()` to define `BUILD_TESTING`. It is required if you specify
+  `TESTS` or `EXAMPLES`.
+- Top-level builds with `BUILD_TESTING=ON` automatically perform
+  [independent public-header compilation](#public-header-compilation).
 - Version is automatically detected from git tags (see [Version Management](#version-management) for overrides).
 - Installation is controlled by `INSTALL_OPTION`, or the uppercase `${NAMESPACE}_INSTALL` option
   when omitted. Options default to `PROJECT_IS_TOP_LEVEL`.
@@ -724,6 +792,27 @@ precedence over the legacy variable.
 ### Testing
 
 Uses [doctest](https://github.com/doctest/doctest) with CTest integration. Compile-fail tests are automatically detected via `_fail` suffix in filenames.
+
+#### Public-header compilation
+
+In top-level projects with `BUILD_TESTING=ON`, the normal build compiles each
+header in the library's `PUBLIC` and `INTERFACE` CMake header file sets in a
+separate translation unit. This includes generated headers and file sets added
+after `cpp_library_setup()`. No separate option or duplicate header list is
+needed. These checks aren't added when a client consumes your library as a
+subproject.
+
+Each check uses the library's public usage requirements and configured C++
+standard, supporting C++17, C++20, and C++23. It doesn't force every library to
+compile in all three modes. Unlike [clangd indexing](#clangd-and-vscode), this
+checks that headers compile independently of include order. The checks run
+during `cmake --build`, not during configuration or `ctest`.
+
+Keep every public header self-contained. If a header doesn't apply to the
+configured target, guard its platform-specific contents with the C++
+preprocessor. On unsupported targets, the header must be a no-op, apart from
+optionally including a configuration header. Don't maintain platform-specific
+header exclusions.
 
 ### Template Files
 

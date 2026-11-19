@@ -56,6 +56,26 @@ jobs:
       # [DEPENDENCY] https://github.com/ilammy/msvc-dev-cmd/releases
       - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
 
+      - name: Verify documented PowerShell scaffold commands
+        shell: pwsh
+        run: |
+          $work = Join-Path $env:RUNNER_TEMP "cpp-library-powershell-scaffold"
+          New-Item -ItemType Directory -Path $work | Out-Null
+          Set-Location $work
+          $setupUrl = "https://raw.githubusercontent.com/stlab/cpp-library/main/setup.cmake"
+          Invoke-WebRequest -UseBasicParsing -Uri $setupUrl -OutFile setup.cmake
+          cmake -P setup.cmake -- `
+            --name=my-library `
+            --namespace=mycompany `
+            --description="My awesome library" `
+            --header-only=yes `
+            --examples=yes `
+            --tests=yes
+          if ($LASTEXITCODE -ne 0) { throw "Scaffolding failed" }
+          if (!(Test-Path -LiteralPath "my-library/CMakeLists.txt")) {
+            throw "The scaffold did not create CMakeLists.txt"
+          }
+
       - name: Run target type tests
         run: cmake -P tests/setup/test_target_type.cmake
 
