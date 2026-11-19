@@ -35,6 +35,9 @@ jobs:
       - name: Run independent public header compilation tests
         run: cmake -P tests/setup/test_header_checks.cmake
 
+      - name: Run static and in-source unit testing checks
+        run: cmake -P tests/setup/test_source_testing.cmake
+
       - name: Run project version override tests
         run: cmake -P tests/setup/test_version_override.cmake
 
@@ -81,6 +84,9 @@ jobs:
 
       - name: Run independent public header compilation tests
         run: cmake -P tests/setup/test_header_checks.cmake
+
+      - name: Run static and in-source unit testing checks
+        run: cmake -P tests/setup/test_source_testing.cmake
 
       - name: Run project version override tests
         run: cmake -P tests/setup/test_version_override.cmake

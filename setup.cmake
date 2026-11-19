@@ -388,7 +388,7 @@ cpp_library_enable_dependency_tracking()
 # Now declare project
 project(${ARG_NAME})
 
-# Enable CTest infrastructure (required for tests/examples to work)
+# Enable CTest infrastructure (required for sources/tests/examples)
 include(CTest)
 
 # Setup library

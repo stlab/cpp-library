@@ -164,7 +164,7 @@ cpp_library_enable_dependency_tracking()
 # Now declare project
 project(your-library LANGUAGES CXX)
 
-# Enable testing infrastructure (required for TESTS and EXAMPLES)
+# Enable testing infrastructure (required for SOURCES, TESTS, and EXAMPLES)
 include(CTest)
 
 # Setup library
@@ -791,7 +791,71 @@ precedence over the legacy variable.
 
 ### Testing
 
-Uses [doctest](https://github.com/doctest/doctest) with CTest integration. Compile-fail tests are automatically detected via `_fail` suffix in filenames.
+Tests use [doctest](https://github.com/doctest/doctest) with CTest integration.
+Call `include(CTest)` at directory scope before `cpp_library_setup()`.
+Development tests are enabled for top-level projects with `BUILD_TESTING=ON`.
+Filenames containing `_fail` register compile-fail tests.
+
+Each `TESTS` file remains a separate executable with its own main.
+Unit tests link a separate static implementation, even when the production
+library uses `BUILD_SHARED_LIBS=ON`. They inherit the implementation's private
+build requirements rather than consumer-only DLL-import definitions. Dependencies
+retain the client's selected linkage, so a test can still require third-party
+DLLs. Examples continue to link the production library.
+
+The library implementation and unit tests have a private `src/` include root.
+Place private headers in `src/private/` and include them as
+`#include "private/header.hpp"`. This path isn't added to the production
+library's public interface or to the independent public-header checks.
+
+#### In-source tests
+
+Put tests for unnamed-namespace components in the same `.cpp` file as the
+implementation. Include the generated private configuration header and guard
+both the doctest include and test cases:
+
+```cpp
+#include <cpp-library/testing.hpp>
+
+namespace {
+/// Reports whether value is even.
+constexpr bool is_even(unsigned value) noexcept {
+    return value % 2 == 0;
+}
+}
+
+#if CPP_LIBRARY_TESTING()
+#include <doctest/doctest.h>
+
+TEST_CASE("even values") {
+    CHECK(is_even(0));
+    CHECK(is_even(4));
+    CHECK_FALSE(is_even(3));
+}
+#endif
+```
+
+After you include the configuration header, `CPP_LIBRARY_TESTING()` is always
+defined as `0` or `1`. Use `#if CPP_LIBRARY_TESTING()`, not `#ifdef`, and don't
+define it yourself. Production compilation and the static implementation used
+by existing per-file tests use `0`; the in-source runner and the per-file test
+sources use `1`. Keep this header private; don't include it from installed
+public headers. Production compilation doesn't need doctest headers or libraries.
+
+For compiled libraries, cpp-library adds `<project>_in_source_tests` to the normal
+build and CTest, even if you omit `TESTS`. This separate executable compiles the
+implementation with testing enabled and includes every source directly, so
+registration-only translation units aren't lost inside a static archive.
+cpp-library supplies its doctest main: don't define
+`DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN` in implementation sources. Keep the existing
+mains in your `TESTS` files unchanged. Embedded tests run only in the separate
+runner, not again in each per-file executable.
+
+Test variants require additional implementation compilation. They use the
+library's finalized build settings, including dependencies and generated-header
+ordering declared after `cpp_library_setup()`, and its configured C++ standard.
+No in-source runner is added for header-only libraries, subprojects, or
+`BUILD_TESTING=OFF`.
 
 #### Public-header compilation
 
