@@ -54,11 +54,11 @@ macro(run_test TEST_NAME)
     message(STATUS "Running test ${TEST_COUNT}: ${TEST_NAME}")
     
     # Clear global state before each test
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_PKG_KEYS "")
     get_property(ALL_PKG_KEYS GLOBAL PROPERTY _CPP_LIBRARY_PKG_KEYS)
     foreach(prop IN LISTS ALL_PKG_KEYS)
         set_property(GLOBAL PROPERTY "_CPP_LIBRARY_PKG_COMPONENTS_${prop}")
     endforeach()
+    set_property(GLOBAL PROPERTY _CPP_LIBRARY_PKG_KEYS "")
     
     # Clear all dependency mappings from previous tests
     get_property(ALL_MAPPING_PROPERTIES GLOBAL PROPERTY _CPP_LIBRARY_ALL_MAPPING_PROPERTIES)
