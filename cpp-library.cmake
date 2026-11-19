@@ -17,10 +17,9 @@ get_filename_component(CPP_LIBRARY_ROOT "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 #   cpp_library_set_version()
 #   # Now PROJECT_VERSION and related variables are set from git tags
 #
-# The function respects CPP_LIBRARY_VERSION if set (e.g., by package managers),
-# otherwise queries git tags, stripping the 'v' prefix if present.
+# Uses CPP_LIBRARY_VERSION_<PROJECT_NAME> before Git tags, stripping the 'v' prefix
+# from tags. Legacy CPP_LIBRARY_VERSION applies only to the top-level project.
 function(cpp_library_set_version)
-    # Get version from git tags (respects CPP_LIBRARY_VERSION override)
     _cpp_library_get_git_version(GIT_VERSION)
 
     # Parse version components
@@ -41,7 +40,7 @@ function(cpp_library_set_version)
     set(PROJECT_VERSION_MINOR ${VERSION_MINOR} PARENT_SCOPE)
     set(PROJECT_VERSION_PATCH ${VERSION_PATCH} PARENT_SCOPE)
 
-    message(STATUS "cpp-library: Set project version to ${GIT_VERSION} from git tags")
+    message(STATUS "cpp-library: Set project version to ${GIT_VERSION}")
 endfunction()
 
 # Enable dependency tracking for accurate find_dependency() generation
@@ -164,6 +163,8 @@ endfunction()
 # - When PROJECT_IS_TOP_LEVEL: also configures templates, testing, and docs
 # - Installation is controlled by INSTALL_OPTION or uppercase ${NAMESPACE}_INSTALL
 #   (defaults to PROJECT_IS_TOP_LEVEL)
+# - Installs an existing project-root LICENSE and optional LICENSE_FILES; relative paths
+#   are project-root relative, and missing explicit files are errors when installation is enabled
 function(cpp_library_setup)
     # Parse arguments
     set(oneValueArgs
@@ -180,6 +181,7 @@ function(cpp_library_setup)
         DOCS_EXCLUDE_SYMBOLS # Symbols to exclude from docs
         DOCS_INPUTS # Additional documentation files or directories
         DOCS_OPTIONS # Single-line Doxygen assignments applied after the template
+        LICENSE_FILES # Additional project-relative or absolute license/notice files
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -187,7 +189,7 @@ function(cpp_library_setup)
     if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
         message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
     endif()
-    foreach(keyword DOCS_INPUTS DOCS_OPTIONS)
+    foreach(keyword DOCS_INPUTS DOCS_OPTIONS LICENSE_FILES)
         if(keyword IN_LIST ARG_KEYWORDS_MISSING_VALUES)
             message(FATAL_ERROR "cpp_library_setup: ${keyword} requires a value")
         endif()
@@ -195,6 +197,9 @@ function(cpp_library_setup)
     set(install_args)
     if(DEFINED ARG_INSTALL_OPTION)
         list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
+    endif()
+    if(ARG_LICENSE_FILES)
+        list(APPEND install_args LICENSE_FILES ${ARG_LICENSE_FILES})
     endif()
 
     # Validate required arguments
@@ -309,6 +314,12 @@ function(cpp_library_setup)
     # Only setup development infrastructure when building as top-level project
     if(NOT PROJECT_IS_TOP_LEVEL)
         return() # Early return for lightweight consumer mode
+    endif()
+
+    if(BUILD_TESTING)
+        set_property(TARGET "${ARG_NAME}" PROPERTY VERIFY_INTERFACE_HEADER_SETS ON)
+        add_custom_target("${ARG_NAME}_check_headers" ALL)
+        add_dependencies("${ARG_NAME}_check_headers" "${ARG_NAME}_verify_interface_header_sets")
     endif()
 
     _cpp_library_setup_package_test("${PACKAGE_NAME}")

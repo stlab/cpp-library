@@ -18,9 +18,10 @@
 # To extend this list in your project, use cpp_library_map_dependency() to explicitly map additional packages.
 set(_CPP_LIBRARY_SYSTEM_PACKAGES "Threads" "OpenMP" "ZLIB" "CURL" "OpenSSL")
 
-# Registers a custom dependency mapping for find_dependency() generation
+# Registers a project-local dependency mapping for find_dependency() generation.
 # - Precondition: TARGET is a namespaced target (e.g., "Qt6::Core", "stlab::enum-ops") or non-namespaced (e.g., "opencv_core")
-# - Postcondition: FIND_DEPENDENCY_CALL stored for TARGET, used in package config generation
+# - Postcondition: FIND_DEPENDENCY_CALL overrides TARGET's requirement only for libraries
+#   declared in this CMake project, including its non-project subdirectories
 # - FIND_DEPENDENCY_CALL should be the complete arguments to find_dependency(), including version if needed
 # - Multiple components of the same package (same name+version+args) are automatically merged into one call
 # - Examples:
@@ -31,9 +32,11 @@ set(_CPP_LIBRARY_SYSTEM_PACKAGES "Threads" "OpenMP" "ZLIB" "CURL" "OpenSSL")
 #   - cpp_library_map_dependency("opencv_core" "OpenCV 4.5.0")
 # - Note: Most namespaced dependencies work automatically; only use when automatic detection fails or special syntax needed
 function(cpp_library_map_dependency TARGET FIND_DEPENDENCY_CALL)
-    set_property(GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${TARGET} "${FIND_DEPENDENCY_CALL}")
-    # Track all mapped targets for cleanup in tests
-    set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_MAPPED_TARGETS "${TARGET}")
+    string(SHA256 project_key "${PROJECT_BINARY_DIR}")
+    set(mapping_property "_CPP_LIBRARY_DEPENDENCY_MAP_${project_key}_${TARGET}")
+    set_property(GLOBAL PROPERTY "${mapping_property}" "${FIND_DEPENDENCY_CALL}")
+    # Track property names for cleanup in script-mode tests.
+    set_property(GLOBAL APPEND PROPERTY _CPP_LIBRARY_ALL_MAPPING_PROPERTIES "${mapping_property}")
 endfunction()
 
 # Generates find_dependency() calls for target's INTERFACE link libraries
@@ -58,33 +61,23 @@ function(_cpp_library_generate_dependencies OUTPUT_VAR TARGET_NAME NAMESPACE)
         set(${OUTPUT_VAR} "" PARENT_SCOPE)
         return()
     endif()
+
+    get_target_property(TARGET_BINARY_DIR ${TARGET_NAME} BINARY_DIR)
+    get_directory_property(MAPPING_PROJECT DIRECTORY "${TARGET_BINARY_DIR}"
+        DEFINITION PROJECT_BINARY_DIR)
+    string(SHA256 project_key "${MAPPING_PROJECT}")
     
     # Process each linked library
     foreach(LIB IN LISTS LINK_LIBS)
-        # Handle BUILD_INTERFACE generator expressions
-        # When re-exporting dependencies from external packages, they must be wrapped in BUILD_INTERFACE
-        # to avoid CMake export errors, but we still want to track them for find_dependency()
-        if(LIB MATCHES "^\\$<BUILD_INTERFACE:([^>]+)>$")
-            set(EXTRACTED_TARGET "${CMAKE_MATCH_1}")
-            # Only process if it's a namespaced target (external dependency)
-            # Non-namespaced targets in BUILD_INTERFACE are local build targets
-            if(EXTRACTED_TARGET MATCHES "::")
-                set(LIB "${EXTRACTED_TARGET}")
-                message(DEBUG "cpp-library: Extracted ${LIB} from BUILD_INTERFACE generator expression")
-            else()
-                # Skip non-namespaced BUILD_INTERFACE targets (local build targets)
-                message(DEBUG "cpp-library: Skipping non-namespaced BUILD_INTERFACE target: ${EXTRACTED_TARGET}")
-                continue()
-            endif()
-        elseif(LIB MATCHES "^\\$<")
-            # Skip other generator expressions (INSTALL_INTERFACE, etc.)
+        if(LIB MATCHES "^\\$<")
             continue()
         endif()
         
         set(FIND_DEP_CALL "")
         
         # Check for custom mapping first (allows overrides for non-namespaced targets)
-        get_property(CUSTOM_MAPPING GLOBAL PROPERTY _CPP_LIBRARY_DEPENDENCY_MAP_${LIB})
+        get_property(CUSTOM_MAPPING GLOBAL
+            PROPERTY "_CPP_LIBRARY_DEPENDENCY_MAP_${project_key}_${LIB}")
         
         if(CUSTOM_MAPPING)
             # Use explicit custom mapping
@@ -456,6 +449,8 @@ endfunction()
 # - Supports header-only (INTERFACE) and compiled libraries, uses SameMajorVersion compatibility
 # - Installation is controlled via INSTALL_OPTION or uppercase ${NAMESPACE}_INSTALL
 #   (defaults to PROJECT_IS_TOP_LEVEL)
+# - Installs the project's existing LICENSE and LICENSE_FILES under the package's license directory
+# - Missing explicit LICENSE_FILES are configuration errors when installation is enabled
 function(_cpp_library_setup_install)
     set(oneValueArgs
         NAME            # Target name (e.g., "stlab-enum-ops")
@@ -466,6 +461,7 @@ function(_cpp_library_setup_install)
     )
     set(multiValueArgs
         HEADERS     # List of header file paths (for FILE_SET support check)
+        LICENSE_FILES # Additional project-relative or absolute license/notice files
     )
     
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -504,6 +500,32 @@ function(_cpp_library_setup_install)
     # Include required CMake modules (deferred from top-level to avoid requiring project() before include)
     include(GNUInstallDirs)
     include(CMakePackageConfigHelpers)
+
+    set(license_files)
+    if(EXISTS "${PROJECT_SOURCE_DIR}/LICENSE" AND NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/LICENSE")
+        list(APPEND license_files "${PROJECT_SOURCE_DIR}/LICENSE")
+    endif()
+    foreach(license IN LISTS ARG_LICENSE_FILES)
+        get_filename_component(license_path "${license}" ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+        if(NOT EXISTS "${license_path}" OR IS_DIRECTORY "${license_path}")
+            message(FATAL_ERROR "cpp-library: License file not found: ${license_path}")
+        endif()
+        list(APPEND license_files "${license_path}")
+    endforeach()
+    if(license_files)
+        list(REMOVE_DUPLICATES license_files)
+        set(license_names)
+        foreach(license IN LISTS license_files)
+            get_filename_component(license_name "${license}" NAME)
+            if(license_name IN_LIST license_names)
+                message(FATAL_ERROR
+                    "cpp-library: License files have the same installed name: ${license_name}")
+            endif()
+            list(APPEND license_names "${license_name}")
+        endforeach()
+        install(FILES ${license_files}
+            DESTINATION "${CMAKE_INSTALL_DATADIR}/licenses/${ARG_PACKAGE_NAME}")
+    endif()
     
     # Install the library target
     # For header-only libraries (INTERFACE), this installs the target metadata

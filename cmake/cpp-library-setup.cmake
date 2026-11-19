@@ -2,12 +2,14 @@
 #
 # cpp-library-setup.cmake - Core library setup functionality
 
-# Returns version string from CPP_LIBRARY_VERSION cache variable (if set), git tag (with 'v' prefix removed), or 
-#    "0.0.0" fallback
+# Returns this project's scoped override, top-level legacy override, Git-tag version,
+# or "0.0.0" when no tag is found.
 function(_cpp_library_get_git_version OUTPUT_VAR)
-    # If CPP_LIBRARY_VERSION is set (e.g., by vcpkg or other package manager via -DCPP_LIBRARY_VERSION=x.y.z),
-    # use it instead of trying to query git (which may not be available in source archives)
-    if(DEFINED CPP_LIBRARY_VERSION AND NOT CPP_LIBRARY_VERSION STREQUAL "")
+    set(version_override "CPP_LIBRARY_VERSION_${PROJECT_NAME}")
+    if(DEFINED "${version_override}" AND NOT "${${version_override}}" STREQUAL "")
+        set(${OUTPUT_VAR} "${${version_override}}" PARENT_SCOPE)
+        return()
+    elseif(PROJECT_IS_TOP_LEVEL AND DEFINED CPP_LIBRARY_VERSION AND NOT CPP_LIBRARY_VERSION STREQUAL "")
         set(${OUTPUT_VAR} "${CPP_LIBRARY_VERSION}" PARENT_SCOPE)
         return()
     endif()
@@ -71,6 +73,7 @@ function(_cpp_library_setup_core)
     set(multiValueArgs
         HEADERS
         SOURCES
+        LICENSE_FILES
     )
 
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -80,6 +83,9 @@ function(_cpp_library_setup_core)
     set(install_args)
     if(DEFINED ARG_INSTALL_OPTION)
         list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
+    endif()
+    if(ARG_LICENSE_FILES)
+        list(APPEND install_args LICENSE_FILES ${ARG_LICENSE_FILES})
     endif()
 
     # Get version from git tags if not provided

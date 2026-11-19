@@ -109,12 +109,16 @@ mock_target_links(test13_target)
 _cpp_library_generate_dependencies(RESULT test13_target "mylib")
 verify_output("${RESULT}" "" "Test 13")
 
-# Test 14: Generator expressions should be skipped
+# Test 14: Build-only links must not become installed package requirements
 run_test("Generator expressions skipped")
 set_property(GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED TRUE)
-mock_target_links(test14_target "Threads::Threads" "$<BUILD_INTERFACE:some_local_target>")
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_TRACKED_DEP_BuildOnly" "BuildOnly 1.0 CONFIG")
+cpp_library_map_dependency("MappedBuildOnly::dep" "MappedBuildOnly 2.0 CONFIG")
+mock_target_links(test14_target "Threads::Threads" "$<BUILD_INTERFACE:some_local_target>"
+    "$<BUILD_INTERFACE:BuildOnly::dep>" "$<BUILD_INTERFACE:MappedBuildOnly::dep>"
+    "$<INSTALL_INTERFACE:$<1:BuildOnly::dep>>")
 _cpp_library_generate_dependencies(RESULT test14_target "mylib")
-verify_output("${RESULT}" "find_dependency(Threads)" "Test 14")
+verify_output("${RESULT}" "find_dependency(Threads)" "Build-only dependencies are not installed requirements")
 
 # Test 15: Multiple Boost components (same package, different components)
 run_test("Boost with multiple components")
@@ -153,4 +157,21 @@ mock_target_links(test18_target "stlab::enum-ops" "Qt6::Core" "Qt6::Widgets" "op
 _cpp_library_generate_dependencies(RESULT test18_target "stlab")
 set(EXPECTED "find_dependency(stlab-enum-ops 1.0.0)\nfind_dependency(Qt6 6.5.0 COMPONENTS Core Widgets)\nfind_dependency(OpenCV 4.5.0)\nfind_dependency(Threads)\nfind_dependency(OpenMP)")
 verify_output("${RESULT}" "${EXPECTED}" "Test 18")
+
+set_property(GLOBAL PROPERTY _CPP_LIBRARY_PKG_KEYS "ResetProbe<|>1.0<|>" "OtherProbe<|>2.0<|>")
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_PKG_COMPONENTS_ResetProbe<|>1.0<|>" Core)
+set_property(GLOBAL PROPERTY "_CPP_LIBRARY_PKG_COMPONENTS_OtherProbe<|>2.0<|>" Network)
+get_property(previous_package_keys GLOBAL PROPERTY _CPP_LIBRARY_PKG_KEYS)
+
+run_test("Component state does not survive the next case")
+foreach(key IN LISTS previous_package_keys)
+    get_property(remaining_components GLOBAL PROPERTY "_CPP_LIBRARY_PKG_COMPONENTS_${key}")
+    verify_output("${remaining_components}" "" "Previous package components were cleared")
+endforeach()
+get_property(provider_installed GLOBAL PROPERTY _CPP_LIBRARY_PROVIDER_INSTALLED)
+verify_output("${provider_installed}" "TRUE" "Provider fixture remains installed")
+cpp_library_map_dependency("ResetProbe::Widgets" "ResetProbe 1.0 COMPONENTS Widgets")
+mock_target_links(reset_probe "ResetProbe::Widgets")
+_cpp_library_generate_dependencies(RESULT reset_probe "mylib")
+verify_output("${RESULT}" "find_dependency(ResetProbe 1.0 COMPONENTS Widgets)" "Next case has only its own components")
 

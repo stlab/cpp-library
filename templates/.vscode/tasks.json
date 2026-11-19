@@ -240,7 +240,7 @@
         "$gcc",
         "$msCompile"
       ],
-      "detail": "Release build for installation with CPM_USE_LOCAL_PACKAGES enabled for testing installed packages Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
+      "detail": "Release build for installation, preferring locally installed dependencies before fetching. Requires the CMake Tools extension (ms-vscode.cmake-tools) — without it, this task fails to start.",
       "windows": {
         "options": {
           "shell": {
