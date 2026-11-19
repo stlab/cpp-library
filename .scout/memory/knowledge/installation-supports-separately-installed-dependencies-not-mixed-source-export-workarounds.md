@@ -7,8 +7,8 @@ last_accessed: 2026-11-18T23:22:41Z
 last_reinforced: 2026-11-18T23:22:41Z
 access_count: 1
 sources:
-  - "README.md:169-180"
-  - "README.md:194-199"
+  - "README.md:215-226"
+  - "README.md:240-245"
   - "cmake/cpp-library-install.cmake:70-72"
 tags: ["cmake", "installation", "cpm", "supported-boundary"]
 tier: knowledge

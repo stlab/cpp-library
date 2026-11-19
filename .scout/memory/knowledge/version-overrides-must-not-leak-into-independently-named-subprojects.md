@@ -8,7 +8,7 @@ last_reinforced: 2026-11-18T23:22:35Z
 access_count: 1
 sources:
   - "cmake/cpp-library-setup.cmake:5-23"
-  - "README.md:698-722"
+  - "README.md:769-790"
 tags: ["cmake", "versions", "project-scope", "package-managers"]
 tier: knowledge
 ---
