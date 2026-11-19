@@ -31,7 +31,9 @@ foreach(shared OFF ON)
         DESTINATION "${build}/source")
     run("${CMAKE_COMMAND}" -S "${build}/source" -B "${build}/build" -G Ninja
         "-DTOOLKIT_SOURCE=${toolkit_source}" "-DBUILD_SHARED_LIBS=${shared}"
+        "-DFILE_SET_GENERATION=${shared}"
         "-DFETCHCONTENT_BASE_DIR=${test_root}/dependencies")
+    run("${CMAKE_COMMAND}" --build "${build}/build" --target existing sample_in_source_tests)
     run("${CMAKE_COMMAND}" --build "${build}/build")
     execute_process(COMMAND "${CMAKE_COMMAND}" --build "${build}/build" --target rejected_fail
         RESULT_VARIABLE rejected OUTPUT_VARIABLE rejected_out ERROR_VARIABLE rejected_err)
@@ -47,6 +49,7 @@ foreach(standard 17 20 23)
         DESTINATION "${build}/source")
     run("${CMAKE_COMMAND}" -S "${build}/source" -B "${build}/build" -G Ninja
         "-DTOOLKIT_SOURCE=${toolkit_source}" -DBUILD_SHARED_LIBS=ON -DSOURCE_ONLY=ON
+        -DFILE_SET_GENERATION=ON -DDEFAULT_HEADER_SET=ON
         "-DCMAKE_CXX_STANDARD=${standard}" "-DFETCHCONTENT_BASE_DIR=${test_root}/dependencies")
     run("${CMAKE_COMMAND}" --build "${build}/build" --target sample_in_source_tests)
     run("${ctest}" --test-dir "${build}/build" --output-on-failure)
@@ -56,6 +59,7 @@ set(build "${test_root}/failing")
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/fixtures/source_testing/" DESTINATION "${build}/source")
 run("${CMAKE_COMMAND}" -S "${build}/source" -B "${build}/build" -G Ninja
     "-DTOOLKIT_SOURCE=${toolkit_source}" -DSOURCE_ONLY=ON -DFAIL_EMBEDDED=ON
+    -DFILE_SET_GENERATION=ON
     "-DFETCHCONTENT_BASE_DIR=${test_root}/dependencies")
 run("${CMAKE_COMMAND}" --build "${build}/build" --target sample_in_source_tests)
 execute_process(COMMAND "${ctest}" --test-dir "${build}/build" --output-on-failure

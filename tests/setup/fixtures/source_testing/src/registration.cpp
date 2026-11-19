@@ -1,5 +1,12 @@
 #include <cpp-library/testing.hpp>
 
+namespace {
+/// Returns the configured internal value.
+[[maybe_unused]] int internal_value() {
+    return 42;
+}
+}
+
 #if CPP_LIBRARY_TESTING()
 #include <doctest/doctest.h>
 #include <fstream>
@@ -19,11 +26,6 @@ static_assert(FIXTURE_CPLUSPLUS > 202002L);
 #endif
 
 namespace {
-/// Returns the configured internal value.
-int internal_value() {
-    return 42;
-}
-
 TEST_CASE("anonymous component") {
     CHECK(internal_value() == EXPECTED_INTERNAL);
     std::ofstream marker("in-source-executions", std::ios::app);

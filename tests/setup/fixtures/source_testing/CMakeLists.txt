@@ -53,8 +53,18 @@ set(generated "${CMAKE_CURRENT_BINARY_DIR}/generated/config.hpp")
 add_custom_command(OUTPUT "${generated}"
     COMMAND "${CMAKE_COMMAND}" "-DOUTPUT=${generated}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake")
-add_custom_target(generate_config DEPENDS "${generated}")
-add_dependencies(sample generate_config)
+if(FILE_SET_GENERATION)
+    if(DEFAULT_HEADER_SET)
+        target_sources(sample PUBLIC FILE_SET HEADERS
+            BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/generated" FILES "${generated}")
+    else()
+        target_sources(sample PRIVATE FILE_SET generated_headers TYPE HEADERS
+            BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/generated" FILES "${generated}")
+    endif()
+else()
+    add_custom_target(generate_config DEPENDS "${generated}")
+    add_dependencies(sample generate_config)
+endif()
 target_include_directories(sample PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 if(NOT BUILD_TESTING OR NOT PROJECT_IS_TOP_LEVEL)
     foreach(target existing rejected_fail sample_in_source_tests doctest::doctest)
