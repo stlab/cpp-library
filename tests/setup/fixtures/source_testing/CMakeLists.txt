@@ -29,9 +29,21 @@ set(test_args TESTS existing.cpp rejected_fail.cpp EXAMPLES example.cpp)
 if(SOURCE_ONLY)
     set(test_args)
 endif()
-cpp_library_setup(DESCRIPTION "Static implementation testing" NAMESPACE fixture
+cpp_library_setup(DESCRIPTION "Public and in-source testing" NAMESPACE fixture
     HEADERS api.hpp REQUIRES_CPP_VERSION "${CMAKE_CXX_STANDARD}" ${source_args}
     ${test_args})
+
+foreach(test_target existing rejected_fail)
+    if(TARGET "${test_target}")
+        get_target_property(links "${test_target}" LINK_LIBRARIES)
+        if(NOT "fixture::sample" IN_LIST links)
+            message(FATAL_ERROR "Public test ${test_target} must link the production library: ${links}")
+        endif()
+    endif()
+endforeach()
+if(TARGET existing AND BUILD_SHARED_LIBS AND NOT HEADER_ONLY)
+    target_compile_definitions(existing PRIVATE EXPECT_SHARED)
+endif()
 
 add_library(requirements INTERFACE)
 target_compile_definitions(requirements INTERFACE PUBLIC_VALUE=19)

@@ -849,13 +849,13 @@ Development tests are enabled for top-level projects with `BUILD_TESTING=ON`.
 Filenames containing `_fail` register compile-fail tests.
 
 Each `TESTS` file remains a separate executable with its own main.
-Unit tests link a separate static implementation, even when the production
-library uses `BUILD_SHARED_LIBS=ON`. They inherit the implementation's private
-build requirements rather than consumer-only DLL-import definitions. Dependencies
-retain the client's selected linkage, so a test can still require third-party
-DLLs. Examples continue to link the production library.
+`TESTS` and `EXAMPLES` link the production library and consume its public usage
+requirements, including DLL-import definitions for shared libraries. They don't
+receive private implementation settings, the testing configuration header, or
+the private `src/` include root. Runtime DLLs are copied beside generated
+executables on Windows.
 
-The library implementation and unit tests have a private `src/` include root.
+The library implementation and in-source tests have a private `src/` include root.
 Place private headers in `src/private/` and include them as
 `#include "private/header.hpp"`. This path isn't added to the production
 library's public interface or to the independent public-header checks.
@@ -889,10 +889,33 @@ TEST_CASE("even values") {
 
 After you include the configuration header, `CPP_LIBRARY_TESTING()` is always
 defined as `0` or `1`. Use `#if CPP_LIBRARY_TESTING()`, not `#ifdef`, and don't
-define it yourself. Production compilation and the static implementation used
-by existing per-file tests use `0`; the in-source runner and the per-file test
-sources use `1`. Keep this header private; don't include it from installed
+define it yourself. Production compilation uses `0`; the in-source runner uses
+`1`. Keep this header private; don't include it from installed
 public headers. Production compilation doesn't need doctest headers or libraries.
+
+Each translation unit containing in-source tests must include the headers needed
+by its assertions and diagnostic formatting. The generated runner's includes
+don't supply definitions to other translation units. In particular, include
+`<ostream>` directly when assertion diagnostics need standard stream insertion,
+including string or `std::string_view` diagnostics that otherwise encounter an
+incomplete `std::basic_ostream` on MSVC. Keep test-only headers inside the selector:
+
+```cpp
+#include <cpp-library/testing.hpp>
+#if CPP_LIBRARY_TESTING()
+#include <doctest/doctest.h>
+#include <ostream>
+#include <string_view>
+
+TEST_CASE("string diagnostics") {
+    CHECK(std::string_view("value") == std::string_view("value"));
+}
+#endif
+```
+
+When moving standalone tests into implementation files, add these includes to
+each affected file. A standalone doctest implementation might have supplied them
+transitively; adding a header to one implementation file doesn't fix another.
 
 For compiled libraries, cpp-library adds `<project>_in_source_tests` to the normal
 build and CTest, even if you omit `TESTS`. This separate executable compiles the
@@ -908,6 +931,23 @@ library's finalized build settings, including dependencies and generated-header
 ordering declared after `cpp_library_setup()`, and its configured C++ standard.
 No in-source runner is added for header-only libraries, subprojects, or
 `BUILD_TESTING=OFF`.
+
+#### Migrate private standalone tests
+
+**Breaking change from 6.x:** `TESTS` no longer links a separate static
+implementation or exposes private headers and settings. Public tests exercise
+the production target, including its shared-library boundary.
+
+Move tests that require private implementation access into the corresponding
+implementation `.cpp` files under `#if CPP_LIBRARY_TESTING()`. Remove their
+standalone entries from `TESTS`, and leave public-contract tests and their
+doctest mains in `TESTS`. Don't define doctest implementation or main macros in
+production source files. There is no compatibility option for the old private
+standalone-test behavior.
+
+Build and run CTest to verify both the public executables and
+`<project>_in_source_tests`. If you rewrote generated test targets to restore
+production links or remove private include paths, remove those overrides.
 
 #### Public-header compilation
 
