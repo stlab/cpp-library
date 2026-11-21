@@ -1,0 +1,83 @@
+# Copy into cel-euclid's .github/workflows/install.yml.
+name: Test installation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      INSTALL_PREFIX: ${{ runner.temp }}/cel-install
+      CMAKE_BUILD_PARALLEL_LEVEL: 2
+
+    steps:
+      # [DEPENDENCY] https://github.com/actions/checkout/releases
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check out GLM 1.0.3
+        uses: actions/checkout@v7
+        with:
+          repository: g-truc/glm
+          ref: 8d1fd52e5ab5590e2c81768ace50c72bae28f2ed
+          path: .install-deps/glm
+
+      - name: Check out cel-runtime 1.1.2
+        uses: actions/checkout@v7
+        with:
+          repository: stlab/cel-runtime
+          ref: a819042cfa3fab8ede82052518f2b7f5175af5ad
+          path: .install-deps/cel-runtime
+          fetch-depth: 0
+
+      - name: Check out cel-parser 1.1.1
+        uses: actions/checkout@v7
+        with:
+          repository: stlab/cel-parser
+          ref: 3ba7e1990551817427872b9dc88d7ebed32b9cf8
+          path: .install-deps/cel-parser
+          fetch-depth: 0
+
+      - name: Install GLM
+        run: |
+          cmake -S .install-deps/glm -B "$RUNNER_TEMP/build-glm" -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DGLM_BUILD_TESTS=OFF -DGLM_BUILD_INSTALL=ON \
+            "-DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX"
+          cmake --build "$RUNNER_TEMP/build-glm"
+          cmake --install "$RUNNER_TEMP/build-glm"
+
+      - name: Install CEL dependencies
+        run: |
+          for package in cel-runtime cel-parser; do
+            cmake -S ".install-deps/$package" \
+              -B "$RUNNER_TEMP/build-$package" -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DBUILD_TESTING=OFF -DCEL_INSTALL=ON \
+              -DCPM_USE_LOCAL_PACKAGES=ON \
+              "-DCMAKE_PREFIX_PATH=$INSTALL_PREFIX" \
+              "-DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX"
+            cmake --build "$RUNNER_TEMP/build-$package"
+            cmake --install "$RUNNER_TEMP/build-$package"
+          done
+
+      - name: Build and install cel-euclid
+        run: |
+          cmake --preset install -DCEL_INSTALL=ON \
+            "-DCMAKE_PREFIX_PATH=$INSTALL_PREFIX" \
+            "-DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX"
+          cmake --build --preset install
+          cmake --install build/install
+
+      - name: Check installed package artifacts
+        run: |
+          cmake "-DPACKAGE_TEST_PREFIX=$INSTALL_PREFIX" \
+            -P build/install/cpp-library-test-package.cmake

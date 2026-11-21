@@ -148,13 +148,16 @@ function(_cpp_library_setup_core)
 
 endfunction()
 
-# Copies template files (.clang-format, .gitignore, etc.) to project root if not present.
-# - Precondition: PACKAGE_NAME must be passed as first parameter
+# Copies static templates and configures project-specific presets and CI if missing.
+# - Precondition: PACKAGE_NAME and INSTALL_OPTION identify the current project's package and switch
 # - Postcondition: missing template files copied to project, CI workflow configured with PACKAGE_NAME substitution
 # - With FORCE_INIT: overwrites existing files
 function(_cpp_library_copy_templates PACKAGE_NAME)
     set(options FORCE_INIT)
-    cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
+    cmake_parse_arguments(ARG "${options}" "INSTALL_OPTION" "" ${ARGN})
+    if(NOT ARG_INSTALL_OPTION)
+        message(FATAL_ERROR "_cpp_library_copy_templates: INSTALL_OPTION is required")
+    endif()
 
     # List of static template files to copy
     set(TEMPLATE_FILES
@@ -165,7 +168,6 @@ function(_cpp_library_copy_templates PACKAGE_NAME)
         ".vscode/settings.json"
         ".vscode/tasks.json"
         "docs/index.html"
-        "CMakePresets.json"
     )
 
     foreach(template_file IN LISTS TEMPLATE_FILES)
@@ -181,6 +183,14 @@ function(_cpp_library_copy_templates PACKAGE_NAME)
             message(WARNING "Template file not found: ${source_file}")
         endif()
     endforeach()
+
+    set(preset_dest "${CMAKE_CURRENT_SOURCE_DIR}/CMakePresets.json")
+    if(NOT EXISTS "${preset_dest}" OR ARG_FORCE_INIT)
+        set(CPP_LIBRARY_INSTALL_OPTION "${ARG_INSTALL_OPTION}")
+        configure_file("${CPP_LIBRARY_ROOT}/templates/CMakePresets.json.in"
+            "${preset_dest}" @ONLY)
+        message(STATUS "Configured template file: CMakePresets.json")
+    endif()
     
     # Setup CI workflow with PACKAGE_NAME substitution
     _cpp_library_setup_ci("${PACKAGE_NAME}" ${ARG_FORCE_INIT})

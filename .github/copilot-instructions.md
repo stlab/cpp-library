@@ -20,10 +20,10 @@ The consumer lifecycle is order-sensitive:
 1. Load CPM and this toolkit, then call
    `cpp_library_enable_dependency_tracking()` **before `project()`**. It registers
    the provider through `CMAKE_PROJECT_TOP_LEVEL_INCLUDES`; CMake 3.24+ is required.
-2. After `project()`, declare dependencies through `find_package()` or CPM.
-   Call `include(CTest)` at directory scope before `cpp_library_setup()` when
+2. After `project()`, call `include(CTest)` at directory scope before `cpp_library_setup()` when
    supplying `TESTS` or `EXAMPLES`. Setup requires `DESCRIPTION`, `NAMESPACE`,
-   and `HEADERS`.
+   and `HEADERS`. Declare dependencies through `find_package()` or CPM after
+   `cpp_library_setup()`.
 3. Setup creates the library target and optional installation rules. Only
    top-level projects proceed to template generation, tests, examples, and docs.
    `BUILD_TESTING` gates both tests and examples; `BUILD_DOCS` gates documentation.
@@ -104,7 +104,8 @@ cmake --build --preset docs
 ```
 
 The `clang-tidy` preset requires clang-tidy and runs analysis during compilation.
-These presets come from `templates/CMakePresets.json` and apply to consumers.
+These presets come from `templates/CMakePresets.json.in` and apply to consumers.
+Source-build presets disable the resolved installation option; `install` enables it.
 `cmake --preset init` enables `CPP_LIBRARY_FORCE_INIT` and overwrites generated
 consumer templates.
 

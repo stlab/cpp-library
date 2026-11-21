@@ -8,6 +8,7 @@
       "binaryDir": "${sourceDir}/build/default",
       "generator": "Ninja",
       "cacheVariables": {
+        "@CPP_LIBRARY_INSTALL_OPTION@": "OFF",
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_TESTING": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -22,6 +23,7 @@
       "binaryDir": "${sourceDir}/build/test",
       "generator": "Ninja",
       "cacheVariables": {
+        "@CPP_LIBRARY_INSTALL_OPTION@": "OFF",
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_TESTING": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -36,6 +38,7 @@
       "binaryDir": "${sourceDir}/build/docs",
       "generator": "Ninja",
       "cacheVariables": {
+        "@CPP_LIBRARY_INSTALL_OPTION@": "OFF",
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_TESTING": "OFF",
         "BUILD_DOCS": "ON",
@@ -51,6 +54,7 @@
       "binaryDir": "${sourceDir}/build/clang-tidy",
       "generator": "Ninja",
       "cacheVariables": {
+        "@CPP_LIBRARY_INSTALL_OPTION@": "OFF",
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_TESTING": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -66,6 +70,7 @@
       "binaryDir": "${sourceDir}/build/init",
       "generator": "Ninja",
       "cacheVariables": {
+        "@CPP_LIBRARY_INSTALL_OPTION@": "OFF",
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_TESTING": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -81,6 +86,7 @@
       "binaryDir": "${sourceDir}/build/install",
       "generator": "Ninja",
       "cacheVariables": {
+        "@CPP_LIBRARY_INSTALL_OPTION@": "ON",
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_TESTING": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
