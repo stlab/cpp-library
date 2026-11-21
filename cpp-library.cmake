@@ -336,11 +336,12 @@ function(cpp_library_setup)
 
     _cpp_library_setup_package_test("${PACKAGE_NAME}")
 
-    # Copy static template files (like .clang-format, .gitignore, CMakePresets.json, etc.)
+    # Copy static templates and configure project-specific presets and CI.
+    get_target_property(install_option "${ARG_NAME}" _CPP_LIBRARY_INSTALL_OPTION)
     if(DEFINED CPP_LIBRARY_FORCE_INIT AND CPP_LIBRARY_FORCE_INIT)
-        _cpp_library_copy_templates("${PACKAGE_NAME}" FORCE_INIT)
+        _cpp_library_copy_templates("${PACKAGE_NAME}" INSTALL_OPTION "${install_option}" FORCE_INIT)
     else()
-        _cpp_library_copy_templates("${PACKAGE_NAME}")
+        _cpp_library_copy_templates("${PACKAGE_NAME}" INSTALL_OPTION "${install_option}")
     endif()
 
     # Download doctest if we'll need it for tests or examples

@@ -57,27 +57,6 @@ jobs:
       - name: Test
         run: ctest --preset=test
 
-      - name: Build and Install
-        run: |
-          cmake --preset=default
-          cmake --build --preset=default
-          cmake --install build/default --prefix "${{ runner.temp }}/install"
-        env:
-          CC: ${{ matrix.cc }}
-          CXX: ${{ matrix.cxx }}
-        if: ${{ matrix.cc }}
-
-      - name: Build and Install
-        run: |
-          cmake --preset=default
-          cmake --build --preset=default
-          cmake --install build/default --prefix "${{ runner.temp }}/install"
-        if: ${{ !matrix.cc }}
-
-      - name: Check installed package artifacts
-        run: |
-          cmake "-DPACKAGE_TEST_PREFIX=${{ runner.temp }}/install" -P build/default/cpp-library-test-package.cmake
-
   clang-tidy:
     runs-on: ubuntu-latest
 

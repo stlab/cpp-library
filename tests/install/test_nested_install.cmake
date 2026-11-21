@@ -183,9 +183,62 @@ function(run_invalid_case invalid clean target)
     message(STATUS "PASS invalid-${invalid}: isolated '${diagnostic}' / '${target}'")
 endfunction()
 
+# Checks setup ordering without adding installation or consumer tests.
+function(run_order_case name)
+    set(case_root "${test_root}/${name}")
+    set(source "${case_root}/source")
+    set(binary "${case_root}/build")
+    file(MAKE_DIRECTORY "${source}")
+    file(COPY "${CMAKE_CURRENT_LIST_DIR}/fixtures/nested/" DESTINATION "${source}")
+    set(args -DDEPENDENCIES_FIRST=ON -DLEGACY_OPTIONS=ON)
+    set(expect_failure TRUE)
+    set(attempts 1)
+    if(name STREQUAL "order-explicit-on")
+        list(APPEND args -DSTLAB_INSTALL=ON)
+    elseif(name STREQUAL "order-explicit-off")
+        list(APPEND args -DSTLAB_INSTALL=OFF)
+    elseif(name STREQUAL "order-reconfigure")
+        set(attempts 2)
+    elseif(name STREQUAL "order-custom" OR name STREQUAL "order-siblings")
+        set(args -DDEPENDENCIES_FIRST=ON)
+        set(expect_failure FALSE)
+        if(name STREQUAL "order-siblings")
+            list(APPEND args -DSIBLING_PROJECT=ON)
+        endif()
+    elseif(name STREQUAL "order-external-source")
+        file(RENAME "${source}/leaf" "${case_root}/external-leaf")
+        list(APPEND args "-DLEAF_SOURCE_DIR=${case_root}/external-leaf")
+    endif()
+    foreach(attempt RANGE 1 ${attempts})
+        execute_process(
+            COMMAND "${CMAKE_COMMAND}" -S "${source}" -B "${binary}" -G Ninja
+                "-DTOOLKIT_SOURCE=${toolkit_source}" ${args}
+            RESULT_VARIABLE result OUTPUT_VARIABLE out ERROR_VARIABLE err)
+        set(output "${out}\n${err}")
+        if(expect_failure)
+            if(result EQUAL 0)
+                message(FATAL_ERROR "${name}: reversed shared-option setup order was accepted")
+            endif()
+            string(REGEX REPLACE "[ \r\n]+" " " output "${output}")
+            foreach(part IN ITEMS "parent" "leaf" "STLAB_INSTALL"
+                    "Call cpp_library_setup() before loading dependencies")
+                string(FIND "${output}" "${part}" found)
+                if(found LESS 0)
+                    message(FATAL_ERROR "${name}: missing '${part}' in diagnostic:\n${output}")
+                endif()
+            endforeach()
+        elseif(NOT result EQUAL 0)
+            message(FATAL_ERROR "${name}: independent projects rejected:\n${output}")
+        endif()
+    endforeach()
+    message(STATUS "PASS ${name}: setup ordering")
+endfunction()
+
 # Separate child script invocations let all expected RED failures be inspected in one run.
 if(DEFINED CASE)
-    if(CASE STREQUAL "both")
+    if(CASE MATCHES "^order-")
+        run_order_case("${CASE}")
+    elseif(CASE STREQUAL "both")
         run_case(both TRUE TRUE OFF -DSTLAB_PARENT_INSTALL=ON -DSTLAB_LEAF_INSTALL=ON -DLEGACY_OFF=ON)
     elseif(CASE STREQUAL "both-shared")
         run_case(both-shared TRUE TRUE ON -DSTLAB_PARENT_INSTALL=ON -DSTLAB_LEAF_INSTALL=ON)
@@ -251,7 +304,9 @@ if(DEFINED CASE)
     return()
 endif()
 
-foreach(case both both-shared parent-only leaf-only custom-defaults legacy-on legacy-off legacy-defaults
+foreach(case order-default order-explicit-on order-explicit-off order-reconfigure
+    order-custom order-siblings order-external-source
+    both both-shared parent-only leaf-only custom-defaults legacy-on legacy-off legacy-defaults
     custom-datadir no-licenses no-leaf-license disabled-missing-license
     duplicate-license-files colliding-license-files
     invalid-parent invalid-leaf missing-option missing-license empty-license-files)

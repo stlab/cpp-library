@@ -290,7 +290,7 @@ jobs:
       - name: Validate template files
         run: |
           # Check that all template files exist
-          test -f templates/CMakePresets.json
+          test -f templates/CMakePresets.json.in
           test -f templates/Config.cmake.in
           test -f templates/Doxyfile.in
           test -f templates/custom.css

@@ -443,6 +443,29 @@ function(_cpp_library_deferred_generate_config TARGET_NAME)
     message(STATUS "cpp-library: Generated ${ARG_PACKAGE_NAME}Config.cmake with dependencies")
 endfunction()
 
+# Rejects setup after a descendant project using the same installation switch.
+# Repeated setup in one project is allowed; ancestor marking takes O(directory depth).
+function(_cpp_library_check_install_order INSTALL_OPTION)
+    set(property "_CPP_LIBRARY_INSTALL_ORDER_${INSTALL_OPTION}")
+    get_property(already_setup DIRECTORY "${PROJECT_SOURCE_DIR}" PROPERTY "${property}_SETUP")
+    if(already_setup)
+        return()
+    endif()
+    get_property(descendant DIRECTORY "${PROJECT_SOURCE_DIR}" PROPERTY "${property}_DESCENDANT")
+    if(NOT "${descendant}" STREQUAL "")
+        message(FATAL_ERROR
+            "cpp-library: ${descendant} called cpp_library_setup() before ${PROJECT_NAME}; "
+            "both use ${INSTALL_OPTION}. "
+            "Call cpp_library_setup() before loading dependencies in ${PROJECT_NAME}.")
+    endif()
+    set_property(DIRECTORY "${PROJECT_SOURCE_DIR}" PROPERTY "${property}_SETUP" TRUE)
+    get_directory_property(parent DIRECTORY "${PROJECT_SOURCE_DIR}" PARENT_DIRECTORY)
+    while(parent)
+        set_property(DIRECTORY "${parent}" PROPERTY "${property}_DESCENDANT" "${PROJECT_NAME}")
+        get_directory_property(parent DIRECTORY "${parent}" PARENT_DIRECTORY)
+    endwhile()
+endfunction()
+
 # Configures CMake install rules for library target and package config files.
 # - Precondition: NAME, PACKAGE_NAME, VERSION, and NAMESPACE specified; target NAME exists
 # - Postcondition: install rules created for target, config files, and export with NAMESPACE:: prefix
@@ -489,6 +512,8 @@ function(_cpp_library_setup_install)
         string(TOUPPER "${ARG_NAMESPACE}" NAMESPACE_UPPER)
         set(install_option "${NAMESPACE_UPPER}_INSTALL")
     endif()
+    _cpp_library_check_install_order("${install_option}")
+    set_property(TARGET "${ARG_NAME}" PROPERTY _CPP_LIBRARY_INSTALL_OPTION "${install_option}")
     option(${install_option} "Enable installation of ${ARG_PACKAGE_NAME}" ${PROJECT_IS_TOP_LEVEL})
     
     # Check if installation is enabled

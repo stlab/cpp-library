@@ -17,7 +17,7 @@ Modern CMake template for C++ libraries with comprehensive infrastructure.
 - **Testing**: Integrated [doctest](https://github.com/doctest/doctest) with CTest and compile-fail test support
 - **Documentation**: [Doxygen](https://www.doxygen.nl/) with [doxygen-awesome-css](https://github.com/jothepro/doxygen-awesome-css) theme
 - **Development Tools**: [clangd](https://clangd.llvm.org/) integration, CMakePresets.json, [clang-tidy](https://clang.llvm.org/extra/clang-tidy/) support
-- **CI/CD**: [GitHub Actions](https://docs.github.com/en/actions) workflows with multi-platform testing and installation verification
+- **CI/CD**: [GitHub Actions](https://docs.github.com/en/actions) workflows with multi-platform source builds and testing
 - **Dependency Management**: [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) integration
 
 ## Quick reference
@@ -31,9 +31,12 @@ Use this order in your top-level `CMakeLists.txt`:
 | --- | --- |
 | 1 | Load CPM and cpp-library, as shown in [Manual Setup](#manual-setup). |
 | 2 | Call [`cpp_library_enable_dependency_tracking()`](#cpp_library_enable_dependency_tracking) **before `project()`**. |
-| 3 | Call `project(... LANGUAGES CXX)`, then declare dependencies with `CPMAddPackage()` or `find_package()`. |
+| 3 | Call `project(... LANGUAGES CXX)`. |
 | 4 | Call `include(CTest)` at directory scope to define `BUILD_TESTING`. |
 | 5 | Call [`cpp_library_setup()`](#cpp_library_setup), using the [file-resolution conventions](#path-conventions). |
+| 6 | Declare dependencies with `CPMAddPackage()` or `find_package()`, then link them to your library. |
+
+Declare dependencies after `cpp_library_setup()`.
 
 For custom target setup, see [`cpp_library_set_version()`](#cpp_library_set_version).
 For non-namespaced dependency targets, see [dependency mapping](#non-namespaced-target-error).
@@ -223,7 +226,11 @@ against dependencies fetched from source in the same build is not supported.
 Source consumption requires no special build/install-interface wrappers.
 CMake checks installation exports during configuration/generation, before
 `cmake --install` runs. For source-only builds without installed dependencies,
-disable the component's installation option.
+disable the component's installation option. The generated `default`, `test`,
+`docs`, `clang-tidy`, and `init` presets do this automatically; the `install`
+preset enables it. Presets use your package's installation-option name, including
+a custom `INSTALL_OPTION`. Configuring without a preset preserves the
+`PROJECT_IS_TOP_LEVEL` default.
 
 If system-wide deployment or a package manager requires installation, use:
 
@@ -244,10 +251,18 @@ rather than falling back to source. It does not verify your project's installed
 package config or dependency closure. See the
 [CPM.cmake documentation](https://github.com/cpm-cmake/CPM.cmake#cpm_use_local_packages).
 
-The generated CI package check verifies only that the root package's
-`Config.cmake`, `ConfigVersion.cmake`, and `Targets.cmake` files exist and appear in
-the install manifest. It does not load the package or check that its dependencies
-are installed. Report installation failures if you encounter them.
+Generated CI builds and tests from source; it does not test installation.
+If you want installation testing, provide a separate workflow that prepares
+dependencies and installs your package. No installation-specific changes to your
+`CMakeLists.txt` are required. See [Test installation in your own workflow](docs/installation-testing.md)
+for a cel-euclid example with GLM and the CEL packages.
+
+cpp-library generates `cpp-library-test-package.cmake` in your build directory
+for optional artifact checking. It checks that the root package's `Config.cmake`,
+`ConfigVersion.cmake`, and `Targets.cmake` files exist and appear in the install
+manifest. It does not load the package or check its dependency closure.
+To update existing generated CI and presets, use the
+[template regeneration procedure](#updating-cpp-library).
 
 **Controlling installation**: The uppercase `${NAMESPACE}_INSTALL` option controls whether installation is enabled (defaults to `PROJECT_IS_TOP_LEVEL`). Use `-D${NAMESPACE}_INSTALL=ON/OFF` to override:
 
