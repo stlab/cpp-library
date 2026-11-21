@@ -25,13 +25,97 @@ endif()
 if(DEFINED FIXTURE_CPP_VERSION)
     set(version_args REQUIRES_CPP_VERSION "${FIXTURE_CPP_VERSION}")
 endif()
+if(CHECK_THREADS)
+    include(CTest)
+    include("${TOOLKIT_SOURCE}/tests/setup/fixtures/mock_doctest.cmake")
+    set(test_args TESTS thread_test.cpp EXAMPLES thread_example.cpp)
+    if(DEFINED FIXTURE_ENABLE_THREADS)
+        set(thread_args ENABLE_THREADS "${FIXTURE_ENABLE_THREADS}")
+    elseif(MISSING_THREADS_VALUE)
+        set(thread_args ENABLE_THREADS)
+    endif()
+    if(EXPECT_THREADS)
+        if(FORCE_PTHREAD_FLAG AND UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+            set(CMAKE_HAVE_LIBC_PTHREAD FALSE)
+        endif()
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/include/fixture/thread.hpp" [=[
+#pragma once
+#include <latch>
+#include <thread>
+inline int thread_value() {
+    int result = 0;
+    std::latch ready(1);
+    std::jthread worker([&] { result = 42; ready.count_down(); });
+    ready.wait();
+    worker.join();
+    return result;
+}
+]=])
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/src/sample.cpp" [=[
+#include <fixture/thread.hpp>
+#include <cpp-library/testing.hpp>
+namespace fixture { int sample() { return thread_value(); } }
+#if CPP_LIBRARY_TESTING()
+const int embedded_thread_result = thread_value();
+#endif
+]=])
+        set(thread_main [=[
+#include <fixture/thread.hpp>
+#include <fixture/sample.hpp>
+int main() {
+    if (thread_value() != 42) return 1;
+#ifndef HEADER_ONLY
+    if (fixture::sample() != 42) return 2;
+#endif
+    return 0;
+}
+]=])
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/tests/thread_test.cpp" "${thread_main}")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/examples/thread_example.cpp" "${thread_main}")
+        if(OMIT_SOURCES)
+            add_compile_definitions(HEADER_ONLY)
+        endif()
+    else()
+        set(CMAKE_DISABLE_FIND_PACKAGE_Threads TRUE)
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/tests/thread_test.cpp" "int main() { return 0; }\n")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/examples/thread_example.cpp" "int main() { return 0; }\n")
+    endif()
+endif()
 cpp_library_setup(
     DESCRIPTION "Consumer-selected target type fixture"
     NAMESPACE fixture
     HEADERS sample.hpp
     ${version_args}
+    ${thread_args}
     ${test_args}
     ${source_args})
+if(CHECK_THREADS)
+    if(BUILD_SHARED_LIBS AND NOT OMIT_SOURCES)
+        set_target_properties(sample PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    endif()
+    get_target_property(links sample INTERFACE_LINK_LIBRARIES)
+    _cpp_library_generate_dependencies(dependencies sample fixture)
+    if(EXPECT_THREADS)
+        if(NOT "Threads::Threads" IN_LIST links OR NOT dependencies MATCHES "find_dependency\\(Threads\\)")
+            message(FATAL_ERROR "Missing transitive thread dependency: ${links}; ${dependencies}")
+        endif()
+        if(FORCE_PTHREAD_FLAG AND UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+            get_target_property(options Threads::Threads INTERFACE_COMPILE_OPTIONS)
+            if(NOT options MATCHES "-pthread")
+                message(FATAL_ERROR "Explicit pthread flag case did not supply compile flags: ${options}")
+            endif()
+        endif()
+    elseif(TARGET Threads::Threads OR "Threads::Threads" IN_LIST links OR dependencies MATCHES "Threads")
+        message(FATAL_ERROR "Disabled threading still configured thread support")
+    endif()
+    if(NOT PROJECT_IS_TOP_LEVEL OR NOT BUILD_TESTING)
+        foreach(target thread_test thread_example sample_in_source_tests)
+            if(TARGET "${target}")
+                message(FATAL_ERROR "Unexpected development target ${target}")
+            endif()
+        endforeach()
+    endif()
+endif()
 if(CHECK_INSTALL_DIRS)
     if(NOT CMAKE_INSTALL_DATADIR STREQUAL EXPECTED_DATADIR)
         message(FATAL_ERROR "Expected DATADIR ${EXPECTED_DATADIR}, got '${CMAKE_INSTALL_DATADIR}'")
