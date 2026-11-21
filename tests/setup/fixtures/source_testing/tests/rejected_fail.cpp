@@ -1,11 +1,13 @@
-#include <cpp-library/testing.hpp>
 #include <fixture/api.hpp>
-#include "private/component.hpp"
+
+#if __has_include(<cpp-library/testing.hpp>) || __has_include("private/component.hpp")
+#error "Public compile-fail tests must not receive private include directories"
+#endif
+
+#if defined(PRIVATE_VALUE) || defined(REQUIRED_STANDARD)
+#error "Public compile-fail tests must not receive implementation-only definitions"
+#endif
 
 int main() {
-#if CPP_LIBRARY_TESTING()
     return public_value("not an argument");
-#else
-    return 0;
-#endif
 }

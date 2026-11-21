@@ -9,6 +9,7 @@
 
 TEST_CASE("compiled component") {
     CHECK(private_value() == 42);
+    CHECK(configured_private_value() == 84);
     std::ofstream marker("in-source-executions", std::ios::app);
     marker << "component\n";
     CHECK(marker.good());
