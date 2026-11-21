@@ -137,6 +137,7 @@ function(_cpp_library_setup_executables)
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
                 set_tests_properties(compile_${executable_base} PROPERTIES WILL_FAIL TRUE)
+                _cpp_library_set_test_timeout("${ARG_NAME}" "compile_${executable_base}")
             else()
                 # Regular executable - build and link normally
                 add_executable(${executable_base} "${source_dir}/${executable}")
@@ -146,6 +147,7 @@ function(_cpp_library_setup_executables)
 
                 # Register as CTest test
                 add_test(NAME ${executable_base} COMMAND ${executable_base})
+                _cpp_library_set_test_timeout("${ARG_NAME}" "${executable_base}")
 
                 # Set test properties for better IDE integration (only for tests)
                 if(ARG_TYPE STREQUAL "tests")
@@ -184,6 +186,7 @@ function(cpp_library_setup)
         NAMESPACE # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION # C++ version (default: 20)
         ENABLE_THREADS # Portable thread requirements (default: ON)
+        TEST_TIMEOUT # Generated-test timeout in seconds (default: 120)
         INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
@@ -202,13 +205,20 @@ function(cpp_library_setup)
     if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
         message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
     endif()
-    foreach(keyword DOCS_INPUTS DOCS_OPTIONS LICENSE_FILES ENABLE_THREADS)
+    foreach(keyword DOCS_INPUTS DOCS_OPTIONS LICENSE_FILES ENABLE_THREADS TEST_TIMEOUT)
         if(keyword IN_LIST ARG_KEYWORDS_MISSING_VALUES)
             message(FATAL_ERROR "cpp_library_setup: ${keyword} requires a value")
         endif()
     endforeach()
     if(NOT DEFINED ARG_ENABLE_THREADS)
         set(ARG_ENABLE_THREADS ON)
+    endif()
+    if(DEFINED ARG_TEST_TIMEOUT)
+        if(NOT ARG_TEST_TIMEOUT MATCHES "^[0-9]+$" OR
+                ARG_TEST_TIMEOUT LESS 1 OR ARG_TEST_TIMEOUT GREATER 2147483647)
+            message(FATAL_ERROR
+                "cpp_library_setup: TEST_TIMEOUT must be a positive integer in seconds (1 through 2147483647)")
+        endif()
     endif()
     set(install_args)
     if(DEFINED ARG_INSTALL_OPTION)
@@ -324,6 +334,10 @@ function(cpp_library_setup)
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
         ${install_args}
     )
+
+    if(DEFINED ARG_TEST_TIMEOUT)
+        set_property(TARGET "${ARG_NAME}" PROPERTY _CPP_LIBRARY_TEST_TIMEOUT "${ARG_TEST_TIMEOUT}")
+    endif()
 
     if(ARG_ENABLE_THREADS)
         set(THREADS_PREFER_PTHREAD_FLAG TRUE)
