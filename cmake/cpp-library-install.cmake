@@ -13,11 +13,6 @@
 # _cpp_library_setup_install() to avoid requiring project() to be called
 # when this module is loaded.
 
-# System packages that don't require version constraints in find_dependency()
-# These are commonly available system libraries where version requirements are typically not specified.
-# To extend this list in your project, use cpp_library_map_dependency() to explicitly map additional packages.
-set(_CPP_LIBRARY_SYSTEM_PACKAGES "Threads" "OpenMP" "ZLIB" "CURL" "OpenSSL")
-
 # Registers a project-local dependency mapping for find_dependency() generation.
 # - Precondition: TARGET is a namespaced target (e.g., "Qt6::Core", "stlab::enum-ops") or non-namespaced (e.g., "opencv_core")
 # - Postcondition: FIND_DEPENDENCY_CALL overrides TARGET's requirement only for libraries
@@ -133,6 +128,7 @@ endfunction()
 # - Postcondition: OUTPUT_VAR contains find_dependency() call syntax or error is raised
 # - Optional fourth argument receives the unverified dependency, or an empty string
 function(_cpp_library_resolve_dependency LIB NAMESPACE OUTPUT_VAR)
+    set(_CPP_LIBRARY_SYSTEM_PACKAGES "Threads" "OpenMP" "ZLIB" "CURL" "OpenSSL")
     if(ARGC GREATER 3)
         set(${ARGV3} "" PARENT_SCOPE)
     endif()

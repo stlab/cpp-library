@@ -505,6 +505,7 @@ cpp_library_setup(
     [DOCS_INPUTS input_list]       # Additional documentation files/directories
     [DOCS_OPTIONS setting_list]    # Additive single-line Doxygen assignments
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 20)
+    [ENABLE_THREADS ON|OFF]        # Transitive thread requirements (default: ON)
     [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
     [LICENSE_FILES file_list]      # Additional project-relative or absolute license/notice files
 )
@@ -530,6 +531,15 @@ cpp_library_setup(
   and example targets default to `CXX_EXTENSIONS OFF` unless
   `CMAKE_CXX_EXTENSIONS` is set by the caller. This does not impose a dialect on
   consumers or enable pedantic diagnostics.
+- `ENABLE_THREADS` defaults to `ON`. Setup requires CMake's `Threads` package and
+  links `Threads::Threads` publicly for compiled libraries or through the interface
+  for header-only libraries. Production code, generated tests, in-source test
+  runners, examples, and downstream consumers inherit the platform's thread
+  requirements, including compiler/linker flags when needed. Installed packages
+  declare `find_dependency(Threads)`.
+  This applies even when `BUILD_TESTING=OFF` or the library is a subproject.
+  Pass `ENABLE_THREADS OFF` to skip automatic thread discovery and linkage;
+  this does not disable C++ thread APIs or remove thread requirements you add manually.
 
 ### Documentation configuration
 

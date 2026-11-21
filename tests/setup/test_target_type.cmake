@@ -16,6 +16,11 @@ function(run_case name shared expected_type)
     file(MAKE_DIRECTORY "${case_source}")
     file(COPY "${CMAKE_CURRENT_LIST_DIR}/fixtures/target_type/"
         DESTINATION "${case_source}")
+    if(name MATCHES "^threads_nested")
+        file(WRITE "${test_root}/${name}/CMakeLists.txt"
+            "cmake_minimum_required(VERSION 3.24)\ninclude(\"\${TOOLKIT_SOURCE}/cpp-library.cmake\")\ncpp_library_enable_dependency_tracking()\nproject(parent LANGUAGES CXX)\nenable_testing()\nadd_subdirectory(source)\n")
+        set(case_source "${test_root}/${name}")
+    endif()
 
     execute_process(
         COMMAND "${CMAKE_COMMAND}" -S "${case_source}" -B "${case_binary}" -G Ninja
@@ -26,7 +31,15 @@ function(run_case name shared expected_type)
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
             ${ARGN}
         RESULT_VARIABLE result OUTPUT_VARIABLE out ERROR_VARIABLE err)
-    if(result EQUAL 0 AND name MATCHES "^dialect_")
+    if(name STREQUAL "threads_missing_value")
+        if(NOT result EQUAL 0 AND "${out}${err}" MATCHES "ENABLE_THREADS requires a value")
+            set(result 0)
+            set(err "")
+        else()
+            set(result 1)
+            set(err "Expected a missing ENABLE_THREADS value diagnostic:\n${out}\n${err}")
+        endif()
+    elseif(result EQUAL 0 AND name MATCHES "^(dialect_|threads_)")
         execute_process(COMMAND "${CMAKE_COMMAND}" --build "${case_binary}"
             RESULT_VARIABLE result OUTPUT_VARIABLE out ERROR_VARIABLE err)
         if(result EQUAL 0)
@@ -86,6 +99,22 @@ run_case(dialect_on OFF STATIC_LIBRARY -DCHECK_DIALECT=ON
     -DCMAKE_CXX_EXTENSIONS=ON -DEXPECTED_EXTENSIONS=ON -DEXPECTED_CALLER_EXTENSIONS=ON)
 run_case(dialect_off OFF STATIC_LIBRARY -DCHECK_DIALECT=ON
     -DCMAKE_CXX_EXTENSIONS=OFF -DEXPECTED_EXTENSIONS=OFF -DEXPECTED_CALLER_EXTENSIONS=OFF)
+run_case(threads_default OFF STATIC_LIBRARY -DCHECK_THREADS=ON -DEXPECT_THREADS=ON)
+run_case(threads_shared ON SHARED_LIBRARY -DCHECK_THREADS=ON -DEXPECT_THREADS=ON
+    -DFIXTURE_ENABLE_THREADS=ON -DFORCE_PTHREAD_FLAG=ON)
+run_case(threads_interface OFF INTERFACE_LIBRARY -DOMIT_SOURCES=ON
+    -DCHECK_THREADS=ON -DEXPECT_THREADS=ON)
+run_case(threads_disabled OFF STATIC_LIBRARY -DCHECK_THREADS=ON
+    -DEXPECT_THREADS=OFF -DFIXTURE_ENABLE_THREADS=OFF)
+run_case(threads_interface_disabled OFF INTERFACE_LIBRARY -DOMIT_SOURCES=ON
+    -DCHECK_THREADS=ON -DEXPECT_THREADS=OFF -DFIXTURE_ENABLE_THREADS=OFF)
+run_case(threads_without_tests OFF STATIC_LIBRARY -DCHECK_THREADS=ON
+    -DEXPECT_THREADS=ON -DBUILD_TESTING=OFF)
+run_case(threads_nested OFF STATIC_LIBRARY -DCHECK_THREADS=ON -DEXPECT_THREADS=ON)
+run_case(threads_nested_disabled OFF STATIC_LIBRARY -DCHECK_THREADS=ON
+    -DEXPECT_THREADS=OFF -DFIXTURE_ENABLE_THREADS=OFF)
+run_case(threads_missing_value OFF STATIC_LIBRARY -DCHECK_THREADS=ON
+    -DEXPECT_THREADS=OFF -DMISSING_THREADS_VALUE=ON)
 
 file(REMOVE_RECURSE "${test_root}")
 if(failed_cases)

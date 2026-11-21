@@ -183,6 +183,7 @@ function(cpp_library_setup)
         DESCRIPTION # Description string
         NAMESPACE # Namespace (e.g., "stlab")
         REQUIRES_CPP_VERSION # C++ version (default: 20)
+        ENABLE_THREADS # Portable thread requirements (default: ON)
         INSTALL_OPTION # Custom installation option name
     )
     set(multiValueArgs
@@ -201,11 +202,14 @@ function(cpp_library_setup)
     if("INSTALL_OPTION" IN_LIST ARG_KEYWORDS_MISSING_VALUES)
         message(FATAL_ERROR "cpp_library_setup: INSTALL_OPTION requires a value")
     endif()
-    foreach(keyword DOCS_INPUTS DOCS_OPTIONS LICENSE_FILES)
+    foreach(keyword DOCS_INPUTS DOCS_OPTIONS LICENSE_FILES ENABLE_THREADS)
         if(keyword IN_LIST ARG_KEYWORDS_MISSING_VALUES)
             message(FATAL_ERROR "cpp_library_setup: ${keyword} requires a value")
         endif()
     endforeach()
+    if(NOT DEFINED ARG_ENABLE_THREADS)
+        set(ARG_ENABLE_THREADS ON)
+    endif()
     set(install_args)
     if(DEFINED ARG_INSTALL_OPTION)
         list(APPEND install_args INSTALL_OPTION "${ARG_INSTALL_OPTION}")
@@ -320,6 +324,16 @@ function(cpp_library_setup)
         REQUIRES_CPP_VERSION "${ARG_REQUIRES_CPP_VERSION}"
         ${install_args}
     )
+
+    if(ARG_ENABLE_THREADS)
+        set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+        find_package(Threads REQUIRED)
+        if(ARG_SOURCES)
+            target_link_libraries("${ARG_NAME}" PUBLIC Threads::Threads)
+        else()
+            target_link_libraries("${ARG_NAME}" INTERFACE Threads::Threads)
+        endif()
+    endif()
 
     cpp_library_add_clangd_headers(TARGET "${ARG_NAME}" HEADERS ${GENERATED_HEADERS})
 
