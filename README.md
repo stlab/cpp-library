@@ -506,6 +506,7 @@ cpp_library_setup(
     [DOCS_OPTIONS setting_list]    # Additive single-line Doxygen assignments
     [REQUIRES_CPP_VERSION 17|20|23] # C++ version (default: 20)
     [ENABLE_THREADS ON|OFF]        # Transitive thread requirements (default: ON)
+    [TEST_TIMEOUT seconds]         # Per-test timeout in seconds (default: 120)
     [INSTALL_OPTION option_name]   # Independent installation control (default: uppercase NAMESPACE_INSTALL)
     [LICENSE_FILES file_list]      # Additional project-relative or absolute license/notice files
 )
@@ -540,6 +541,32 @@ cpp_library_setup(
   This applies even when `BUILD_TESTING=OFF` or the library is a subproject.
   Pass `ENABLE_THREADS OFF` to skip automatic thread discovery and linkage;
   this does not disable C++ thread APIs or remove thread requirements you add manually.
+
+### Test timeouts
+
+Generated unit tests, examples, compile-fail checks, and in-source test runners
+each have a 120-second CTest `TIMEOUT`. Set `TEST_TIMEOUT` to change this
+project-wide limit. Values must be whole seconds from 1 through 2147483647;
+zero (unlimited), missing, fractional, and nonnumeric values fail configuration.
+Manually registered tests are unchanged.
+
+For an intentionally longer test, set a finite per-test exception after setup:
+
+```cmake
+cpp_library_setup(
+    DESCRIPTION "My library"
+    NAMESPACE mylib
+    HEADERS api.hpp
+    TESTS fast_test.cpp slow_test.cpp
+    TEST_TIMEOUT 120
+)
+set_tests_properties(slow_test PROPERTIES TIMEOUT 300)
+```
+
+These properties apply to ordinary CTest runs, generated test presets, and CI.
+Inspect the effective limits with `ctest --show-only=json-v1` in your build
+directory. A timeout fails the test, including compile-fail checks marked
+`WILL_FAIL`.
 
 ### Documentation configuration
 

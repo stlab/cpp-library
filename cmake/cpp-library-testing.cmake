@@ -5,6 +5,15 @@
 # Provides cpp_library_copy_runtime_dlls for custom and toolkit-created executables.
 # _cpp_library_setup_testing delegates to _cpp_library_setup_executables for compatibility.
 
+# Sets a generated test's project timeout, defaulting to 120 seconds.
+function(_cpp_library_set_test_timeout library_target test_name)
+    get_target_property(timeout "${library_target}" _CPP_LIBRARY_TEST_TIMEOUT)
+    if(NOT timeout)
+        set(timeout 120)
+    endif()
+    set_tests_properties("${test_name}" PROPERTIES TIMEOUT "${timeout}")
+endfunction()
+
 # Adds a private, always-defined function-style testing configuration.
 function(_cpp_library_setup_testing_config)
     cmake_parse_arguments(ARG "" "TARGET;ENABLED" "" ${ARGN})
@@ -115,6 +124,7 @@ function(_cpp_library_setup_test_support)
                 [[${ARG_TARGET}]] [[${runner}]])")
         cpp_library_copy_runtime_dlls("${runner}")
         add_test(NAME "${runner}" COMMAND "${runner}")
+        _cpp_library_set_test_timeout("${ARG_TARGET}" "${runner}")
         set_tests_properties("${runner}" PROPERTIES LABELS doctest
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
     endif()

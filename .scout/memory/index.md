@@ -3,12 +3,13 @@
 ## Knowledge
 
 - [[knowledge/architecture-overview.md|Architecture Overview]] (concept, 0.80) `architecture-overview` `cpp-library-architecture` `cpp-library-overview` `toolkit-architecture` `cmake-infrastructure-overview`
+- [[knowledge/assign-generated-test-timeouts-at-registration-to-preserve-per-test-overrides.md|Assign generated-test timeouts at registration to preserve per-test overrides]] (pattern, 1.00) `ctest` `timeouts` `test-support` `deferred-configuration`
 - [[knowledge/consumer-lifecycle-and-template-overwrite-controls.md|Consumer Lifecycle and Template Overwrite Controls]] (decision, 0.75) `template-initialization` `cpp-library-force-init` `project-is-top-level` `lightweight-consumer-mode` `template-copying`
 - [[knowledge/deferred-install-dependency-validation-and-config-generation.md|Deferred Install Dependency Validation and Config Generation]] (pattern, 0.75) `deferred-install` `install-validation` `untracked-dependencies` `cmake-language-defer` `find-dependency`
 - [[knowledge/dependency-mappings-follow-the-exported-target-s-owning-project.md|Dependency mappings follow the exported target's owning project]] (discovery, 0.99) `cmake` `dependency-mappings` `project-scope` `deferred-install`
 - [[knowledge/dependency-tracking-lifecycle-and-provider-ordering.md|Dependency Tracking Lifecycle and Provider Ordering]] (observation, 0.75) `dependency-tracking` `dependency-provider` `cpp-library-enable-dependency-tracking` `cmake-project-top-level-includes` `set-dependency-provider`
 - [[knowledge/documentation-setup-and-theme-integration-with-build-docs.md|Documentation Setup and Theme Integration with BUILD_DOCS]] (pattern, 0.75) `build-docs` `doxygen` `doxygen-awesome-css` `documentation-generation` `docs-target`
-- [[knowledge/generated-ci-package-artifact-check.md|Generated CI package artifact check]] (decision, 0.95) `ci` `packaging` `cmake`
+- [[knowledge/generated-ci-package-artifact-check.md|Generated CI package artifact check]] (decision, 0.98) `ci` `packaging` `cmake` `source-builds`
 - [[knowledge/installation-supports-separately-installed-dependencies-not-mixed-source-export-workarounds.md|Installation supports separately installed dependencies, not mixed source export workarounds]] (decision, 0.99) `cmake` `installation` `cpm` `supported-boundary`
 - [[knowledge/public-header-verification-must-participate-in-the-default-build.md|Public-header verification must participate in the default build]] (pattern, 0.99) `cmake` `header-verification` `testing` `file-sets`
 - [[knowledge/static-and-in-source-tests-require-separate-implementation-compilations.md|Static and in-source tests require separate implementation compilations]] (decision, 0.99) `cmake` `testing` `doctest` `static-linkage` `private-components` `generated-headers`

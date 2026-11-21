@@ -38,6 +38,9 @@ jobs:
       - name: Run static and in-source unit testing checks
         run: cmake -P tests/setup/test_source_testing.cmake
 
+      - name: Run generated-test timeout checks
+        run: cmake -P tests/setup/test_timeouts.cmake
+
       - name: Run project version override tests
         run: cmake -P tests/setup/test_version_override.cmake
 
@@ -87,6 +90,9 @@ jobs:
 
       - name: Run static and in-source unit testing checks
         run: cmake -P tests/setup/test_source_testing.cmake
+
+      - name: Run generated-test timeout checks
+        run: cmake -P tests/setup/test_timeouts.cmake
 
       - name: Run project version override tests
         run: cmake -P tests/setup/test_version_override.cmake
